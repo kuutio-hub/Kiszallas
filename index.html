@@ -138,7 +138,8 @@
                 </div></details>
                  <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
                      <button id="manage-rates-btn" class="btn">Árlisták kezelése</button>
-                     <button id="downloadPdf" class="btn" style="background-color: var(--danger-primary); color: var(--text-primary);">PDF letöltése</button>
+                     <button id="downloadPdfSimple" class="btn">Egyszerűsített PDF</button>
+                     <button id="downloadPdfFull" class="btn" style="background-color: var(--danger-primary); color: var(--text-primary);">Részletes PDF</button>
                  </div>
             </div>
             <div class="card calculation-table">
@@ -217,8 +218,10 @@
 
         function openChartModal(){D('chart-modal').style.display='block';const f=D('chart-filters');f.innerHTML=`<input type="date" id="chart-start-date" class="form-group" title="Kezdődátum"> <input type="date" id="chart-end-date" class="form-group" title="Végdátum"> <input type="date" id="chart-single-date" class="form-group" title="Konkrét nap">`;const today=new Date();const oneYearAgo=new Date(new Date().setFullYear(today.getFullYear()-1));D('chart-start-date').value=oneYearAgo.toISOString().split('T')[0];D('chart-end-date').value=today.toISOString().split('T')[0];const draw=()=>{const d=Object.keys(state.exchangeRates).sort();const s=D('chart-start-date').value;const e=D('chart-end-date').value;const fD=d.filter(dt=>dt>=s&&dt<=e);const c=D('exchange-rate-chart').getContext('2d');const l=fD.map(dt=>new Date(dt));const v=fD.map(dt=>state.exchangeRates[dt].HUF);if(chartInstance)chartInstance.destroy();chartInstance=new Chart(c,{type:'line',data:{datasets:[{label:'EUR/HUF',data:v.map((val,idx)=>({x:l[idx],y:val})),borderColor:'rgba(99,179,237,1)',borderWidth:2,pointRadius:0,tension:0.1}]},options:{onClick:(e)=>{const p=chartInstance.getElementsAtEventForMode(e,'nearest',{intersect:true},true);if(p.length){const i=p[0].index;const r=chartInstance.data.datasets[0].data[i].y;D('exchange-rate-manual').value=r.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}},interaction:{mode:'index',intersect:false},scales:{x:{type:'time',time:{unit:'month'},ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}},y:{ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}}},plugins:{tooltip:{enabled:true},legend:{display:false}}}});};D('chart-start-date').onchange=draw;D('chart-end-date').onchange=draw;D('chart-single-date').onchange=(e)=>{const rate=state.exchangeRates[e.target.value]?.HUF;if(rate){D('exchange-rate-manual').value=rate.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}};draw();}
         
-        function generatePdf() {
-            const btn = D('downloadPdf');
+        function generatePdf({ simplified = false }) {
+            const btnId = simplified ? 'downloadPdfSimple' : 'downloadPdfFull';
+            const btn = D(btnId);
+            const originalText = btn.textContent;
             btn.textContent = 'Generálás...';
             btn.disabled = true;
 
@@ -226,7 +229,7 @@
             const res = state.calculationResults;
             if (!res) {
                 alert("Nincs mit exportálni. Kérem, végezzen el egy kalkulációt.");
-                btn.textContent = 'PDF letöltése';
+                btn.textContent = originalText;
                 btn.disabled = false;
                 return;
             }
@@ -236,134 +239,93 @@
             const discount = parseFloat(D('discount-input').value) || 0;
             const totalBeforeDiscount = convertPrice(res.totalHuf, c);
             const finalTotal = totalBeforeDiscount * (1 - (discount / 100));
+            const totalCostFinal = convertPrice(res.totalCostHuf, c);
+            const showCostColumn = !simplified && res.hasCostItems;
+
+            let summaryParts = [];
+            if (i.szerelo_fo > 0) summaryParts.push(`${i.szerelo_fo} fő szerelő (${i.szerelo_munkanap} nap, ebből ${i.szerelo_hetvegi_nap} hétvége)`);
+            if (i.mernok_fo > 0) summaryParts.push(`${i.mernok_fo} fő mérnök (${i.mernok_munkanap} nap, ebből ${i.mernok_hetvegi_nap} hétvége)`);
+            const summaryHtml = summaryParts.length > 0 ? `<div class="summary-block"><b>Adatok összesítve:</b> ${summaryParts.join('; ')}</div>` : '';
 
             let tableBodyHtml = '';
             res.breakdown.forEach(item => {
-                const unit = convertPrice(item.unitPriceHuf, c);
-                const total = convertPrice(item.totalHuf, c) * (1 - discount / 100);
+                const unitPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.unitPriceHuf, c), currencySymbol);
+                const totalRowPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.totalHuf, c) * (1 - (discount / 100)), currencySymbol);
+                const costPriceDisplay = showCostColumn ? (item.isCostItem ? formatCustomCurrency(convertPrice(item.totalCostHuf, c), currencySymbol) : '-') : '';
+                
+                let costColumnHtml = showCostColumn ? `<td class="align-right">${costPriceDisplay}</td>` : '';
+
                 tableBodyHtml += `
                     <tr>
                         <td>${item.label}</td>
                         <td class="align-right">${item.quantity.toLocaleString('hu-HU')}</td>
                         <td class="align-center">${item.unit}</td>
-                        <td class="align-right">${formatCustomCurrency(unit, currencySymbol)}</td>
-                        <td class="align-right">${formatCustomCurrency(total, currencySymbol)}</td>
+                        <td class="align-right">${unitPriceDisplay}</td>
+                        ${costColumnHtml}
+                        <td class="align-right">${totalRowPriceDisplay}</td>
                     </tr>
                 `;
             });
 
             const htmlContent = `
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="UTF-8">
-                    <style>
-                        @font-face {
-                            font-family: 'DejaVuSans';
-                            src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');
-                        }
-                        body { 
-                            font-family: 'DejaVuSans', sans-serif;
-                            font-size: 10px;
-                            color: #333;
-                        }
-                        .page {
-                            width: 180mm;
-                            margin: 0 auto;
-                        }
-                        h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
-                        .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
-                        .meta-item b { display: block; color: #666; font-size: 9px; margin-bottom: 2px; }
-                        .task-description { margin-bottom: 20px; padding: 10px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; }
-                        table { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 20px; }
-                        th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
-                        th { background-color: #f2f2f2; font-weight: bold; }
-                        .align-right { text-align: right; }
-                        .align-center { text-align: center; }
-                        .totals-table { width: 50%; margin-left: auto; }
-                        .totals-table td { border: none; padding: 4px 8px; }
-                        .totals-table .final-total { font-weight: bold; font-size: 12px; border-top: 2px solid #333; }
-                        .footer { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; }
-                        .signature-block { border-top: 1px solid #999; padding-top: 5px; }
-                    </style>
-                </head>
-                <body>
-                    <div class="page">
-                        <h1>Kiszállási és szerelési költségkalkuláció</h1>
-                        <div class="meta-grid">
-                            <div class="meta-item">
-                                <b>Ajánlatszám:</b> ${i.offer_number || '-'} <br>
-                                <b>Projektszám:</b> ${i.project_number || '-'} <br>
-                                <b>Projekt:</b> ${i.project_name || '-'}
-                            </div>
-                            <div class="meta-item" style="text-align: right;">
-                                <b>Megrendelő:</b> ${i.customer || '-'} <br>
-                                <b>Helyszín:</b> ${i.work_location || '-'} <br>
-                                <b>Dátum:</b> ${i.calculation_date ? new Date(i.calculation_date).toLocaleDateString('hu-HU') : '-'}
-                            </div>
-                        </div>
-                        
-                        ${i.feladat ? `<div class="task-description"><b>Feladat leírása:</b> ${i.feladat}</div>` : ''}
-
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Költségnem</th>
-                                    <th class="align-right">Mennyiség</th>
-                                    <th class="align-center">Egység</th>
-                                    <th class="align-right">Egységár</th>
-                                    <th class="align-right">Összesen</th>
-                                </tr>
-                            </thead>
-                            <tbody>${tableBodyHtml}</tbody>
-                        </table>
-
-                        <table class="totals-table">
-                            <tr>
-                                <td>Nettó összeg:</td>
-                                <td class="align-right">${formatCustomCurrency(totalBeforeDiscount, currencySymbol)}</td>
-                            </tr>
-                            ${discount > 0 ? `
-                            <tr>
-                                <td>Engedmény (${discount}%):</td>
-                                <td class="align-right">- ${formatCustomCurrency(totalBeforeDiscount - finalTotal, currencySymbol)}</td>
-                            </tr>` : ''}
-                            <tr>
-                                <td class="final-total">Végösszeg:</td>
-                                <td class="align-right final-total">${formatCustomCurrency(finalTotal, currencySymbol)}</td>
-                            </tr>
-                        </table>
-
-                        <div class="footer">
-                            <div class="signature-block">Megrendelő</div>
-                            <div class="signature-block">Vállalkozó</div>
-                        </div>
+                <!DOCTYPE html><html><head><meta charset="UTF-8">
+                <style>
+                    @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
+                    body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
+                    .page { width: 180mm; margin: 0 auto; }
+                    h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
+                    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
+                    .meta-item b { display: block; color: #666; font-size: 9px; margin-bottom: 2px; }
+                    .task-description, .summary-block { margin-bottom: 10px; padding: 10px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; }
+                    .summary-block { margin-bottom: 20px; }
+                    table { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 20px; }
+                    th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
+                    th { background-color: #f2f2f2; font-weight: bold; }
+                    .align-right { text-align: right; }
+                    .align-center { text-align: center; }
+                    .totals-table { width: 60%; margin-left: auto; }
+                    .totals-table td { border: none; padding: 4px 8px; }
+                    .totals-table .final-total { font-weight: bold; font-size: 12px; border-top: 2px solid #333; }
+                    .footer { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; }
+                    .signature-block { border-top: 1px solid #999; padding-top: 5px; }
+                </style></head><body><div class="page">
+                    <h1>Kiszállási és szerelési költségkalkuláció ${simplified ? '(Egyszerűsített)' : ''}</h1>
+                    <div class="meta-grid">
+                        <div class="meta-item"><b>Ajánlatszám:</b> ${i.offer_number||'-'}<br><b>Projektszám:</b> ${i.project_number||'-'}<br><b>Projekt:</b> ${i.project_name||'-'}</div>
+                        <div class="meta-item" style="text-align: right;"><b>Megrendelő:</b> ${i.customer||'-'}<br><b>Helyszín:</b> ${i.work_location||'-'}<br><b>Dátum:</b> ${i.calculation_date?new Date(i.calculation_date).toLocaleDateString('hu-HU'):'-'}</div>
                     </div>
-                </body>
-                </html>
-            `;
+                    ${i.feladat ? `<div class="task-description"><b>Feladat leírása:</b> ${i.feladat}</div>` : ''}
+                    ${summaryHtml}
+                    <table><thead><tr>
+                        <th>Költségnem</th><th class="align-right">Mennyiség</th><th class="align-center">Egység</th><th class="align-right">Egységár</th>
+                        ${showCostColumn ? `<th class="align-right">Önköltség</th>` : ''}
+                        <th class="align-right">Összesen</th>
+                    </tr></thead><tbody>${tableBodyHtml}</tbody></table>
+                    <table class="totals-table">
+                        ${showCostColumn ? `<tr><td>Önköltség összesen:</td><td class="align-right">${formatCustomCurrency(totalCostFinal, currencySymbol)}</td></tr>` : ''}
+                        <tr><td>Összesen (kedvezmény nélkül):</td><td class="align-right">${formatCustomCurrency(totalBeforeDiscount, currencySymbol)}</td></tr>
+                        ${discount > 0 ? `<tr><td>Engedmény (${discount}%):</td><td class="align-right">- ${formatCustomCurrency(totalBeforeDiscount - finalTotal, currencySymbol)}</td></tr>` : ''}
+                        <tr><td class="final-total">Nettó végösszeg:</td><td class="align-right final-total">${formatCustomCurrency(finalTotal, currencySymbol)}</td></tr>
+                    </table>
+                    <div class="footer"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó</div></div>
+                </div></body></html>`;
             
             const opt = {
                 margin: [15, 10, 15, 10],
-                filename: `Kalkulacio_${i.offer_number || 'ajanlat'}_${i.project_name || 'projekt'}.pdf`.replace(/[\\s/\\?%*:|"<>]/g, '_'),
+                filename: `Kalkulacio_${simplified ? 'egyszerusitett_' : ''}${i.offer_number || 'ajanlat'}_${i.project_name || 'projekt'}.pdf`.replace(/[\\s/\\?%*:|"<>]/g, '_'),
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
 
-            html2pdf().set(opt).from(htmlContent).save().then(() => {
-                btn.textContent = 'PDF letöltése';
-                btn.disabled = false;
-            }).catch(err => {
-                console.error("PDF generálási hiba:", err);
-                alert("Hiba történt a PDF generálása közben.");
-                btn.textContent = 'PDF letöltése';
+            html2pdf().set(opt).from(htmlContent).save().finally(() => {
+                btn.textContent = originalText;
                 btn.disabled = false;
             });
         }
         
         async function init(){
-            const version = "v2.0.3";
+            const version = "v2.0.4";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -379,7 +341,8 @@
             D('theme-switcher').onclick=()=>{document.body.classList.toggle('light-mode');localStorage.setItem('theme',document.body.classList.contains('light-mode')?'light':'dark');};
             D('manage-rates-btn').onclick=openRateEditor;
             D('show-chart-btn').onclick=openChartModal;
-            D('downloadPdf').addEventListener('click', generatePdf);
+            D('downloadPdfFull').addEventListener('click', () => generatePdf({ simplified: false }));
+            D('downloadPdfSimple').addEventListener('click', () => generatePdf({ simplified: true }));
             D('save-other-cost-btn').onclick = () => {
                 const btn = D('save-other-cost-btn');
                 const originalText = btn.textContent;
