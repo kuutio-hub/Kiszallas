@@ -1,5 +1,14 @@
 # Változási Napló
 
+## v2.3.1 - Felhasználói Kényelem és Biztonsági Funkciók
+*Dátum: 2024-05-22*
+
+### Új funkciók és fejlesztések
+- **Biztonságos Árlista Mentés:** Az árlisták mentésekor egy megerősítő párbeszédablak jelenik meg, amely lehetőséget ad a **felülírásra** vagy a **mentés másként** opcióra, megelőzve a véletlen adatvesztést.
+- **Reset Gomb:** A fejlécbe egy új "Visszaállítás" gomb került, amellyel egy kattintással, megerősítés után törölhető a teljes űrlap tartalma.
+- **Azonnali Kedvezmény Számítás:** A kedvezmény alkalmazása mostantól valós időben, már gépelés közben frissíti a végösszeget.
+- **Verziózás Finomítása:** A felhasználói visszajelzés alapján a verziókezelés részletesebbé vált, hogy jobban tükrözze a változtatások mértékét.
+
 ## v2.3.0 - Logikai Pontosítás és Funkcióbővítés
 *Dátum: 2024-05-22*
 

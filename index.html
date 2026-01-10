@@ -42,7 +42,7 @@
         .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; }
         .seahawks-select { background-color: var(--seahawks-navy) !important; color: var(--seahawks-green) !important; font-weight: bold; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
         .header-action-btn { cursor: pointer; background: var(--bg-secondary); border-left: 1px solid var(--border-color); padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
-        #theme-switcher svg, #refresh-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
+        #theme-switcher svg, #refresh-btn svg, #reset-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
         .sun-icon, .moon-icon { transition: opacity 0.3s ease; }
         .light-mode .sun-icon { opacity: 0; position: absolute; } .light-mode .moon-icon { opacity: 1; }
         .sun-icon { opacity: 1; } .moon-icon { opacity: 0; position: absolute; }
@@ -125,6 +125,9 @@
             </div>
             <div class="header-item"><span class="header-item-title">Engedmény (%)</span><input type="number" id="discount-input" placeholder="0" min="0" max="100"></div>
             <div class="header-item" style="border:none; box-shadow:none; background:transparent; flex-grow:0; display:flex; gap: 1rem;">
+                <div id="reset-btn" class="header-action-btn" title="Visszaállítás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q134 0 227 93t93 227h-60q0-117-76.5-198.5T480-820q-117 0-198.5 81.5T200-540v80h140v60H160v-180h60v80q0-75 44-137.5T377-740q53-42 121-42 100 0 170 70t70 170q0 100-70 170t-170 70q-46 0-88-18t-73-50l-51 34q36 43 85 66.5T480-80Z"/></svg>
+                </div>
                 <div id="refresh-btn" class="header-action-btn" title="Frissítés és újraszámolás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
                     <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h60v280H500v-60h168q-44-74-118-117t-150-43q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 142-44.5T716-291l43 38q-54 62-131 98.5T480-160Z"/></svg>
                 </div>
@@ -188,10 +191,22 @@
     <!-- Modals -->
     <div id="rate-modal" class="modal"><div class="modal-content"><div class="modal-header"></div><div class="modal-body" id="rate-modal-body"></div></div></div>
     <div id="chart-modal" class="modal"><div class="modal-content"><div class="modal-header"><h2>EUR/HUF Árfolyam Előzmények</h2><button class="modal-close-btn">&times;</button></div><div class="modal-body"><div id="chart-filters" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;"></div><canvas id="exchange-rate-chart"></canvas></div></div></div>
+    <div id="save-confirm-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header"><h2>Mentés megerősítése</h2></div>
+          <div class="modal-body">
+            <p id="save-confirm-message" style="margin-bottom: 1.5rem;"></p>
+            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+              <button id="confirm-overwrite-btn" class="btn">Felülírás</button>
+              <button id="confirm-save-as-btn" class="btn">Mentés másként...</button>
+              <button id="confirm-cancel-btn" class="btn" style="background-color: var(--bg-tertiary);">Mégse</button>
+            </div>
+          </div>
+        </div>
+    </div>
     
     <script type="module">
         // --- KONFIGURÁCIÓ ---
-        // A jelszó itt módosítható! Ez a jelszó védi az "Árlisták kezelése" funkciót.
         const ADMIN_PASSWORD = 'kalkulator2026';
         // --- KONFIGURÁCIÓ VÉGE ---
 
@@ -214,7 +229,6 @@
                 integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
                 return `${integerPart},${decimalPart}.- €`;
             }
-            // HUF formatting
             const str = Math.round(num).toString();
             const formatted = str.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
             return `${formatted}.- Ft`;
@@ -330,12 +344,9 @@
             const modal = D('rate-modal');
             const header = modal.querySelector('.modal-header');
             const body = D('rate-modal-body');
-
             header.innerHTML = `<h2>Árlisták kezelése</h2><button class="modal-close-btn">&times;</button>`;
             body.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;
-            
             modal.querySelector('.modal-close-btn').onclick = () => modal.style.display = 'none';
-
             const s=D('rate-editor-select');
             state.rates.forEach(p=>s.add(new Option(p.name,p.id)));
             s.value=state.activeRatePackage.id;
@@ -350,8 +361,52 @@
         function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{input.onblur=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};});}
         
         function handleSaveRatePackage() {
-            const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(pkg){pkg.name=D('rate-package-name').value;Object.keys(RATE_KEY_LABELS).forEach(key=>{const i=D(key);if(i){if(key.includes('_szorzo')){pkg.rates[key]=(parseFloat(i.value)||0)/100+1;}else{pkg.rates[key]=parseCurrency(i.value);}}});localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(selectedId);state.activeRatePackage=state.rates.find(r=>r.id===selectedId);calculateAndDisplay();D('rate-modal').style.display='none';alert(`"${pkg.name}" árlista sikeresen mentve!`);}
+            const modal = D('save-confirm-modal');
+            const selectedId = D('rate-editor-select').value;
+            const pkg = state.rates.find(r => r.id === selectedId);
+            D('save-confirm-message').textContent = `Biztosan felülírja a(z) "${pkg.name}" árlistát? Vagy szeretné más néven menteni?`;
+            modal.dataset.packageId = selectedId;
+            modal.style.display = 'block';
         }
+
+        function getRatesFromForm() {
+            const rates = {};
+            Object.keys(RATE_KEY_LABELS).forEach(key => {
+                const input = D(key);
+                if (input) {
+                    if (key.includes('_szorzo')) {
+                        rates[key] = (parseFloat(input.value) || 0) / 100 + 1;
+                    } else {
+                        rates[key] = parseCurrency(input.value);
+                    }
+                }
+            });
+            return rates;
+        }
+
+        function executeSave({ isSaveAs, newName }) {
+            const packageId = D('save-confirm-modal').dataset.packageId;
+            const formRates = getRatesFromForm();
+            const packageName = D('rate-package-name').value;
+
+            if (isSaveAs) {
+                const newId = `csomag-${Date.now()}`;
+                const newPackage = { id: newId, name: newName, rates: formRates };
+                state.rates.push(newPackage);
+                alert(`"${newName}" árlista sikeresen létrehozva!`);
+                updateRatePackagesUI(newId);
+            } else {
+                const pkg = state.rates.find(r => r.id === packageId);
+                pkg.name = packageName;
+                pkg.rates = formRates;
+                alert(`"${packageName}" árlista sikeresen frissítve!`);
+                updateRatePackagesUI(packageId);
+            }
+            localStorage.setItem('rates', JSON.stringify(state.rates));
+            D('rate-modal').style.display = 'none';
+            calculateAndDisplay();
+        }
+
         function handleNewRatePackage(){const n=prompt("Új árlista neve:",new Date().getFullYear()+1);if(n&&n.trim()){const newId=`csomag-${Date.now()}`;const p={id:newId,name:n,rates:{...state.activeRatePackage.rates}};state.rates.push(p);localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(newId);openRateEditor();}}
         function handleDeleteRatePackage(){if(state.rates.length<=1)return alert("Az utolsó árlista nem törölhető.");const i=D('rate-editor-select').value;if(confirm(`Biztosan törli a "${state.rates.find(r=>r.id===i).name}" árlistát?`)){state.rates=state.rates.filter(r=>r.id!==i);localStorage.setItem('rates',JSON.stringify(state.rates));D('rate-modal').style.display='none';updateRatePackagesUI();calculateAndDisplay();}}
         function updateRatePackagesUI(selectedId=null){const s=D('rate-package-select');const currentVal=selectedId||(s?s.value:null)||(state.rates.length>0?state.rates[0].id:null);s.innerHTML='';state.rates.forEach(p=>s.add(new Option(p.name,p.id)));if(currentVal)s.value=currentVal;if(!s.value&&state.rates.length>0)s.value=state.rates[0].id;state.activeRatePackage=state.rates.find(r=>r.id===s.value);}
@@ -428,7 +483,7 @@
             const dateForFilename = `${date.getFullYear().toString().slice(-2)}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
             let baseName = i.offer_number || 'Kalk';
             if (i.project_number) {
-                baseName += `/${i.project_number}`;
+                baseName += `_${i.project_number}`;
             }
             const filename = `${baseName}_kiszallas_${dateForFilename}.pdf`.replace(/[\\/?%*:|"<>]/g, '_');
 
@@ -491,9 +546,23 @@
                 btn.disabled = false;
             });
         }
+
+        function handleReset() {
+            if (!confirm("Biztosan törli az összes beírt adatot és visszaállítja az alapértelmezett értékeket?")) return;
+
+            document.querySelectorAll('.inputs-container input[type="text"], .inputs-container input[type="number"]').forEach(input => input.value = '');
+            document.querySelectorAll('.inputs-container select').forEach(select => select.selectedIndex = 0);
+            D('discount-input').value = '';
+            D('calculation_date').value = new Date().toISOString().split('T')[0];
+            
+            state.otherCosts = [];
+            D('other-costs-list').innerHTML = '';
+
+            calculateAndDisplay();
+        }
         
         async function init(){
-            const version = "v2.3.0";
+            const version = "v2.3.1";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -508,10 +577,22 @@
 
             D('theme-switcher').onclick=()=>{document.body.classList.toggle('light-mode');localStorage.setItem('theme',document.body.classList.contains('light-mode')?'light':'dark');};
             D('refresh-btn').onclick = calculateAndDisplay;
+            D('reset-btn').onclick = handleReset;
             D('manage-rates-btn').onclick=handleManageRatesClick;
             D('show-chart-btn').onclick=openChartModal;
             D('downloadPdfFull').addEventListener('click', () => generatePdf({ simplified: false }));
             D('downloadPdfSimple').addEventListener('click', () => generatePdf({ simplified: true }));
+            
+            D('confirm-overwrite-btn').onclick = () => { executeSave({ isSaveAs: false }); D('save-confirm-modal').style.display = 'none'; };
+            D('confirm-save-as-btn').onclick = () => {
+                const newName = prompt("Adja meg az új árlista nevét:");
+                if (newName && newName.trim()) {
+                    executeSave({ isSaveAs: true, newName: newName.trim() });
+                    D('save-confirm-modal').style.display = 'none';
+                }
+            };
+            D('confirm-cancel-btn').onclick = () => { D('save-confirm-modal').style.display = 'none'; };
+
             D('save-other-cost-btn').onclick = () => {
                 const btn = D('save-other-cost-btn');
                 const originalText = btn.textContent;
@@ -527,6 +608,7 @@
             
             document.querySelectorAll('.modal-close-btn').forEach(b=>b.onclick=(e)=>e.target.closest('.modal').style.display='none');
             document.querySelector('.inputs-container').oninput=calculateAndDisplay;
+            D('discount-input').addEventListener('input', calculateAndDisplay);
             D('rate-package-select').onchange=(e)=>{state.activeRatePackage=state.rates.find(r=>r.id===e.target.value);calculateAndDisplay();};
             D('currency-select').onchange=(e)=>{state.activeCurrency=e.target.value;calculateAndDisplay();};
 
@@ -566,7 +648,7 @@
                 D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), state.activeCurrency === 'EUR' ? '€' : 'Ft'); calculateAndDisplay(); }});
                 D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });
                 
-                renderList(); // Initial render
+                renderList();
             };
 
             setupDynamicList('other-costs-list', 'otherCosts', 'add-other-cost-btn', [
