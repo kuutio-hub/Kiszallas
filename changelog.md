@@ -1,5 +1,17 @@
 # Változási Napló
 
+## v2.5.0 - Árlista Menedzsment Bővítése és Hibajavítások
+*Dátum: 2024-05-23*
+
+### Új funkciók és fejlesztések
+- **Védett Árlisták:** Az árlistakezelőben bevezetésre került egy "Védett" kapcsoló, amellyel a véglegesített árlisták írásvédetté tehetők, megelőzve a véletlen módosításokat.
+- **Árlista PDF Export:** Új "PDF Export" gombbal bővült az árlistakezelő, amellyel egy kattintással letisztult, nyomtatható kivonat készíthető a kiválasztott árlistáról.
+- **Kompakt Árlista Szerkesztő:** Az árlistakezelő felülete egy kompaktabb, reszponzív elrendezést kapott, ahol a címkék és a beviteli mezők egy sorban helyezkednek el, javítva az átláthatóságot.
+- **Logikai Szabályok Dokumentálása:** Létrehozásra került egy új `VALIDATION_RULES.md` fájl, amely a jövőben bevezethető logikai ellenőrzésekre tesz javaslatokat.
+
+### Javítások
+- **PDF Generálási Hiba:** Javítva lett egy hiba, amely miatt a kalkulációból generált PDF-ek tartalma esetenként nem megfelelően, a lapról "lecsúszva" jelent meg.
+
 ## v2.4.1 - Logikai Javítás
 *Dátum: 2024-05-22*
 
