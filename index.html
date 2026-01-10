@@ -184,13 +184,20 @@
         };
 
         const D = (id) => document.getElementById(id);
-        const formatCustomCurrency = (val, currency = 'Ft') => {
+        const formatCustomCurrency = (val, currencySymbol = 'Ft') => {
             const num = parseFloat(val) || 0;
+            if (currencySymbol === '€') {
+                const fixedNumStr = num.toFixed(2);
+                let [integerPart, decimalPart] = fixedNumStr.split('.');
+                integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+                return `${integerPart},${decimalPart}.- €`;
+            }
+            // HUF formatting
             const str = Math.round(num).toString();
             const formatted = str.replace(/\B(?=(\d{3})+(?!\d))/g, ".");
-            return `${formatted}.- ${currency}`;
+            return `${formatted}.- Ft`;
         };
-        const parseCurrency = (v) => parseFloat(String(v).replace(/[^0-9,-]/g, '').replace(',', '.')) || 0;
+        const parseCurrency = (v) => parseFloat(String(v).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
         const convertPrice = (huf,curr) => curr==='EUR'?huf/(parseFloat(D('exchange-rate-manual').value)||1):huf;
         
         const loadData = async (k,f) => { try {const d=localStorage.getItem(k); if(d)return JSON.parse(d);const r=await fetch(f);const j=await r.json();localStorage.setItem(k,JSON.stringify(j));return j;}catch(e){console.error(`Hiba: ${k} betöltése`,e);return[];}};
@@ -212,19 +219,12 @@
             if (i.feladat) summaryParts.push(`<strong>Feladat:</strong> ${i.feladat}`);
             
             const participants = [];
-            const sN = i.szerelo_munkanap;
-            const mN = i.mernok_munkanap;
-            const mernokVezetoNapok = Math.min(sN, mN);
-            const mernokVezetoFo = mernokVezetoNapok > 0 && i.mernok_fo > 0 ? 1 : 0;
-            const szereloVezetoNapok = (i.mernok_fo === 0 && i.szerelo_fo > 0) ? sN : 0;
-            const szereloVezetoFo = szereloVezetoNapok > 0 ? 1 : 0;
-            const normSzereloFo = i.szerelo_fo - szereloVezetoFo;
-            const normMernokFo = i.mernok_fo - mernokVezetoFo;
-
-            if (normSzereloFo > 0) participants.push(`${normSzereloFo} fő szerelő (${sN} nap, ${i.szerelo_hetvegi_nap} hétvége)`);
-            if (szereloVezetoFo > 0) participants.push(`${szereloVezetoFo} fő szerelésvezető (${sN} nap, ${i.szerelo_hetvegi_nap} hétvége)`);
-            if (normMernokFo > 0) participants.push(`${normMernokFo} fő mérnök (${mN} nap, ${i.mernok_hetvegi_nap} hétvége)`);
-            if (mernokVezetoFo > 0) participants.push(`${mernokVezetoFo} fő mérnök (szerelésvezetőként) (${mN} nap, ${i.mernok_hetvegi_nap} hétvége)`);
+            if (i.szerelo_fo > 0) {
+                participants.push(`${i.szerelo_fo} fő szerelő (${i.szerelo_munkanap} nap, ${i.szerelo_hetvegi_nap} hétvége)`);
+            }
+            if (i.mernok_fo > 0) {
+                participants.push(`${i.mernok_fo} fő mérnök (${i.mernok_munkanap} nap, ${i.mernok_hetvegi_nap} hétvége)`);
+            }
             
             if (participants.length > 0) {
                  summaryParts.push(`<strong>Személyzet:</strong> ${participants.join('; ')}`);
@@ -234,7 +234,59 @@
             D('calculation-summary-header').innerHTML = summaryParts.join('<br>');
         }
 
-        function calculateAndDisplay(){state.calculationResults=calculateCosts();const{breakdown,totalHuf,totalCostHuf,hasCostItems}=state.calculationResults;const tbody=D('breakdown-body'),thead=D('breakdown-head'),tfoot=D('breakdown-foot');const currency=state.activeCurrency;const currencySymbol=currency==='EUR'?'€':'Ft';const discount=parseFloat(D('discount-input').value)||0;const discountMultiplier=1-(discount/100);tbody.innerHTML=thead.innerHTML=tfoot.innerHTML='';let headHtml=`<tr><th>Költségnem</th><th>Menny.</th><th>Egys.</th><th>Egységár</th>`;if(discount>0){headHtml+=`<th>Kedv. Egységár</th>`;}if(hasCostItems){headHtml+=`<th>Önköltség</th>`;}headHtml+=`<th>Összesen</th></tr>`;thead.innerHTML=headHtml;breakdown.forEach(i=>{const r=tbody.insertRow();const u=convertPrice(i.unitPriceHuf,currency);const dU=u*discountMultiplier;const t=convertPrice(i.totalHuf,currency);const dT=t*discountMultiplier;let rowHtml=`<td>${i.label}</td><td style="text-align:right;">${i.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${i.unit}</td><td style="text-align:right;">${formatCustomCurrency(u,currencySymbol)}</td>`;if(discount>0){rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(dU,currencySymbol)}</td>`;}if(hasCostItems){const tc=convertPrice(i.totalCostHuf,currency);rowHtml+=`<td style="text-align:right;">${i.isCostItem?formatCustomCurrency(tc,currencySymbol):'-'}</td>`;}rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(discount>0?dT:t,currencySymbol)}</td>`;r.innerHTML=rowHtml;});const totalFinal=convertPrice(totalHuf,currency);const totalCostFinal=convertPrice(totalCostHuf,currency);let totalCols=3+1+(discount>0?1:0)+(hasCostItems?1:0)+1;const labelColspan=totalCols-1;let footHtml=``;if(hasCostItems){footHtml+=`<tr class="cost-total-row" style="border-top: 2px solid var(--border-color);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Önköltség összesen (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal,currencySymbol)}</td></tr>`;}footHtml+=`<tr class="total-row" style="border-top: 1px solid var(--seahawks-green);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalFinal,currencySymbol)}</td></tr>`;const discountedTotal=totalFinal*discountMultiplier;if(discount>0){footHtml+=`<tr class="discount-row" style="color: var(--success-primary);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Kedvezményes végösszeg (${discount}%)</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(discountedTotal,currencySymbol)}</td></tr>`;}tfoot.innerHTML=footHtml;updateCalculationSummary();}
+        function calculateAndDisplay(){
+            state.calculationResults = calculateCosts();
+            const { breakdown, totalHuf, totalCostHuf, hasCostItems } = state.calculationResults;
+            const tbody = D('breakdown-body'), thead = D('breakdown-head'), tfoot = D('breakdown-foot');
+            const currency = state.activeCurrency;
+            const currencySymbol = currency === 'EUR' ? '€' : 'Ft';
+            const discount = parseFloat(D('discount-input').value) || 0;
+            const discountMultiplier = 1 - (discount / 100);
+            
+            tbody.innerHTML = thead.innerHTML = tfoot.innerHTML = '';
+            
+            let headHtml=`<tr><th>Költségnem</th><th>Menny.</th><th>Egys.</th><th>Egységár</th>`;
+            if (discount > 0) { headHtml += `<th>Kedv. Egységár</th>`; }
+            if (hasCostItems) { headHtml += `<th>Önköltség</th>`; }
+            headHtml += `<th>Összesen</th></tr>`;
+            thead.innerHTML = headHtml;
+
+            breakdown.forEach(i => {
+                const r = tbody.insertRow();
+                const u = convertPrice(i.unitPriceHuf, currency);
+                const dU = u * discountMultiplier;
+                const t = convertPrice(i.totalHuf, currency);
+                const dT = t * discountMultiplier;
+                let rowHtml = `<td>${i.label}</td><td style="text-align:right;">${i.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${i.unit}</td><td style="text-align:right;">${formatCustomCurrency(u, currencySymbol)}</td>`;
+                if (discount > 0) { rowHtml += `<td style="text-align:right;">${formatCustomCurrency(dU, currencySymbol)}</td>`; }
+                if (hasCostItems) {
+                    const tc = convertPrice(i.totalCostHuf, currency);
+                    rowHtml += `<td style="text-align:right;">${i.isCostItem ? formatCustomCurrency(tc, currencySymbol) : '-'}</td>`;
+                }
+                rowHtml += `<td style="text-align:right;">${formatCustomCurrency(discount > 0 ? dT : t, currencySymbol)}</td>`;
+                r.innerHTML = rowHtml;
+            });
+
+            const totalFinal = convertPrice(totalHuf, currency);
+            const visibleTotalCost = breakdown.reduce((acc, item) => item.isCostItem ? acc + item.totalCostHuf : acc, 0);
+            const totalCostFinal = convertPrice(visibleTotalCost, currency);
+
+            let totalCols = 3 + 1 + (discount > 0 ? 1 : 0) + (hasCostItems ? 1 : 0) + 1;
+            const labelColspan = totalCols - 1;
+            let footHtml = ``;
+
+            if (hasCostItems) {
+                footHtml += `<tr class="cost-total-row" style="border-top: 2px solid var(--border-color);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Önköltség összesen (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal, currencySymbol)}</td></tr>`;
+            }
+            footHtml += `<tr class="total-row" style="border-top: 1px solid var(--seahawks-green);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalFinal, currencySymbol)}</td></tr>`;
+            
+            const discountedTotal = totalFinal * discountMultiplier;
+            if (discount > 0) {
+                footHtml += `<tr class="discount-row" style="color: var(--success-primary);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Kedvezményes végösszeg (${discount}%)</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(discountedTotal, currencySymbol)}</td></tr>`;
+            }
+            tfoot.innerHTML = footHtml;
+            updateCalculationSummary();
+        }
         
         function handleManageRatesClick() {
             if (state.isAuthenticated) {
@@ -282,22 +334,13 @@
             const totalBeforeDiscount = convertPrice(res.totalHuf, c);
             const finalTotal = totalBeforeDiscount * (1 - (discount / 100));
             
-            const visibleTotalCost = res.breakdown.reduce((acc, item) => acc + (item.isCostItem ? item.totalCostHuf : 0), 0);
+            const visibleTotalCost = res.breakdown.reduce((acc, item) => item.isCostItem ? acc + item.totalCostHuf : acc, 0);
             const totalCostFinal = convertPrice(visibleTotalCost, c);
             const showCostColumn = !simplified && res.hasCostItems;
 
-            const sN = i.szerelo_munkanap, mN = i.mernok_munkanap;
-            const mernokVezetoNapok = Math.min(sN, mN);
-            const mernokVezetoFo = mernokVezetoNapok > 0 && i.mernok_fo > 0 ? 1 : 0;
-            const szereloVezetoNapok = (i.mernok_fo === 0 && i.szerelo_fo > 0) ? sN : 0;
-            const szereloVezetoFo = szereloVezetoNapok > 0 ? 1 : 0;
-            const normSzereloFo = i.szerelo_fo - szereloVezetoFo;
-            const normMernokFo = i.mernok_fo - mernokVezetoFo;
             let summaryParts = [];
-            if (normSzereloFo > 0) summaryParts.push(`${normSzereloFo} fő szerelő (${i.szerelo_munkanap} nap, ebből ${i.szerelo_hetvegi_nap} hétvége)`);
-            if (szereloVezetoFo > 0) summaryParts.push(`${szereloVezetoFo} fő szerelésvezető (${i.szerelo_munkanap} nap, ebből ${i.szerelo_hetvegi_nap} hétvége)`);
-            if (normMernokFo > 0) summaryParts.push(`${normMernokFo} fő mérnök (${i.mernok_munkanap} nap, ebből ${i.mernok_hetvegi_nap} hétvége)`);
-            if (mernokVezetoFo > 0) summaryParts.push(`${mernokVezetoFo} fő mérnök (szerelésvezetőként) (${i.mernok_munkanap} nap, ebből ${i.mernok_hetvegi_nap} hétvége)`);
+            if (i.szerelo_fo > 0) summaryParts.push(`${i.szerelo_fo} fő szerelő (${i.szerelo_munkanap} nap, ebből ${i.szerelo_hetvegi_nap} hétvége)`);
+            if (i.mernok_fo > 0) summaryParts.push(`${i.mernok_fo} fő mérnök (${i.mernok_munkanap} nap, ebből ${i.mernok_hetvegi_nap} hétvége)`);
             
             const fullDescription = i.feladat ? `<b>Feladat leírása:</b> ${i.feladat}` : '';
             const summaryText = summaryParts.length > 0 ? `<b>Adatok összesítve:</b> ${summaryParts.join('; ')}` : '';
@@ -396,7 +439,7 @@
         }
         
         async function init(){
-            const version = "v2.0.8";
+            const version = "v2.0.9";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -461,7 +504,7 @@
 
                 D(addButtonId).onclick = () => { state[stateKey].push({}); renderList(); };
                 D(listId).addEventListener('input', e => { const i = e.target.dataset.index; if(i !== undefined) { const field = e.target.dataset.field; const val = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value; state[stateKey][i][field] = e.target.type === 'number' ? parseFloat(val) || 0 : val; if(!e.target.classList.contains('currency-input')) calculateAndDisplay(); } });
-                D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value)); calculateAndDisplay(); }});
+                D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), state.activeCurrency === 'EUR' ? '€' : 'Ft'); calculateAndDisplay(); }});
                 D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });
             };
 

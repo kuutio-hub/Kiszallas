@@ -1,5 +1,14 @@
 # Változási Napló
 
+## v2.0.9 - Pontosság és Egyszerűsítés
+*Dátum: 2024-05-22*
+
+### Fejlesztések és Javítások
+- **EUR Pontosság:** Az EUR pénznemre váltáskor az alkalmazás mostantól mindenhol két tizedesjegy pontossággal jeleníti meg az árakat, mind a felületen, mind a PDF exportokban.
+- **Egyszerűsített Összesítő:** Az adatösszesítő (a jobb oldali táblázat fejléce és a PDF) már nem bontja meg a szerelőket és szerelésvezetőket, hanem egységesen "szerelőként" és "mérnökként" összegzi a résztvevőket a könnyebb átláthatóság érdekében.
+- **Önköltség Javítás:** A felhasználói felületen a részletező táblázat láblécében az "Önköltség összesen" sor számítása javítva lett, hogy pontosan csak a tényleges önköltségi tételeket vegye figyelembe, összhangban a PDF export logikájával.
+- **Projekt Tisztítása:** Eltávolításra kerültek a már nem használt `index.tsx`, `templates.json` és `exchange_rates.json` fájlok.
+
 ## v2.0.8 - Jelszavas Védelem
 *Dátum: 2024-05-22*
 
