@@ -18,38 +18,51 @@ Ez a legösszetettebb része a kalkulációnak. A cél, hogy a rendszer a lehet�
 A rendszer automatikusan kezeli, hogy mikor van szükség külön szerelésvezetői díj felszámítására.
 
 **A szabály:** Mindig van egy szerelésvezető a területen.
-- **Ha van mérnök a helyszínen:** A mérnök(ök) látják el a szerelésvezetői feladatokat. Ilyenkor nincs külön szerelésvezetői díj, a mérnökök a saját óradíjukon vannak elszámolva.
+- **Ha van mérnök a helyszínen:** A mérnök(ök) látják el a szerelésvezetői feladatokat. Ilyenkor nincs külön szerelésvezetői díj.
 - **Ha nincs mérnök:** A szerelők közül egy fő automatikusan szerelésvezetővé válik, és az ő munkaórái a magasabb, szerelésvezetői óradíjon kerülnek elszámolásra.
 
 ### 2.2. A Számítás Menete
 
-1.  **Adatgyűjtés:** A rendszer beolvassa a "Szerelők" és "Mérnökök" paneleken megadott adatokat (létszám, munkanapok, hétvégi napok, napi órák).
-
-2.  **Hétköznapok és Hétvégék Szétválasztása:** Külön számolja a hétköznapi és hétvégi munkanapokat mind a szerelők, mind a mérnökök esetében.
-
-3.  **Mérnöki Költségek:** Ha van mérnök, a költségei a megadott óraszámok és a vonatkozó hétköznapi/hétvégi óradíjak alapján kerülnek kiszámításra.
-
-4.  **Felügyelet Nélküli Napok Meghatározása:** A rendszer kiszámolja, hogy a szerelők hány napot dolgoznak mérnöki felügyelet nélkül (`max(0, szerelői_napok - mérnöki_napok)`). Ezeken a napokon van szükség szerelésvezetőre a szerelők közül.
-
-5.  **Szerelésvezetői Órák Számítása:** A felügyelet nélküli napokra a rendszer felszámolja a szerelésvezetői órákat a megfelelő hétköznapi/hétvégi díjjal.
-
-6.  **Szerelői Órák Számítása:** Az összes szerelői órából kivonásra kerülnek a már szerelésvezetőként elszámolt órák, és a maradék óraszám kerül elszámolásra a normál szerelői díjon.
+1.  **Adatgyűjtés:** A rendszer beolvassa a "Szerelők" és "Mérnökök" paneleken megadott adatokat.
+2.  **Hétköznapok és Hétvégék Szétválasztása:** Külön számolja a hétköznapi és hétvégi munkanapokat.
+3.  **Mérnöki Költségek:** Kiszámolja a mérnöki költségeket a megfelelő óradíjak alapján.
+4.  **Felügyelet Nélküli Napok Meghatározása:** Kiszámolja, hány napot dolgoznak a szerelők mérnöki felügyelet nélkül (`max(0, szerelői_napok - mérnöki_napok)`).
+5.  **Szerelésvezetői Órák Számítása:** A felügyelet nélküli napokra felszámolja a szerelésvezetői óradíjat.
+6.  **Szerelői Órák Számítása:** Az összes szerelői órából levonja a szerelésvezetői órákat, a maradékot normál díjon számolja.
 
 ## 3. Egyéb Költségek és Fogalmak
 
 ### 3.1. Önköltség és Ár Szorzó
 
-- **Definíció:** Az önköltség a cég számára felmerülő, közvetlen költséget jelenti egy adott tétel esetében (pl. a szállás tényleges díja, az emelőgép bérleti díja).
-- **Működés:** Az árlistában bizonyos tételekhez (pl. `szallas_dij`, `emelogep_napidij`) tartozik egy `_szorzo` érték is. A kalkuláció során az eladási ár (`unitPriceHuf`) ebből a kettőből tevődik össze: `Eladási ár = Önköltség * Ár szorzó`.
-- **Megjelenítés:** Az önköltség oszlop csak a "Részletes PDF" nézetben jelenik meg, segítve a belső elemzést és a profitabilitás felmérését.
+- **Definíció:** Az önköltség a cég számára felmerülő, közvetlen költséget jelenti (pl. szállás díja, emelőgép bérleti díja).
+- **Működés:** Bizonyos tételekhez tartozik egy `_szorzo` érték. Az eladási ár ebből tevődik össze: `Eladási ár = Önköltség * Ár szorzó`.
+- **Megjelenítés:** Az önköltség oszlop csak a "Belső PDF" nézetben jelenik meg a belső elemzéshez.
 
 ### 3.2. Árfolyamkezelés (EUR)
 
-- **Működés:** A kalkulátor minden számítást forintban (HUF) végez. Amikor a felhasználó a pénznemet "EUR"-ra váltja, az alkalmazás az összes megjelenített árat (egységárakat, összesítőket) elosztja a fejlécben megadott EUR/HUF árfolyammal.
+- **Működés:** A kalkulátor forintban (HUF) számol. EUR-ra váltáskor minden árat eloszt a megadott árfolyammal.
 - **Képlet:** `EUR ár = HUF ár / Árfolyam`
 
 ### 3.3. Engedmény
 
-- **Működés:** Az "Engedmény" mezőbe beírt százalékos érték a kalkuláció teljes nettó végösszegéből kerül levonásra.
+- **Működés:** A megadott százalékos érték a teljes nettó végösszegből kerül levonásra.
 - **Képlet:** `Kedvezményes végösszeg = Végösszeg * (1 - (Engedmény % / 100))`
-- **Megjelenítés:** Az engedmény és a kedvezményes végösszeg a kalkulációs táblázat láblécében, valamint a generált PDF dokumentumokon is feltüntetésre kerül.
+
+## 4. PDF Generálási Szintek
+
+Az alkalmazás három különböző részletességű PDF dokumentum generálására képes, különböző üzleti célokra.
+
+### 4.1. Ügyfél PDF
+- **Célközönség:** Végfelhasználó ügyfelek.
+- **Tartalom:** A lehető legegyszerűbb nézet. Tartalmazza a költségnemeket, de **nem mutatja** sem az egységárakat, sem a soronkénti összesítéseket. Csak a projekt leírását és a nettó végösszeget (az esetleges engedménnyel együtt) jeleníti meg.
+- **Cél:** Átlátható, könnyen érthető ajánlat adása anélkül, hogy az árképzés részleteibe belemennénk.
+
+### 4.2. Partner PDF
+- **Célközönség:** Alvállalkozók, partnerek, vagy olyan ügyfelek, akik részletesebb bontást kérnek.
+- **Tartalom:** Részletes bontást ad a költségekről. Tartalmazza a költségnemeket, mennyiségeket, egységeket, egységárakat és soronkénti összesítéseket. Az egyetlen elrejtett információ a **belső önköltség**.
+- **Cél:** Transzparens árazás bemutatása a belső haszonkulcs felfedése nélkül.
+
+### 4.3. Belső PDF
+- **Célközönség:** Csak belső használatra (pl. projektvezetés, pénzügy).
+- **Tartalom:** A létező legrészletesebb nézet. Minden adatot tartalmaz, beleértve a **belső önköltségi árakat** és az önköltség összesítését is.
+- **Cél:** Teljes körű pénzügyi elemzés, profitabilitás számítása és belső jóváhagyási folyamatok támogatása.

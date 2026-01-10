@@ -21,14 +21,14 @@
             --font-family: 'Segoe UI', system-ui, sans-serif;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --border-radius: 0.5rem;
-            --seahawks-navy: #002244; --seahawks-green: #69BE28; --seahawks-gray: #A5ACAF;
+            --seahawks-navy: #002244; --seahawks-green: #69BE28; --seahawks-wolf-grey: #A5ACAF;
         }
 
         .light-mode {
-            --bg-primary: #f4f7f6; --bg-secondary: #ffffff; --bg-tertiary: #e2e8f0;
-            --text-primary: #1a202c; --text-secondary: #4a5568; --text-on-accent: #ffffff;
-            --border-color: #d1d5db; --accent-primary: #3b82f6; --accent-secondary: #2563eb;
-            --seahawks-navy: #ffffff; --seahawks-green: #69BE28; --seahawks-gray: #4a5568;
+            --bg-primary: #f0f2f5; --bg-secondary: #ffffff; --bg-tertiary: #e4e6eb;
+            --text-primary: #050505; --text-secondary: #65676b; --text-on-accent: #ffffff;
+            --border-color: #d1d5db; --accent-primary: var(--seahawks-green); --accent-secondary: #58a01e;
+            --seahawks-navy: #ffffff; --seahawks-wolf-grey: #4a5568;
         }
 
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -40,7 +40,7 @@
         
         #app-container { display: none; }
         .container { max-width: 1800px; margin: 1rem auto; padding: 1rem; display: flex; flex-direction: column; min-height: 100vh; }
-        .header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-bottom: 1rem; }
+        .header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;}
         .header-item { display: flex; align-items: center; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); flex-grow: 1; flex-basis: 320px; min-width: 250px; }
         .header-item-title { padding: 0.5rem 1rem; font-weight: bold; color: var(--text-primary); background-color: var(--bg-tertiary); white-space: nowrap; }
         .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; transition: box-shadow 0.2s ease-in-out; }
@@ -59,35 +59,43 @@
         .exchange-rate-wrapper input { width: 100%; }
         .exchange-rate-wrapper span { padding: 0 0.5rem; color: var(--text-secondary); white-space: nowrap; }
         
-        .btn { padding: 0.5rem 1.2rem; border: none; border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); }
-        .btn:disabled { background-color: var(--bg-tertiary); cursor: not-allowed; }
+        .btn { padding: 0.6rem 1.2rem; border: none; border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s; box-shadow: var(--shadow); background-image: linear-gradient(to bottom, color-mix(in srgb, var(--bg-tertiary) 80%, black), color-mix(in srgb, var(--bg-tertiary) 100%, black)); }
+        .btn:disabled { background-color: var(--bg-tertiary); background-image: none; cursor: not-allowed; opacity: 0.6; }
+        .btn:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 10px -2px rgba(0,0,0,0.15); }
+        
         .main-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; flex-grow: 1;}
         @media (min-width: 1024px) { .main-grid { grid-template-columns: 1fr 1.5fr; } }
 
         .card { background-color: var(--bg-secondary); border-radius: var(--border-radius); box-shadow: var(--shadow); }
         details.card { padding: 0; overflow: hidden; }
-        details.card summary { padding: 1rem; cursor: pointer; font-size: 1.1rem; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; list-style: none; transition: background-color 0.2s; }
+        details.card summary { padding: 1rem; cursor: pointer; font-size: 1.1rem; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; list-style: none; transition: background-color 0.2s; border-bottom: 1px solid transparent;}
+        details[open].card > summary { border-bottom-color: var(--border-color); }
         details.card summary:hover { background-color: var(--bg-tertiary); }
         details.card summary::-webkit-details-marker { display: none; }
         details.card summary::after { content: ''; display: inline-block; width: 24px; height: 24px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; transition: transform 0.2s ease-in-out; }
         .light-mode details.card summary::after { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a5568'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E"); }
         details[open].card > summary::after { transform: rotate(180deg); }
-        details.card .card-content { padding: 0 1rem 1rem 1rem; }
+        details.card .card-content { padding: 1rem; }
         
         #calculation-summary-header { padding: 1rem; background-color: var(--bg-tertiary); border-bottom: 2px solid var(--seahawks-green); border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius); font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); }
-        #calculation-summary-header strong { color: var(--seahawks-gray); margin-right: 0.5rem;}
+        #calculation-summary-header strong { color: var(--seahawks-wolf-grey); margin-right: 0.5rem;}
         .calculation-table table { width: 100%; border-collapse: collapse; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .form-group label { margin-bottom: 0.3rem; font-size: 0.8rem; color: var(--text-secondary); display: block; }
-        .form-group input, .form-group select { width: 100%; padding: 0.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); max-width: 400px; transition: box-shadow 0.2s ease-in-out; }
-        input:focus, select:focus { outline: none; box-shadow: 0 0 0 3px color-mix(in srgb, var(--seahawks-green) 40%, transparent); }
+        .form-group input, .form-group select { width: 100%; padding: 0.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); transition: box-shadow 0.2s ease-in-out; }
+        input:focus, select:focus { outline: none; box-shadow: 0 0 0 4px color-mix(in srgb, var(--seahawks-green) 50%, transparent); }
+        
+        input[id*="fo"], input[id*="munkaora"], input[id*="munkanap"], input[id*="hetvegi_nap"], input[id*="ejszaka"], input[id*="odautak_szama"], input[id*="jarmuvek_szama"], input[id*="db"], input[id*="szallitasok"] { max-width: 250px; }
+        input[id*="tavolsag_km"], input[id*="ido_ora"] { max-width: 280px; }
+        input[id="offer_number"], input[id="project_number"], input[id="project_name"], input[id="customer"], input[id="work_location"], input[id="creator_name"] { max-width: 400px; }
+        
         .travel-unit-toggle { cursor: pointer; color: var(--accent-primary); font-weight: bold; }
         .close-details-btn { float: right; margin-top: 0.5rem; cursor: pointer; background: var(--bg-tertiary); color: var(--text-primary); border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
         
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); animation: fade-in 0.3s; }
         .modal-content { background-color: var(--bg-secondary); margin: 5% auto; padding: 2rem; width: 90%; max-width: 900px; border-radius: var(--border-radius); position: relative; }
-        .modal-header { display: flex; justify-content: space-between; align-items: center; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
         .modal-header h2 { font-size: 1.5rem; }
         .modal-close-btn { font-size: 2rem; font-weight: bold; cursor: pointer; background: none; border: none; color: var(--text-primary); line-height: 1; padding: 0 0 0 1rem; }
 
@@ -106,22 +114,25 @@
         .percent-input-wrapper input { width: 100%; padding-right: 2em !important; }
         .percent-input-wrapper span { position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); pointer-events: none; color: var(--text-secondary); }
         .protection-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;}
-        .protection-switch input { width: auto; max-width: none; }
+        .protection-switch input { width: auto; }
         
         #landing-page { display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
         #landing-content { background-color: var(--bg-secondary); padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow); width: 100%; max-width: 400px; }
         #landing-content h1 { margin-bottom: 1.5rem; color: var(--text-primary); }
         #password-input { width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); text-align: center; font-size: 1rem; }
-        #password-form .btn { background-color: var(--seahawks-green); color: var(--text-on-accent); }
+        #password-form .btn { background-color: var(--seahawks-green); color: var(--text-on-accent); background-image:none; }
         
         .modal-body .form-group input { max-width: none; }
         .confirmation-checkbox { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; cursor: pointer; user-select: none;}
-        .confirmation-checkbox input { width: auto; max-width: none; }
-        .btn-safe-action { background-color: var(--seahawks-green); color: var(--text-on-accent); }
+        .confirmation-checkbox input { width: auto; }
+        .btn-safe-action { background-color: var(--seahawks-green); color: var(--text-on-accent); background-image:none; }
         
         footer { text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.8rem; margin-top: auto; }
         
-        .light-mode #breakdown-head { background-color: #e2e8f0; color: #1a202c; }
+        .light-mode #breakdown-head { background-color: var(--seahawks-wolf-grey); color: #ffffff; }
+        .light-mode #calculation-summary-header { background-color: var(--seahawks-navy); color: var(--text-primary); }
+        .light-mode #calculation-summary-header strong { color: var(--seahawks-wolf-grey); }
+        .light-mode .calculation-table table { background-color: var(--seahawks-navy); color: var(--seahawks-wolf-grey); }
     </style>
 </head>
 <body>
@@ -184,10 +195,7 @@
                      <details class="card"><summary>Szerelők</summary><div class="card-content"><div class="form-grid" id="szerelo-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
                      <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
                      <details class="card"><summary>Utazás</summary><div class="card-content"><div class="form-grid" id="utazas-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
-                     <details class="card"><summary>Emelőgép</summary><div class="card-content">
-                        <div class="form-grid" id="emelogep-inputs"></div>
-                        <button class="close-details-btn" title="Bezárás">↑</button>
-                    </div></details>
+                     <details class="card"><summary>Emelőgép</summary><div class="card-content"><div class="form-grid" id="emelogep-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
                      <details class="card"><summary>Egyéb költségek</summary><div class="card-content">
                         <div id="other-costs-list"></div>
                         <div class="item-list-controls">
@@ -196,15 +204,16 @@
                         </div>
                         <button class="close-details-btn" title="Bezárás">↑</button>
                     </div></details>
-                     <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                     <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem; flex-wrap: wrap;">
                          <button id="manage-rates-btn" class="btn">Árlisták kezelése</button>
-                         <button id="downloadPdfSimple" class="btn">Egyszerűsített PDF</button>
-                         <button id="downloadPdfFull" class="btn btn-safe-action">Részletes PDF</button>
+                         <button id="downloadPdfClient" class="btn">Ügyfél PDF</button>
+                         <button id="downloadPdfPartner" class="btn">Partner PDF</button>
+                         <button id="downloadPdfInternal" class="btn btn-safe-action">Belső PDF</button>
                      </div>
                 </div>
                 <div class="card calculation-table">
                     <div id="calculation-summary-header"></div>
-                     <table style="background-color: var(--seahawks-navy); color: var(--seahawks-gray);">
+                     <table style="background-color: var(--seahawks-navy); color: var(--seahawks-wolf-grey);">
                         <thead id="breakdown-head" style="background-color: #001a33; color: white;"></thead>
                         <tbody id="breakdown-body"></tbody>
                         <tfoot id="breakdown-foot"></tfoot>
@@ -448,7 +457,7 @@
                     <div class="protection-switch"><input type="checkbox" id="rate-protection-toggle"><label for="rate-protection-toggle">Védett</label></div>
                     <div style="display:flex; gap: 0.5rem;">
                         <button id="new-rate-btn" class="btn">Új</button>
-                        <button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button>
+                        <button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary); background-image:none;">Törlés</button>
                     </div>
                 </div>
                 <form id="rate-editor-form"></form>
@@ -696,7 +705,7 @@
                 const l=fD.map(dt=>new Date(dt));
                 const v=fD.map(dt=>state.exchangeRates[dt].HUF);
                 if(chartInstance)chartInstance.destroy();
-                chartInstance=new Chart(c,{type:'line',data:{datasets:[{label:'EUR/HUF',data:v.map((val,idx)=>({x:l[idx],y:val})),borderColor:'rgba(99,179,237,1)',borderWidth:2,pointRadius:0,tension:0.1}]},options:{onClick:(e)=>{const p=chartInstance.getElementsAtEventForMode(e,'nearest',{intersect:true},true);if(p.length){const i=p[0].index;const r=chartInstance.data.datasets[0].data[i].y;D('exchange-rate-manual').value=r.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}},interaction:{mode:'index',intersect:false},scales:{x:{type:'time',time:{unit:'month'},ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}},y:{ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}}},plugins:{tooltip:{enabled:true},legend:{display:false}}}});
+                chartInstance=new Chart(c,{type:'line',data:{datasets:[{label:'EUR/HUF',data:v.map((val,idx)=>({x:l[idx],y:val})),borderColor: getComputedStyle(document.body).getPropertyValue('--accent-primary'),borderWidth:2,pointRadius:0,tension:0.1}]},options:{onClick:(e)=>{const p=chartInstance.getElementsAtEventForMode(e,'nearest',{intersect:true},true);if(p.length){const i=p[0].index;const r=chartInstance.data.datasets[0].data[i].y;D('exchange-rate-manual').value=r.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}},interaction:{mode:'index',intersect:false},scales:{x:{type:'time',time:{unit:'month'},ticks:{color:getComputedStyle(document.body).getPropertyValue('--text-primary')}},y:{ticks:{color:getComputedStyle(document.body).getPropertyValue('--text-primary')}}},plugins:{tooltip:{enabled:true},legend:{display:false}}}});
             };
 
             const today = new Date();
@@ -720,8 +729,8 @@
             draw();
         }
         
-        function generatePdf({ simplified = false }) {
-            const btnId = simplified ? 'downloadPdfSimple' : 'downloadPdfFull';
+        function generatePdf({ viewLevel = 'internal' }) {
+            const btnId = `downloadPdf${viewLevel.charAt(0).toUpperCase() + viewLevel.slice(1)}`;
             const btn = D(btnId);
             const originalText = btn.textContent;
             btn.textContent = 'Generálás...';
@@ -738,7 +747,10 @@
             const finalTotal = totalBeforeDiscount * (1 - (discount / 100));
             const visibleTotalCost = res.breakdown.reduce((acc, item) => item.isCostItem ? acc + item.totalCostHuf : acc, 0);
             const totalCostFinal = convertPrice(visibleTotalCost, c);
-            const showCostColumn = !simplified && res.hasCostItems;
+
+            const showUnitPrice = viewLevel !== 'client';
+            const showRowTotal = viewLevel !== 'client';
+            const showCostColumn = viewLevel === 'internal' && res.hasCostItems;
 
             let summaryParts = [];
             if (i.szerelo_fo > 0) summaryParts.push(`${i.szerelo_fo} fő szerelő (${i.szerelo_munkanap} nap, ebből ${i.szerelo_hetvegi_nap} hétvége)`);
@@ -751,8 +763,8 @@
 
             let tableBodyHtml = '';
             res.breakdown.forEach(item => {
-                const unitPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.unitPriceHuf, c), currencySymbol);
-                const totalRowPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.totalHuf, c), currencySymbol);
+                const unitPriceDisplay = showUnitPrice ? formatCustomCurrency(convertPrice(item.unitPriceHuf, c), currencySymbol) : '-';
+                const totalRowPriceDisplay = showRowTotal ? formatCustomCurrency(convertPrice(item.totalHuf, c), currencySymbol) : '-';
                 const costPriceDisplay = showCostColumn ? (item.isCostItem ? formatCustomCurrency(convertPrice(item.totalCostHuf, c), currencySymbol) : '-') : '';
                 let costColumnHtml = showCostColumn ? `<td class="align-right">${costPriceDisplay}</td>` : '';
                 tableBodyHtml += `<tr><td>${item.label}</td><td class="align-right">${item.quantity.toLocaleString('hu-HU')}</td><td class="align-center">${item.unit}</td><td class="align-right">${unitPriceDisplay}</td>${costColumnHtml}<td class="align-right">${totalRowPriceDisplay}</td></tr>`;
@@ -844,7 +856,7 @@
         }
         
         async function initializeApp() {
-            const version = "v2.9.0";
+            const version = "v3.0.0";
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
@@ -860,8 +872,9 @@
             D('reset-btn').onclick = handleReset;
             D('manage-rates-btn').onclick=handleManageRatesClick;
             D('show-chart-btn').onclick=openChartModal;
-            D('downloadPdfFull').addEventListener('click', () => generatePdf({ simplified: false }));
-            D('downloadPdfSimple').addEventListener('click', () => generatePdf({ simplified: true }));
+            D('downloadPdfClient').addEventListener('click', () => generatePdf({ viewLevel: 'client' }));
+            D('downloadPdfPartner').addEventListener('click', () => generatePdf({ viewLevel: 'partner' }));
+            D('downloadPdfInternal').addEventListener('click', () => generatePdf({ viewLevel: 'internal' }));
             
             D('save-confirm-form').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -955,6 +968,7 @@
             D('theme-switcher').onclick = () => {
                 document.body.classList.toggle('light-mode');
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+                if (chartInstance) { openChartModal(); D('chart-modal').style.display = 'none'; openChartModal(); } // Redraw chart with new theme colors
             };
         }
 
