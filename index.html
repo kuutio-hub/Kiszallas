@@ -42,7 +42,7 @@
         .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; }
         .seahawks-select { background-color: var(--seahawks-navy) !important; color: var(--seahawks-green) !important; font-weight: bold; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
         .header-action-btn { cursor: pointer; background: var(--bg-secondary); border-left: 1px solid var(--border-color); padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
-        #theme-switcher svg { width: 24px; height: 24px; fill: var(--text-primary); }
+        #theme-switcher svg, #refresh-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
         .sun-icon, .moon-icon { transition: opacity 0.3s ease; }
         .light-mode .sun-icon { opacity: 0; position: absolute; } .light-mode .moon-icon { opacity: 1; }
         .sun-icon { opacity: 1; } .moon-icon { opacity: 0; position: absolute; }
@@ -64,6 +64,8 @@
         details[open].card > summary::after { transform: rotate(180deg); }
         details.card .card-content { padding: 0 1rem 1rem 1rem; }
         
+        #calculation-summary-header { padding: 1rem; background-color: var(--bg-tertiary); border-bottom: 2px solid var(--seahawks-green); border-top-left-radius: var(--border-radius); border-top-right-radius: var(--border-radius); font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); }
+        #calculation-summary-header strong { color: var(--seahawks-gray); margin-right: 0.5rem;}
         .calculation-table table { width: 100%; border-collapse: collapse; }
         
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.8rem; }
@@ -105,8 +107,15 @@
                 <div id="show-chart-btn" class="header-action-btn" title="Árfolyam grafikon">📈</div>
             </div>
             <div class="header-item"><span class="header-item-title">Engedmény (%)</span><input type="number" id="discount-input" placeholder="0" min="0" max="100"></div>
-            <div class="header-item" style="background-color: var(--seahawks-navy); flex-grow: 1.5;"><span class="header-item-title" style="background-color: #001a33;">Összesítés</span><div id="live-summary" style="font-size: 0.9rem; color: var(--seahawks-gray); text-align: right; width: 100%; padding: 0.5rem 1rem; line-height: 1.4; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;"></div></div>
-            <div class="header-item" style="border:none; box-shadow:none; background:transparent; flex-grow:0;"><div id="theme-switcher" class="header-action-btn" title="Téma váltása" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);"><svg viewBox="0 0 24 24" class="sun-icon"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06z"/></svg><svg viewBox="0 0 24 24" class="moon-icon"><path d="M12.3 4.9c.4-.2.6-.7.4-1.1-.2-.4-.7-.6-1.1-.4C7.8 5.2 5 8.3 5 12c0 3.9 3.1 7 7 7 3.7 0 6.8-2.8 7.1-6.6.1-.5-.3-1-.8-1.1s-1 .3-1.1.8c-.2 2.8-2.5 5-5.2 5-2.9 0-5.2-2.3-5.2-5.2 0-2.6 1.9-4.8 4.4-5.2z"/></svg></div></div>
+            <div class="header-item" style="border:none; box-shadow:none; background:transparent; flex-grow:0; display:flex; gap: 1rem;">
+                <div id="refresh-btn" class="header-action-btn" title="Frissítés és újraszámolás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h60v280H500v-60h168q-44-74-118-117t-150-43q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 142-44.5T716-291l43 38q-54 62-131 98.5T480-160Z"/></svg>
+                </div>
+                <div id="theme-switcher" class="header-action-btn" title="Téma váltása" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                    <svg viewBox="0 0 24 24" class="sun-icon"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06z"/></svg>
+                    <svg viewBox="0 0 24 24" class="moon-icon"><path d="M12.3 4.9c.4-.2.6-.7.4-1.1-.2-.4-.7-.6-1.1-.4C7.8 5.2 5 8.3 5 12c0 3.9 3.1 7 7 7 3.7 0 6.8-2.8 7.1-6.6.1-.5-.3-1-.8-1.1s-1 .3-1.1.8c-.2 2.8-2.5 5-5.2 5-2.9 0-5.2-2.3-5.2-5.2 0-2.6 1.9-4.8 4.4-5.2z"/></svg>
+                </div>
+            </div>
         </header>
 
         <main class="main-grid">
@@ -143,6 +152,7 @@
                  </div>
             </div>
             <div class="card calculation-table">
+                <div id="calculation-summary-header"></div>
                  <table style="background-color: var(--seahawks-navy); color: var(--seahawks-gray);">
                     <thead id="breakdown-head" style="background-color: #001a33; color: white;"></thead>
                     <tbody id="breakdown-body"></tbody>
@@ -191,22 +201,35 @@
         const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true); const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
         state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity,'tétel',c.amount,c.amount,false);});return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};}
         
-        function updateLiveSummary() {
+        function updateCalculationSummary() {
             const i = getInputs();
             const summaryParts = [];
-            if (i.feladat) summaryParts.push(i.feladat);
-            const totalPeople = (i.szerelo_fo || 0) + (i.mernok_fo || 0);
-            if (totalPeople > 0) summaryParts.push(`${totalPeople} Fő`);
-            const totalDays = Math.max(i.szerelo_munkanap || 0, i.mernok_munkanap || 0);
-            if (totalDays > 0) {
-                const totalWeekends = Math.max(i.szerelo_hetvegi_nap || 0, i.mernok_hetvegi_nap || 0);
-                summaryParts.push(`${totalDays} Nap (${totalWeekends} hétvége)`);
+            if (i.feladat) summaryParts.push(`<strong>Feladat:</strong> ${i.feladat}`);
+            
+            const participants = [];
+            const sN = i.szerelo_munkanap;
+            const mN = i.mernok_munkanap;
+            const mernokVezetoNapok = Math.min(sN, mN);
+            const mernokVezetoFo = mernokVezetoNapok > 0 && i.mernok_fo > 0 ? 1 : 0;
+            const szereloVezetoNapok = (i.mernok_fo === 0 && i.szerelo_fo > 0) ? sN : 0;
+            const szereloVezetoFo = szereloVezetoNapok > 0 ? 1 : 0;
+            const normSzereloFo = i.szerelo_fo - szereloVezetoFo;
+            const normMernokFo = i.mernok_fo - mernokVezetoFo;
+
+            if (normSzereloFo > 0) participants.push(`${normSzereloFo} fő szerelő (${sN} nap, ${i.szerelo_hetvegi_nap} hétvége)`);
+            if (szereloVezetoFo > 0) participants.push(`${szereloVezetoFo} fő szerelésvezető (${sN} nap, ${i.szerelo_hetvegi_nap} hétvége)`);
+            if (normMernokFo > 0) participants.push(`${normMernokFo} fő mérnök (${mN} nap, ${i.mernok_hetvegi_nap} hétvége)`);
+            if (mernokVezetoFo > 0) participants.push(`${mernokVezetoFo} fő mérnök (szerelésvezetőként) (${mN} nap, ${i.mernok_hetvegi_nap} hétvége)`);
+            
+            if (participants.length > 0) {
+                 summaryParts.push(`<strong>Személyzet:</strong> ${participants.join('; ')}`);
             }
-            if (i.work_location) summaryParts.push(i.work_location);
-            D('live-summary').textContent = summaryParts.join('  |  ');
+
+            if (i.work_location) summaryParts.push(`<strong>Helyszín:</strong> ${i.work_location}`);
+            D('calculation-summary-header').innerHTML = summaryParts.join('<br>');
         }
 
-        function calculateAndDisplay(){state.calculationResults=calculateCosts();const{breakdown,totalHuf,totalCostHuf,hasCostItems}=state.calculationResults;const tbody=D('breakdown-body'),thead=D('breakdown-head'),tfoot=D('breakdown-foot');const currency=state.activeCurrency;const currencySymbol=currency==='EUR'?'€':'Ft';const discount=parseFloat(D('discount-input').value)||0;const discountMultiplier=1-(discount/100);tbody.innerHTML=thead.innerHTML=tfoot.innerHTML='';let headHtml=`<tr><th>Költségnem</th><th>Menny.</th><th>Egys.</th><th>Egységár</th>`;if(discount>0){headHtml+=`<th>Kedv. Egységár</th>`;}if(hasCostItems){headHtml+=`<th>Önköltség</th>`;}headHtml+=`<th>Összesen</th></tr>`;thead.innerHTML=headHtml;breakdown.forEach(i=>{const r=tbody.insertRow();const u=convertPrice(i.unitPriceHuf,currency);const dU=u*discountMultiplier;const t=convertPrice(i.totalHuf,currency);const dT=t*discountMultiplier;let rowHtml=`<td>${i.label}</td><td style="text-align:right;">${i.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${i.unit}</td><td style="text-align:right;">${formatCustomCurrency(u,currencySymbol)}</td>`;if(discount>0){rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(dU,currencySymbol)}</td>`;}if(hasCostItems){const tc=convertPrice(i.totalCostHuf,currency);rowHtml+=`<td style="text-align:right;">${i.isCostItem?formatCustomCurrency(tc,currencySymbol):'-'}</td>`;}rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(discount>0?dT:t,currencySymbol)}</td>`;r.innerHTML=rowHtml;});const totalFinal=convertPrice(totalHuf,currency);const totalCostFinal=convertPrice(totalCostHuf,currency);let totalCols=3+1+(discount>0?1:0)+(hasCostItems?1:0)+1;const labelColspan=totalCols-1;let footHtml=``;if(hasCostItems){footHtml+=`<tr class="cost-total-row" style="border-top: 2px solid var(--border-color);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Önköltség összesen (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal,currencySymbol)}</td></tr>`;}footHtml+=`<tr class="total-row" style="border-top: 1px solid var(--seahawks-green);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalFinal,currencySymbol)}</td></tr>`;const discountedTotal=totalFinal*discountMultiplier;if(discount>0){footHtml+=`<tr class="discount-row" style="color: var(--success-primary);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Kedvezményes végösszeg (${discount}%)</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(discountedTotal,currencySymbol)}</td></tr>`;}tfoot.innerHTML=footHtml;updateLiveSummary();}
+        function calculateAndDisplay(){state.calculationResults=calculateCosts();const{breakdown,totalHuf,totalCostHuf,hasCostItems}=state.calculationResults;const tbody=D('breakdown-body'),thead=D('breakdown-head'),tfoot=D('breakdown-foot');const currency=state.activeCurrency;const currencySymbol=currency==='EUR'?'€':'Ft';const discount=parseFloat(D('discount-input').value)||0;const discountMultiplier=1-(discount/100);tbody.innerHTML=thead.innerHTML=tfoot.innerHTML='';let headHtml=`<tr><th>Költségnem</th><th>Menny.</th><th>Egys.</th><th>Egységár</th>`;if(discount>0){headHtml+=`<th>Kedv. Egységár</th>`;}if(hasCostItems){headHtml+=`<th>Önköltség</th>`;}headHtml+=`<th>Összesen</th></tr>`;thead.innerHTML=headHtml;breakdown.forEach(i=>{const r=tbody.insertRow();const u=convertPrice(i.unitPriceHuf,currency);const dU=u*discountMultiplier;const t=convertPrice(i.totalHuf,currency);const dT=t*discountMultiplier;let rowHtml=`<td>${i.label}</td><td style="text-align:right;">${i.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${i.unit}</td><td style="text-align:right;">${formatCustomCurrency(u,currencySymbol)}</td>`;if(discount>0){rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(dU,currencySymbol)}</td>`;}if(hasCostItems){const tc=convertPrice(i.totalCostHuf,currency);rowHtml+=`<td style="text-align:right;">${i.isCostItem?formatCustomCurrency(tc,currencySymbol):'-'}</td>`;}rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(discount>0?dT:t,currencySymbol)}</td>`;r.innerHTML=rowHtml;});const totalFinal=convertPrice(totalHuf,currency);const totalCostFinal=convertPrice(totalCostHuf,currency);let totalCols=3+1+(discount>0?1:0)+(hasCostItems?1:0)+1;const labelColspan=totalCols-1;let footHtml=``;if(hasCostItems){footHtml+=`<tr class="cost-total-row" style="border-top: 2px solid var(--border-color);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Önköltség összesen (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal,currencySymbol)}</td></tr>`;}footHtml+=`<tr class="total-row" style="border-top: 1px solid var(--seahawks-green);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalFinal,currencySymbol)}</td></tr>`;const discountedTotal=totalFinal*discountMultiplier;if(discount>0){footHtml+=`<tr class="discount-row" style="color: var(--success-primary);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Kedvezményes végösszeg (${discount}%)</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(discountedTotal,currencySymbol)}</td></tr>`;}tfoot.innerHTML=footHtml;updateCalculationSummary();}
         
         function openRateEditor(){const b=D('rate-modal-body');b.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;const s=D('rate-editor-select');state.rates.forEach(p=>s.add(new Option(p.name,p.id)));s.value=state.activeRatePackage.id;populateRateForm();s.onchange=populateRateForm;D('new-rate-btn').onclick=handleNewRatePackage;D('delete-rate-btn').onclick=handleDeleteRatePackage;D('save-rate-btn').onclick=handleSaveRatePackage;D('rate-modal').style.display='block';}
         function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{const format=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};input.onfocus=()=>input.select();input.onblur=format;});}
@@ -239,7 +262,9 @@
             const discount = parseFloat(D('discount-input').value) || 0;
             const totalBeforeDiscount = convertPrice(res.totalHuf, c);
             const finalTotal = totalBeforeDiscount * (1 - (discount / 100));
-            const totalCostFinal = convertPrice(res.totalCostHuf, c);
+            
+            const visibleTotalCost = res.breakdown.reduce((acc, item) => acc + (item.isCostItem ? item.totalCostHuf : 0), 0);
+            const totalCostFinal = convertPrice(visibleTotalCost, c);
             const showCostColumn = !simplified && res.hasCostItems;
 
             const sN = i.szerelo_munkanap, mN = i.mernok_munkanap;
@@ -254,7 +279,11 @@
             if (szereloVezetoFo > 0) summaryParts.push(`${szereloVezetoFo} fő szerelésvezető (${i.szerelo_munkanap} nap, ebből ${i.szerelo_hetvegi_nap} hétvége)`);
             if (normMernokFo > 0) summaryParts.push(`${normMernokFo} fő mérnök (${i.mernok_munkanap} nap, ebből ${i.mernok_hetvegi_nap} hétvége)`);
             if (mernokVezetoFo > 0) summaryParts.push(`${mernokVezetoFo} fő mérnök (szerelésvezetőként) (${i.mernok_munkanap} nap, ebből ${i.mernok_hetvegi_nap} hétvége)`);
-            const summaryHtml = summaryParts.length > 0 ? `<div class="summary-block"><b>Adatok összesítve:</b> ${summaryParts.join('; ')}</div>` : '';
+            
+            const fullDescription = i.feladat ? `<b>Feladat leírása:</b> ${i.feladat}` : '';
+            const summaryText = summaryParts.length > 0 ? `<b>Adatok összesítve:</b> ${summaryParts.join('; ')}` : '';
+            const separator = fullDescription && summaryText ? '<br>' : '';
+            const combinedBlock = (fullDescription || summaryText) ? `<div class="task-description">${fullDescription}${separator}${summaryText}</div>` : '';
 
             let tableBodyHtml = '';
             res.breakdown.forEach(item => {
@@ -275,6 +304,17 @@
                     </tr>
                 `;
             });
+            
+            let totalsTableHtml = '';
+            if (showCostColumn) { totalsTableHtml += `<tr><td>Önköltség összesen:</td><td class="align-right">${formatCustomCurrency(totalCostFinal, currencySymbol)}</td></tr>`; }
+            if (discount > 0) {
+                totalsTableHtml += `<tr><td>Összesen (kedvezmény nélkül):</td><td class="align-right">${formatCustomCurrency(totalBeforeDiscount, currencySymbol)}</td></tr>`;
+                totalsTableHtml += `<tr><td>Engedmény (${discount}%):</td><td class="align-right">- ${formatCustomCurrency(totalBeforeDiscount - finalTotal, currencySymbol)}</td></tr>`;
+            }
+            totalsTableHtml += `<tr><td class="final-total">Nettó végösszeg:</td><td class="align-right final-total">${formatCustomCurrency(finalTotal, currencySymbol)}</td></tr>`;
+
+            const dateFormatted = i.calculation_date ? new Date(i.calculation_date).toLocaleDateString('hu-HU') : '';
+            const mainTitle = `<h1>Kiszállás kalkuláció ${simplified ? '(Egyszerűsített)' : ''} <span class="date">(${dateFormatted})</span></h1>`;
 
             const htmlContent = `
                 <!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -283,10 +323,12 @@
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
                     .page { width: 180mm; margin: 0 auto; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
-                    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
-                    .meta-item b { display: block; color: #666; font-size: 9px; margin-bottom: 2px; }
-                    .task-description, .summary-block { margin-bottom: 10px; padding: 10px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; }
-                    .summary-block { margin-bottom: 20px; }
+                    h1 span.date { font-size: 14px; font-weight: normal; color: #666; }
+                    .meta-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px; align-items: start; }
+                    .meta-item p { margin-bottom: 3px; font-size: 10px; }
+                    .meta-item span { display: inline-block; width: 85px; color: #666; }
+                    .meta-item strong { color: #000; font-weight: bold; }
+                    .task-description { margin-bottom: 20px; padding: 10px; background-color: #f8f8f8; border: 1px solid #ddd; border-radius: 4px; }
                     table { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 20px; }
                     th, td { border: 1px solid #ddd; padding: 6px; text-align: left; }
                     th { background-color: #f2f2f2; font-weight: bold; }
@@ -298,24 +340,25 @@
                     .footer { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; }
                     .signature-block { border-top: 1px solid #999; padding-top: 5px; }
                 </style></head><body><div class="page">
-                    <h1>Kiszállási és szerelési költségkalkuláció ${simplified ? '(Egyszerűsített)' : ''}</h1>
+                    ${mainTitle}
                     <div class="meta-grid">
-                        <div class="meta-item"><b>Ajánlatszám:</b> ${i.offer_number||'-'}<br><b>Projektszám:</b> ${i.project_number||'-'}<br><b>Projekt:</b> ${i.project_name||'-'}</div>
-                        <div class="meta-item" style="text-align: right;"><b>Megrendelő:</b> ${i.customer||'-'}<br><b>Helyszín:</b> ${i.work_location||'-'}<br><b>Dátum:</b> ${i.calculation_date?new Date(i.calculation_date).toLocaleDateString('hu-HU'):'-'}</div>
+                         <div class="meta-item">
+                            <p><span>Ajánlatszám:</span> <strong>${i.offer_number||'-'}</strong></p>
+                            <p><span>Projektszám:</span> <strong>${i.project_number||'-'}</strong></p>
+                            <p><span>Projekt:</span> <strong>${i.project_name||'-'}</strong></p>
+                        </div>
+                        <div class="meta-item">
+                            <p><span>Megrendelő:</span> <strong>${i.customer||'-'}</strong></p>
+                            <p><span>Helyszín:</span> <strong>${i.work_location||'-'}</strong></p>
+                        </div>
                     </div>
-                    ${i.feladat ? `<div class="task-description"><b>Feladat leírása:</b> ${i.feladat}</div>` : ''}
-                    ${summaryHtml}
+                    ${combinedBlock}
                     <table><thead><tr>
                         <th>Költségnem</th><th class="align-right">Mennyiség</th><th class="align-center">Egység</th><th class="align-right">Egységár</th>
                         ${showCostColumn ? `<th class="align-right">Önköltség</th>` : ''}
                         <th class="align-right">Összesen</th>
                     </tr></thead><tbody>${tableBodyHtml}</tbody></table>
-                    <table class="totals-table">
-                        ${showCostColumn ? `<tr><td>Önköltség összesen:</td><td class="align-right">${formatCustomCurrency(totalCostFinal, currencySymbol)}</td></tr>` : ''}
-                        <tr><td>Összesen (kedvezmény nélkül):</td><td class="align-right">${formatCustomCurrency(totalBeforeDiscount, currencySymbol)}</td></tr>
-                        ${discount > 0 ? `<tr><td>Engedmény (${discount}%):</td><td class="align-right">- ${formatCustomCurrency(totalBeforeDiscount - finalTotal, currencySymbol)}</td></tr>` : ''}
-                        <tr><td class="final-total">Nettó végösszeg:</td><td class="align-right final-total">${formatCustomCurrency(finalTotal, currencySymbol)}</td></tr>
-                    </table>
+                    <table class="totals-table">${totalsTableHtml}</table>
                     <div class="footer"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó</div></div>
                 </div></body></html>`;
             
@@ -334,7 +377,7 @@
         }
         
         async function init(){
-            const version = "v2.0.5";
+            const version = "v2.0.7";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -348,6 +391,7 @@
             calculateAndDisplay();
 
             D('theme-switcher').onclick=()=>{document.body.classList.toggle('light-mode');localStorage.setItem('theme',document.body.classList.contains('light-mode')?'light':'dark');};
+            D('refresh-btn').onclick = calculateAndDisplay;
             D('manage-rates-btn').onclick=openRateEditor;
             D('show-chart-btn').onclick=openChartModal;
             D('downloadPdfFull').addEventListener('click', () => generatePdf({ simplified: false }));
