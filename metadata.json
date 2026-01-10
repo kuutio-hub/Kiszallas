@@ -1,5 +1,5 @@
 {
   "name": "Kiszallas",
-  "description": "Egy teljes, reszponzív, modern, ipari jellegű webalkalmazás, amely kiszámítja egy projekt helyszíni szerelési költségeit, beleértve a munkaerőt, utazást, szállást és egyéb díjakat. Az alkalmazás támogatja az árcsomagok kezelését, valamint részletes és egyszerűsített PDF ajánlatok generálását.",
+  "description": "Egy teljes, reszponzív, modern, ipari jellegű webalkalmazás, amely kiszámítja egy projekt helyszíni szerelési költségeit, beleértve a munkaerőt, utazást, szállást és egyéb díjakat. Az alkalmazás támogatja az árcsomagok és sablonok kezelését, valamint részletes és egyszerűsített PDF ajánlatok generálását.",
   "requestFramePermissions": []
 }
