@@ -141,11 +141,12 @@
                     <div class="card-content">
                         <div class="form-grid">
                             <div class="form-group"><label for="offer_number">Ajánlatszám</label><input type="text" id="offer_number"></div>
-                            <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number"></div>
+                            <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number" placeholder="Opcionális"></div>
                             <div class="form-group"><label for="project_name">Projekt neve</label><input type="text" id="project_name" placeholder="Opcionális"></div>
                             <div class="form-group"><label for="customer">Megrendelő</label><input type="text" id="customer"></div>
                             <div class="form-group"><label for="work_location">Munkavégzés helyszíne</label><input type="text" id="work_location"></div>
                             <div class="form-group"><label for="calculation_date">Kalkuláció dátuma</label><input type="date" id="calculation_date"></div>
+                            <div class="form-group"><label for="creator_name">Készítő</label><input type="text" id="creator_name" placeholder="Opcionális"></div>
                             <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat"></div>
                         </div>
                         <button class="close-details-btn" title="Bezárás">↑</button>
@@ -228,11 +229,17 @@
         
         function getInputs(){const i={};document.querySelectorAll('.inputs-container input,.inputs-container select').forEach(e=>{if(e.id)i[e.id]=(e.type==='number')?parseFloat(e.value)||0:e.value;});return i;}
         
-        function calculateCosts(){const i=getInputs();const r=state.activeRatePackage?.rates;if(!r)return{totalHuf:0,totalCostHuf:0,breakdown:[],hasCostItems:false};let b=[],t_sell=0,t_cost=0,hasCost=false;const a=(l,q,u,p_sell,p_cost,isCostItem)=>{if(q>0&&p_sell>0){const o_sell=q*p_sell;const o_cost=q*p_cost;b.push({label:l,quantity:q,unit:u,costPriceHuf:p_cost,totalCostHuf:o_cost,unitPriceHuf:p_sell,totalHuf:o_sell,isCostItem:isCostItem});t_sell+=o_sell;t_cost+=o_cost;if(isCostItem)hasCost=true;}};const sN=i.szerelo_munkanap,mN=i.mernok_munkanap;const mernokVezetoNapok=Math.min(sN,mN);const mernokVezetoFo=mernokVezetoNapok>0&&i.mernok_fo>0?1:0;const szereloVezetoNapok=(i.mernok_fo===0&&i.szerelo_fo>0)?sN:0;const szereloVezetoFo=szereloVezetoNapok>0?1:0;const sVezHkN=Math.max(0,szereloVezetoNapok-i.szerelo_hetvegi_nap);const sVezHvN=Math.min(szereloVezetoNapok,i.szerelo_hetvegi_nap);const szvHk=r.szerelesvezeto_hetkoznap_oradij;a('Szerelésvezető óradíj',sVezHkN*i.szerelo_munkaora*szereloVezetoFo,'óra',szvHk,szvHk,false);const szvHv=r.szerelesvezeto_hetvege_oradij;a('Szerelésvezető óradíj (hétvége)',sVezHvN*i.szerelo_munkaora*szereloVezetoFo,'óra',szvHv,szvHv,false);const normSzereloFo=i.szerelo_fo-szereloVezetoFo;const normSzereloHkN=sN-i.szerelo_hetvegi_nap;const szHk=r.szerelo_hetkoznap_oradij;a('Szerelő óradíj',normSzereloFo*normSzereloHkN*i.szerelo_munkaora,'óra',szHk,szHk,false);const szHv=r.szerelo_hetvege_oradij;a('Szerelő óradíj (hétvége)',normSzereloFo*i.szerelo_hetvegi_nap*i.szerelo_munkaora,'óra',szHv,szHv,false);const normMernokFo=i.mernok_fo-mernokVezetoFo;const normMernokHkN=mN-i.mernok_hetvegi_nap;const mHk=r.mernok_hetkoznap_oradij;a('Mérnök óradíj',normMernokFo*normMernokHkN*i.mernok_munkaora,'óra',mHk,mHk,false);const mHv=r.mernok_hetvege_oradij;a('Mérnök óradíj (hétvége)',normMernokFo*i.mernok_hetvegi_nap*i.mernok_munkaora,'óra',mHv,mHv,false);const mernokVezetoHkN=Math.max(0,mernokVezetoNapok-i.mernok_hetvegi_nap);const mernokVezetoHvN=Math.min(mernokVezetoNapok,i.mernok_hetvegi_nap);a('Mérnök óradíj (szerelésvezetőként)',mernokVezetoHkN*i.mernok_munkaora*mernokVezetoFo,'óra',szvHk,szvHk,false);a('Mérnök óradíj (szerelésvezetőként, hétvége)',mernokVezetoHvN*i.mernok_munkaora*mernokVezetoFo,'óra',szvHv,szvHv,false);if(i.location_type==='kulfold'){const kdsz=r.kikuldeles_dij_szerelo;a('Kiküldetési díj - Szerelő',i.szerelo_fo*sN,'nap',kdsz,kdsz,true);const kdm=r.kikuldeles_dij_mernok;a('Kiküldetési díj - Mérnök',i.mernok_fo*mN,'nap',kdm,kdm,true);}
-        const travelTimeInput=D('utazas_ido_ora'); const travelTimeHours=travelTimeInput.dataset.unit==='perc'?(i.utazas_ido_ora/60):i.utazas_ido_ora;
-        const kszdsz=r.kiszallasi_dij_szerelo;a('Kiszállási díj - Szerelő',travelTimeHours*2*i.utazas_odautak_szama_szerelo*i.szerelo_fo,'óra',kszdsz,kszdsz,false);const kszdm=r.kiszallasi_dij_mernok;a('Kiszállási díj - Mérnök',travelTimeHours*2*i.utazas_odautak_szama_mernok*i.mernok_fo,'óra',kszdm,kszdm,false);const kmd=r.km_dij;a('Jármű km díj',i.utazas_tavolsag_km*2*(i.utazas_odautak_szama_szerelo*i.utazas_jarmuvek_szama_szerelo+i.utazas_odautak_szama_mernok*i.utazas_jarmuvek_szama_mernok),'km',kmd,kmd,false);const szallasCost=r.szallas_dij;const szallasSell=szallasCost*(r.szallas_szorzo||1);a('Szállás költség',i.szerelo_szallas_ejszaka*i.szerelo_fo+i.mernok_szallas_ejszaka*i.mernok_fo,'éj',szallasSell,szallasCost,true);
-        const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true); const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
-        state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity, c.unit || 'tétel',c.amount,c.amount,false);});return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};}
+        function calculateCosts(){const i=getInputs();const r=state.activeRatePackage?.rates;if(!r)return{totalHuf:0,totalCostHuf:0,breakdown:[],hasCostItems:false};let b=[],t_sell=0,t_cost=0,hasCost=false;const a=(l,q,u,p_sell,p_cost,isCostItem)=>{if(q>0&&p_sell>0){const o_sell=q*p_sell;const o_cost=q*p_cost;b.push({label:l,quantity:q,unit:u,costPriceHuf:p_cost,totalCostHuf:o_cost,unitPriceHuf:p_sell,totalHuf:o_sell,isCostItem:isCostItem});t_sell+=o_sell;t_cost+=o_cost;if(isCostItem)hasCost=true;}};
+            const sN=i.szerelo_munkanap,mN=i.mernok_munkanap;const szereloVezetoNapok=(i.mernok_fo===0&&i.szerelo_fo>0)?sN:0;const szereloVezetoFo=szereloVezetoNapok>0?1:0;
+            if(szereloVezetoFo>0){const sVezHkN=Math.max(0,szereloVezetoNapok-i.szerelo_hetvegi_nap);const sVezHvN=Math.min(szereloVezetoNapok,i.szerelo_hetvegi_nap);const szvHk=r.szerelesvezeto_hetkoznap_oradij;a('Szerelésvezető óradíj',sVezHkN*i.szerelo_munkaora*szereloVezetoFo,'óra',szvHk,szvHk,false);const szvHv=r.szerelesvezeto_hetvege_oradij;a('Szerelésvezető óradíj (hétvége)',sVezHvN*i.szerelo_munkaora*szereloVezetoFo,'óra',szvHv,szvHv,false);}
+            const normSzereloFo=i.szerelo_fo-szereloVezetoFo;if(normSzereloFo>0){const normSzereloHkN=sN-i.szerelo_hetvegi_nap;const szHk=r.szerelo_hetkoznap_oradij;a('Szerelő óradíj',normSzereloFo*normSzereloHkN*i.szerelo_munkaora,'óra',szHk,szHk,false);const szHv=r.szerelo_hetvege_oradij;a('Szerelő óradíj (hétvége)',normSzereloFo*i.szerelo_hetvegi_nap*i.szerelo_munkaora,'óra',szHv,szHv,false);}
+            if(i.mernok_fo>0){const mernokHkN=mN-i.mernok_hetvegi_nap;const mHk=r.mernok_hetkoznap_oradij;a('Mérnök óradíj',i.mernok_fo*mernokHkN*i.mernok_munkaora,'óra',mHk,mHk,false);const mHv=r.mernok_hetvege_oradij;a('Mérnök óradíj (hétvége)',i.mernok_fo*i.mernok_hetvegi_nap*i.mernok_munkaora,'óra',mHv,mHv,false);}
+            if(i.location_type==='kulfold'){const kdsz=r.kikuldeles_dij_szerelo;a('Kiküldetési díj - Szerelő',i.szerelo_fo*sN,'nap',kdsz,kdsz,true);const kdm=r.kikuldeles_dij_mernok;a('Kiküldetési díj - Mérnök',i.mernok_fo*mN,'nap',kdm,kdm,true);}
+            const travelTimeInput=D('utazas_ido_ora'); const travelTimeHours=travelTimeInput.dataset.unit==='perc'?(i.utazas_ido_ora/60):i.utazas_ido_ora;
+            const kszdsz=r.kiszallasi_dij_szerelo;a('Kiszállási díj - Szerelő',travelTimeHours*2*i.utazas_odautak_szama_szerelo*i.szerelo_fo,'óra',kszdsz,kszdsz,false);const kszdm=r.kiszallasi_dij_mernok;a('Kiszállási díj - Mérnök',travelTimeHours*2*i.utazas_odautak_szama_mernok*i.mernok_fo,'óra',kszdm,kszdm,false);const kmd=r.km_dij;a('Jármű km díj',i.utazas_tavolsag_km*2*(i.utazas_odautak_szama_szerelo*i.utazas_jarmuvek_szama_szerelo+i.utazas_odautak_szama_mernok*i.utazas_jarmuvek_szama_mernok),'km',kmd,kmd,false);const szallasCost=r.szallas_dij;const szallasSell=szallasCost*(r.szallas_szorzo||1);a('Szállás költség',i.szerelo_szallas_ejszaka*i.szerelo_fo+i.mernok_szallas_ejszaka*i.mernok_fo,'éj',szallasSell,szallasCost,true);
+            const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true); const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
+            state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity, c.unit || 'tétel',c.amount,c.amount,false);});return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};
+        }
         
         function updateCalculationSummary() {
             const i = getInputs();
@@ -319,45 +326,15 @@
             }
         }
 
-        function handleRateConversion() {
-            const form = D('rate-editor-form');
-            const inputs = form.querySelectorAll('.currency-input');
-            const exchangeRate = parseFloat(D('exchange-rate-manual').value) || 1;
-            const currentMode = form.dataset.currencyMode || 'HUF';
-
-            if (currentMode === 'HUF') {
-                inputs.forEach(input => {
-                    const hufValue = parseCurrency(input.value);
-                    const eurValue = hufValue / exchangeRate;
-                    input.value = formatCustomCurrency(eurValue, '€');
-                });
-                form.dataset.currencyMode = 'EUR';
-            } else { // currentMode is 'EUR'
-                inputs.forEach(input => {
-                    const eurValue = parseCurrency(input.value);
-                    const hufValue = eurValue * exchangeRate;
-                    input.value = formatCustomCurrency(hufValue, 'Ft');
-                });
-                form.dataset.currencyMode = 'HUF';
-            }
-        }
-
         function openRateEditor(){
             const modal = D('rate-modal');
             const header = modal.querySelector('.modal-header');
             const body = D('rate-modal-body');
 
-            header.innerHTML = `<h2>Árlisták kezelése</h2>
-                ${state.activeCurrency === 'EUR' ? `<button id="rate-converter-btn" class="btn" style="margin-left: auto; margin-right: 1rem;">HUF ⇄ EUR</button>` : ''}
-                <button class="modal-close-btn">&times;</button>`;
-            
-            body.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form" data-currency-mode="HUF"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;
+            header.innerHTML = `<h2>Árlisták kezelése</h2><button class="modal-close-btn">&times;</button>`;
+            body.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;
             
             modal.querySelector('.modal-close-btn').onclick = () => modal.style.display = 'none';
-
-            if (state.activeCurrency === 'EUR') {
-                D('rate-converter-btn').onclick = handleRateConversion;
-            }
 
             const s=D('rate-editor-select');
             state.rates.forEach(p=>s.add(new Option(p.name,p.id)));
@@ -370,42 +347,10 @@
             modal.style.display='block';
         }
 
-        function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.dataset.currencyMode = 'HUF';form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{input.onblur=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};});}
+        function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{input.onblur=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};});}
         
         function handleSaveRatePackage() {
-            const selectedId = D('rate-editor-select').value;
-            const packageName = D('rate-package-name').value;
-            const pkg = state.rates.find(r => r.id === selectedId);
-            const form = D('rate-editor-form');
-            const isEurMode = form.dataset.currencyMode === 'EUR';
-            const exchangeRate = parseFloat(D('exchange-rate-manual').value) || 1;
-
-            if (pkg) {
-                pkg.name = packageName;
-                Object.keys(RATE_KEY_LABELS).forEach(key => {
-                    const input = D(key);
-                    if (input) {
-                        if (key.includes('_szorzo')) {
-                            pkg.rates[key] = (parseFloat(input.value) || 0) / 100 + 1;
-                        } else if (input.classList.contains('currency-input')) {
-                            let hufValue;
-                            const rawValue = parseCurrency(input.value);
-                            if (isEurMode) {
-                                hufValue = rawValue * exchangeRate;
-                            } else {
-                                hufValue = rawValue;
-                            }
-                            pkg.rates[key] = hufValue;
-                        }
-                    }
-                });
-                localStorage.setItem('rates', JSON.stringify(state.rates));
-                updateRatePackagesUI(selectedId);
-                state.activeRatePackage = state.rates.find(r => r.id === selectedId);
-                calculateAndDisplay();
-                D('rate-modal').style.display = 'none';
-                alert(`"${packageName}" árlista sikeresen mentve!`);
-            }
+            const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(pkg){pkg.name=D('rate-package-name').value;Object.keys(RATE_KEY_LABELS).forEach(key=>{const i=D(key);if(i){if(key.includes('_szorzo')){pkg.rates[key]=(parseFloat(i.value)||0)/100+1;}else{pkg.rates[key]=parseCurrency(i.value);}}});localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(selectedId);state.activeRatePackage=state.rates.find(r=>r.id===selectedId);calculateAndDisplay();D('rate-modal').style.display='none';alert(`"${pkg.name}" árlista sikeresen mentve!`);}
         }
         function handleNewRatePackage(){const n=prompt("Új árlista neve:",new Date().getFullYear()+1);if(n&&n.trim()){const newId=`csomag-${Date.now()}`;const p={id:newId,name:n,rates:{...state.activeRatePackage.rates}};state.rates.push(p);localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(newId);openRateEditor();}}
         function handleDeleteRatePackage(){if(state.rates.length<=1)return alert("Az utolsó árlista nem törölhető.");const i=D('rate-editor-select').value;if(confirm(`Biztosan törli a "${state.rates.find(r=>r.id===i).name}" árlistát?`)){state.rates=state.rates.filter(r=>r.id!==i);localStorage.setItem('rates',JSON.stringify(state.rates));D('rate-modal').style.display='none';updateRatePackagesUI();calculateAndDisplay();}}
@@ -476,8 +421,16 @@
             }
             totalsTableHtml += `<tr><td class="final-total">Nettó végösszeg:</td><td class="align-right final-total">${formatCustomCurrency(finalTotal, currencySymbol)}</td></tr>`;
 
-            const dateFormatted = i.calculation_date ? new Date(i.calculation_date).toLocaleDateString('hu-HU') : '';
+            const date = i.calculation_date ? new Date(i.calculation_date) : new Date();
+            const dateFormatted = date.toLocaleDateString('hu-HU');
             const mainTitle = `<h1>Kiszállás kalkuláció <span class="date">(${dateFormatted})</span></h1>`;
+
+            const dateForFilename = `${date.getFullYear().toString().slice(-2)}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+            let baseName = i.offer_number || 'Kalk';
+            if (i.project_number) {
+                baseName += `/${i.project_number}`;
+            }
+            const filename = `${baseName}_kiszallas_${dateForFilename}.pdf`.replace(/[\\/?%*:|"<>]/g, '_');
 
             const htmlContent = `
                 <!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -522,12 +475,12 @@
                         <th class="align-right">Összesen</th>
                     </tr></thead><tbody>${tableBodyHtml}</tbody></table>
                     <table class="totals-table">${totalsTableHtml}</table>
-                    <div class="footer"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó</div></div>
+                    <div class="footer"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó ${i.creator_name ? `(${i.creator_name})` : ''}</div></div>
                 </div></body></html>`;
             
             const opt = {
                 margin: [15, 10, 15, 10],
-                filename: `Kalkulacio_${i.offer_number || 'ajanlat'}_${i.project_name || 'projekt'}.pdf`.replace(/[\\s/\\?%*:|"<>]/g, '_'),
+                filename: filename,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -540,7 +493,7 @@
         }
         
         async function init(){
-            const version = "v2.2.0";
+            const version = "v2.3.0";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -595,7 +548,7 @@
                             if (field.type === 'currency') {
                                 inputHtml = `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" value="${formatCustomCurrency(item[field.id] || 0, state.activeCurrency === 'EUR' ? '€' : 'Ft')}">`;
                             } else if (field.type === 'number') {
-                                inputHtml = `<input type="number" data-index="${index}" data-field="${field.id}" value="${item[field.id] || 1}">`;
+                                inputHtml = `<input type="number" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`;
                             } else { // text
                                 inputHtml = `<input type="text" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`;
                             }
@@ -608,7 +561,7 @@
                     });
                 };
 
-                D(addButtonId).onclick = () => { state[stateKey].push({quantity: 1, unit: 'db'}); renderList(); };
+                D(addButtonId).onclick = () => { state[stateKey].push({}); renderList(); };
                 D(listId).addEventListener('input', e => { const i = e.target.dataset.index; if(i !== undefined) { const field = e.target.dataset.field; const val = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value; state[stateKey][i][field] = e.target.type === 'number' ? parseFloat(val) || 0 : val; if(!e.target.classList.contains('currency-input')) calculateAndDisplay(); } });
                 D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), state.activeCurrency === 'EUR' ? '€' : 'Ft'); calculateAndDisplay(); }});
                 D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });

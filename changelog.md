@@ -1,5 +1,15 @@
 # Változási Napló
 
+## v2.3.0 - Logikai Pontosítás és Funkcióbővítés
+*Dátum: 2024-05-22*
+
+### Új funkciók és fejlesztések
+- **Szerelési Vezető Logika:** A kalkulációs logika pontosításra került. A mérnökök mostantól minden esetben mérnöki díjon kerülnek elszámolásra, a "mérnök mint szerelésvezető" tétel megszűnt. Szerelésvezetői díj csak akkor van, ha a projektben nincs mérnök.
+- **"Készítő" Mező:** Az alapadatokhoz hozzáadásra került egy opcionális "Készítő" mező, amelynek értéke megjelenik a PDF-ek láblécében.
+- **Dinamikus PDF Fájlnév:** A generált PDF-ek neve mostantól `[Ajánlatszám]_[Projektszám]_kiszallas_[dátum].pdf` séma szerint generálódik.
+- **Üres "Egyéb" Tételek:** Új "Egyéb költség" tétel hozzáadásakor a mezők üresen indulnak, nincsenek előre kitöltött értékek.
+- **UI Finomítások:** A projektszám mező megkapta az "Opcionális" jelzést, és az árlistakezelőből el lett távolítva a feleslegessé vált EUR/HUF átváltó gomb.
+
 ## v2.2.0 - Funkcionális Bővítések és Finomítások
 *Dátum: 2024-05-22*
 
