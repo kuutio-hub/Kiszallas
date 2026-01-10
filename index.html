@@ -346,8 +346,9 @@
         }
         
         async function init(){
+            const version = "v2.0.2";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
-            D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva.`;
+            D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
             state.rates=await loadData('rates','rates.json');
