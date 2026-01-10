@@ -1,5 +1,12 @@
 # Változási Napló
 
+## v2.0.5 - PDF Pontosítások
+*Dátum: 2024-05-22*
+
+### Fejlesztések
+- **Részletesebb PDF adatösszesítő:** A PDF fejlécében található adatösszesítő mostantól pontosan, szerepkörökre bontva (pl. szerelő, mérnök, mérnök szerelésvezetőként) jeleníti meg a projektben résztvevő személyeket és a rájuk vonatkozó napok számát.
+- **Egyértelműbb címkék:** A kalkulációban és a PDF-ben is pontosításra kerültek a címkék, hogy egyértelmű legyen, ha egy mérnök látja el a szerelésvezetői feladatokat.
+
 ## v2.0.4 - Bővített PDF export és UX finomítások
 *Dátum: 2024-05-22*
 
