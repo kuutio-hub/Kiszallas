@@ -34,12 +34,15 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-primary); font-size: 14px; transition: background-color 0.3s, color 0.3s; }
-
+        
+        #app-container { display: none; }
         .container { max-width: 1800px; margin: 1rem auto; padding: 1rem; display: flex; flex-direction: column; min-height: 100vh; }
         .header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-bottom: 1rem; }
-        .header-item { display: flex; align-items: center; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); flex-grow: 1; }
+        .header-item { display: flex; align-items: center; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); flex-grow: 1; min-width: 250px; }
         .header-item-title { padding: 0.5rem 1rem; font-weight: bold; color: var(--text-primary); background-color: var(--bg-tertiary); white-space: nowrap; }
         .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; }
+        .header-item:has(#discount-input) { flex-grow: 0.2; min-width: 180px; }
+        .header-item:has(#discount-input) input { text-align: right; }
         .seahawks-select { background-color: var(--seahawks-navy) !important; color: var(--seahawks-green) !important; font-weight: bold; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
         .header-action-btn { cursor: pointer; background: var(--bg-secondary); border-left: 1px solid var(--border-color); padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
         #theme-switcher svg, #refresh-btn svg, #reset-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
@@ -90,93 +93,112 @@
         #rate-editor-form legend { padding: 0 0.5rem; color: var(--text-secondary); }
         .rate-editor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 0.5rem 1.5rem; }
         .compact-form-group { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-        .compact-form-group label { flex-shrink: 0; margin-bottom: 0; }
-        .compact-form-group input, .compact-form-group .percent-input-wrapper { max-width: 160px; }
+        .compact-form-group label { flex-shrink: 0; margin-bottom: 0; color: var(--text-secondary); }
+        .compact-form-group input, .compact-form-group .percent-input-wrapper { max-width: 140px; }
         .percent-input-wrapper { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 0.3rem; background: var(--bg-primary); padding-right: 0.5rem; }
         .percent-input-wrapper input { border: none; background: transparent; }
         .protection-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;}
         .protection-switch input { width: auto; }
         
+        #landing-page { display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
+        #landing-content { background-color: var(--bg-secondary); padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow); width: 100%; max-width: 400px; }
+        #landing-content h1 { margin-bottom: 1.5rem; color: var(--text-primary); }
+        #password-input { width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); text-align: center; font-size: 1rem; }
+        
         footer { text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.8rem; margin-top: auto; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header class="header">
-            <div class="header-item"><span class="header-item-title">Árlista</span><select id="rate-package-select" class="seahawks-select"></select></div>
-            <div class="header-item"><span class="header-item-title">Pénznem</span><select id="currency-select" class="seahawks-select"><option value="HUF">HUF</option><option value="EUR">EUR</option></select></div>
-            <div class="header-item">
-                <span class="header-item-title">Árfolyam</span>
-                <div class="exchange-rate-wrapper">
-                    <input type="number" id="exchange-rate-manual" step="0.01">
-                    <span>Ft/EUR</span>
-                </div>
-                <div id="show-chart-btn" class="header-action-btn" title="Árfolyam grafikon">📈</div>
-            </div>
-            <div class="header-item"><span class="header-item-title">Engedmény (%)</span><input type="number" id="discount-input" placeholder="0" min="0" max="100"></div>
-            <div class="header-item" style="border:none; box-shadow:none; background:transparent; flex-grow:0; display:flex; gap: 1rem;">
-                <div id="reset-btn" class="header-action-btn" title="Visszaállítás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q134 0 227 93t93 227h-60q0-117-76.5-198.5T480-820q-117 0-198.5 81.5T200-540v80h140v60H160v-180h60v80q0-75 44-137.5T377-740q53-42 121-42 100 0 170 70t70 170q0 100-70 170t-170 70q-46 0-88-18t-73-50l-51 34q36 43 85 66.5T480-80Z"/></svg>
-                </div>
-                <div id="refresh-btn" class="header-action-btn" title="Frissítés és újraszámolás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h60v280H500v-60h168q-44-74-118-117t-150-43q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 142-44.5T716-291l43 38q-54 62-131 98.5T480-160Z"/></svg>
-                </div>
-                <div id="theme-switcher" class="header-action-btn" title="Téma váltása" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
-                    <svg viewBox="0 0 24 24" class="sun-icon"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06z"/></svg>
-                    <svg viewBox="0 0 24 24" class="moon-icon"><path d="M12.3 4.9c.4-.2.6-.7.4-1.1-.2-.4-.7-.6-1.1-.4C7.8 5.2 5 8.3 5 12c0 3.9 3.1 7 7 7 3.7 0 6.8-2.8 7.1-6.6.1-.5-.3-1-.8-1.1s-1 .3-1.1.8c-.2 2.8-2.5 5-5.2 5-2.9 0-5.2-2.3-5.2-5.2 0-2.6 1.9-4.8 4.4-5.2z"/></svg>
-                </div>
-            </div>
-        </header>
 
-        <main class="main-grid">
-            <div class="inputs-container">
-                 <details class="card" open><summary>Alapadatok</summary>
-                    <div class="card-content">
-                        <div class="form-grid">
-                            <div class="form-group"><label for="offer_number">Ajánlatszám</label><input type="text" id="offer_number"></div>
-                            <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number" placeholder="Opcionális"></div>
-                            <div class="form-group"><label for="project_name">Projekt neve</label><input type="text" id="project_name" placeholder="Opcionális"></div>
-                            <div class="form-group"><label for="customer">Megrendelő</label><input type="text" id="customer"></div>
-                            <div class="form-group"><label for="work_location">Munkavégzés helyszíne</label><input type="text" id="work_location"></div>
-                            <div class="form-group"><label for="calculation_date">Kalkuláció dátuma</label><input type="date" id="calculation_date"></div>
-                            <div class="form-group"><label for="creator_name">Készítő</label><input type="text" id="creator_name" placeholder="Opcionális"></div>
-                            <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat"></div>
+    <div id="landing-page">
+        <div id="landing-content">
+            <h1>Kiszállási Kalkulátor</h1>
+            <form id="password-form">
+                <input type="password" id="password-input" placeholder="Jelszó" required>
+                <button type="submit" class="btn">Belépés</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="app-container">
+        <div class="container">
+            <header class="header">
+                <div class="header-item"><span class="header-item-title">Árlista</span><select id="rate-package-select" class="seahawks-select"></select></div>
+                <div class="header-item"><span class="header-item-title">Pénznem</span><select id="currency-select" class="seahawks-select"><option value="HUF">HUF</option><option value="EUR">EUR</option></select></div>
+                <div class="header-item">
+                    <span class="header-item-title">Árfolyam</span>
+                    <div class="exchange-rate-wrapper">
+                        <input type="number" id="exchange-rate-manual" step="0.01">
+                        <span>Ft/EUR</span>
+                    </div>
+                    <div id="show-chart-btn" class="header-action-btn" title="Árfolyam grafikon">📈</div>
+                </div>
+                <div class="header-item"><span class="header-item-title">Engedmény (%)</span><input type="number" id="discount-input" placeholder="0" min="0" max="100"></div>
+                <div class="header-item" style="border:none; box-shadow:none; background:transparent; flex-grow:0; display:flex; gap: 1rem;">
+                    <div id="reset-btn" class="header-action-btn" title="Visszaállítás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q134 0 227 93t93 227h-60q0-117-76.5-198.5T480-820q-117 0-198.5 81.5T200-540v80h140v60H160v-180h60v80q0-75 44-137.5T377-740q53-42 121-42 100 0 170 70t70 170q0 100-70 170t-170 70q-46 0-88-18t-73-50l-51 34q36 43 85 66.5T480-80Z"/></svg>
+                    </div>
+                    <div id="refresh-btn" class="header-action-btn" title="Frissítés és újraszámolás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-110h60v280H500v-60h168q-44-74-118-117t-150-43q-100 0-170 70t-70 170q0 100 70 170t170 70q77 0 142-44.5T716-291l43 38q-54 62-131 98.5T480-160Z"/></svg>
+                    </div>
+                    <div id="theme-switcher" class="header-action-btn" title="Téma váltása" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
+                        <svg viewBox="0 0 24 24" class="sun-icon" fill="currentColor"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06z"/></svg>
+                        <svg viewBox="0 0 24 24" class="moon-icon" fill="currentColor"><path d="M12.3 4.9c.4-.2.6-.7.4-1.1-.2-.4-.7-.6-1.1-.4C7.8 5.2 5 8.3 5 12c0 3.9 3.1 7 7 7 3.7 0 6.8-2.8 7.1-6.6.1-.5-.3-1-.8-1.1s-1 .3-1.1.8c-.2 2.8-2.5 5-5.2 5-2.9 0-5.2-2.3-5.2-5.2 0-2.6 1.9-4.8 4.4-5.2z"/></svg>
+                    </div>
+                </div>
+            </header>
+
+            <main class="main-grid">
+                <div class="inputs-container">
+                     <details class="card" open><summary>Alapadatok</summary>
+                        <div class="card-content">
+                            <div class="form-grid">
+                                <div class="form-group"><label for="offer_number">Ajánlatszám</label><input type="text" id="offer_number"></div>
+                                <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number" placeholder="Opcionális"></div>
+                                <div class="form-group"><label for="project_name">Projekt neve</label><input type="text" id="project_name" placeholder="Opcionális"></div>
+                                <div class="form-group"><label for="customer">Megrendelő</label><input type="text" id="customer"></div>
+                                <div class="form-group"><label for="work_location">Munkavégzés helyszíne</label><input type="text" id="work_location"></div>
+                                <div class="form-group"><label for="calculation_date">Kalkuláció dátuma</label><input type="date" id="calculation_date"></div>
+                                <div class="form-group"><label for="creator_name">Készítő</label><input type="text" id="creator_name" placeholder="Opcionális"></div>
+                                <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat"></div>
+                            </div>
+                            <button class="close-details-btn" title="Bezárás">↑</button>
+                        </div>
+                    </details>
+                     <details class="card"><summary>Szerelők</summary><div class="card-content"><div class="form-grid" id="szerelo-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
+                     <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
+                     <details class="card"><summary>Utazás</summary><div class="card-content"><div class="form-grid" id="utazas-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
+                     <details class="card"><summary>Emelőgép</summary><div class="card-content">
+                        <div class="form-grid" id="emelogep-inputs"></div>
+                        <button class="close-details-btn" title="Bezárás">↑</button>
+                    </div></details>
+                     <details class="card"><summary>Egyéb költségek</summary><div class="card-content">
+                        <div id="other-costs-list"></div>
+                        <div class="item-list-controls">
+                            <button id="add-other-cost-btn" class="btn">+ Új tétel hozzáadása</button>
+                            <button id="save-other-cost-btn" class="btn" style="margin-left: 1rem;">Mentés</button>
                         </div>
                         <button class="close-details-btn" title="Bezárás">↑</button>
-                    </div>
-                </details>
-                 <details class="card"><summary>Szerelők</summary><div class="card-content"><div class="form-grid" id="szerelo-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
-                 <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
-                 <details class="card"><summary>Utazás</summary><div class="card-content"><div class="form-grid" id="utazas-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
-                 <details class="card"><summary>Eszközök</summary><div class="card-content">
-                    <div class="form-grid" id="emelogep-inputs"></div>
-                    <button class="close-details-btn" title="Bezárás">↑</button>
-                </div></details>
-                 <details class="card"><summary>Egyéb költségek</summary><div class="card-content">
-                    <div id="other-costs-list"></div>
-                    <div class="item-list-controls">
-                        <button id="add-other-cost-btn" class="btn">+ Új tétel hozzáadása</button>
-                        <button id="save-other-cost-btn" class="btn" style="margin-left: 1rem;">Mentés</button>
-                    </div>
-                    <button class="close-details-btn" title="Bezárás">↑</button>
-                </div></details>
-                 <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
-                     <button id="manage-rates-btn" class="btn">Árlisták kezelése</button>
-                     <button id="downloadPdfSimple" class="btn">Egyszerűsített PDF</button>
-                     <button id="downloadPdfFull" class="btn" style="background-color: var(--danger-primary); color: var(--text-primary);">Részletes PDF</button>
-                 </div>
-            </div>
-            <div class="card calculation-table">
-                <div id="calculation-summary-header"></div>
-                 <table style="background-color: var(--seahawks-navy); color: var(--seahawks-gray);">
-                    <thead id="breakdown-head" style="background-color: #001a33; color: white;"></thead>
-                    <tbody id="breakdown-body"></tbody>
-                    <tfoot id="breakdown-foot"></tfoot>
-                </table>
-            </div>
-        </main>
-        <footer id="copyright-footer"></footer>
+                    </div></details>
+                     <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                         <button id="manage-rates-btn" class="btn">Árlisták kezelése</button>
+                         <button id="downloadPdfSimple" class="btn">Egyszerűsített PDF</button>
+                         <button id="downloadPdfFull" class="btn" style="background-color: var(--danger-primary); color: var(--text-primary);">Részletes PDF</button>
+                     </div>
+                </div>
+                <div class="card calculation-table">
+                    <div id="calculation-summary-header"></div>
+                     <table style="background-color: var(--seahawks-navy); color: var(--seahawks-gray);">
+                        <thead id="breakdown-head" style="background-color: #001a33; color: white;"></thead>
+                        <tbody id="breakdown-body"></tbody>
+                        <tfoot id="breakdown-foot"></tfoot>
+                    </table>
+                </div>
+            </main>
+            <footer id="copyright-footer"></footer>
+        </div>
     </div>
+
 
     <!-- Modals -->
     <div id="rate-modal" class="modal"><div class="modal-content"><div class="modal-header"></div><div class="modal-body" id="rate-modal-body"></div></div></div>
@@ -194,6 +216,29 @@
           </div>
         </div>
     </div>
+    <div id="new-rate-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header">
+            <h2>Új árlista létrehozása</h2>
+            <button class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <form id="new-rate-form">
+                <div class="form-group">
+                    <label for="new-rate-name">Új árlista neve</label>
+                    <input type="text" id="new-rate-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-rate-template">Sablon</label>
+                    <select id="new-rate-template"></select>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                  <button type="submit" class="btn">Létrehozás</button>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
     
     <script type="module">
         // --- KONFIGURÁCIÓ ---
@@ -202,7 +247,7 @@
 
         let chartInstance = null;
         let state = { rates: [], otherCosts: [], exchangeRates: {}, activeRatePackage: null, calculationResults: null, activeCurrency: 'HUF', isAuthenticated: false };
-        const RATE_KEY_LABELS = { szerelo_hetkoznap_oradij: "Óradíj - Szerelő", szerelo_hetvege_oradij: "Óradíj - Szerelő (hétvége)", szerelesvezeto_hetkoznap_oradij: "Óradíj - Szerelésvezető", szerelesvezeto_hetvege_oradij: "Óradíj - Szerelésvezető (hétvége)", mernok_hetkoznap_oradij: "Óradíj - Mérnök", mernok_hetvege_oradij: "Óradíj - Mérnök (hétvége)", kiszallasi_dij_szerelo: "Kiszállási díj - Szerelő", kiszallasi_dij_mernok: "Kiszállási díj - Mérnök", kikuldeles_dij_szerelo: "Kiküldetési díj - Szerelő", kikuldeles_dij_mernok: "Kiküldetési díj - Mérnök", km_dij: "Kilométerdíj", szallas_dij: "Szállás önköltség", szallas_szorzo: "Szállás továbbértékesítés", emelogep_napidij: "Emelőgép napidíj", emelogep_szallitas_dij: "Emelőgép szállítás", emelogep_szorzo: "Eszköz továbbértékesítés" };
+        const RATE_KEY_LABELS = { szerelo_hetkoznap_oradij: "Óradíj - Szerelő", szerelo_hetvege_oradij: "Óradíj - Szerelő (hétvége)", szerelesvezeto_hetkoznap_oradij: "Óradíj - Szerelésvezető", szerelesvezeto_hetvege_oradij: "Óradíj - Szerelésvezető (hétvége)", mernok_hetkoznap_oradij: "Óradíj - Mérnök", mernok_hetvege_oradij: "Óradíj - Mérnök (hétvége)", kiszallasi_dij_szerelo: "Kiszállási díj - Szerelő", kiszallasi_dij_mernok: "Kiszállási díj - Mérnök", kikuldeles_dij_szerelo: "Kiküldetési díj - Szerelő", kikuldeles_dij_mernok: "Kiküldetési díj - Mérnök", km_dij: "Kilométerdíj (/autó)", szallas_dij: "Szállás költség", szallas_szorzo: "Szállás ár szorzó", emelogep_napidij: "Emelőgép napidíj", emelogep_szallitas_dij: "Emelőgép szállítás", emelogep_szorzo: "Eszköz ár szorzó" };
         const INPUT_CONFIG = {
             szerelo: [{ id: 'szerelo_fo', label: 'Szerelők (fő)' }, { id: 'szerelo_munkaora', label: 'Napi munkaóra' }, { id: 'szerelo_munkanap', label: 'Munkanapok' }, { id: 'szerelo_hetvegi_nap', label: 'Ebből hétvégi nap' }, { id: 'szerelo_szallas_ejszaka', label: 'Szállás (éj)' }, { id: 'utazas_odautak_szama_szerelo', label: 'Kiszállások (db)' }, { id: 'utazas_jarmuvek_szama_szerelo', label: 'Járművek (db)' }, { id: 'location_type', label: 'Munkavégzés helye', type: 'select', options: [{value:'belfold', text:'Belföld'},{value:'kulfold',text:'Külföld'}] }],
             mernok: [{ id: 'mernok_fo', label: 'Mérnökök (fő)' }, { id: 'mernok_munkaora', label: 'Napi munkaóra' }, { id: 'mernok_munkanap', label: 'Munkanapok' }, { id: 'mernok_hetvegi_nap', label: 'Ebből hétvégi nap' }, { id: 'mernok_szallas_ejszaka', label: 'Szállás (éj)' }, { id: 'utazas_odautak_szama_mernok', label: 'Kiszállások (db)' }, { id: 'utazas_jarmuvek_szama_mernok', label: 'Járművek (db)' }],
@@ -242,10 +287,9 @@
             
             const sN=i.szerelo_munkanap, sF=i.szerelo_fo, sH=i.szerelo_munkaora, sW=i.szerelo_hetvegi_nap;
             const mN=i.mernok_munkanap, mF=i.mernok_fo, mH=i.mernok_munkaora, mW=i.mernok_hetvegi_nap;
-            const sWd = sN - sW; // Assembler weekdays
-            const mWd = mN - mW; // Engineer weekdays
+            const sWd = sN - sW;
+            const mWd = mN - mW;
 
-            // --- Personnel Costs ---
             if (mF > 0 && mN > 0) {
                 a('Mérnök óradíj', mF * mWd * mH, 'óra', r.mernok_hetkoznap_oradij, r.mernok_hetkoznap_oradij, false);
                 a('Mérnök óradíj (hétvége)', mF * mW * mH, 'óra', r.mernok_hetvege_oradij, r.mernok_hetvege_oradij, false);
@@ -254,7 +298,6 @@
             if (sF > 0 && sN > 0) {
                 const foreman_needed_wd = Math.max(0, sWd - mWd);
                 const foreman_needed_we = Math.max(0, sW - mW);
-
                 const foreman_hours_wd = foreman_needed_wd * sH;
                 const foreman_hours_we = foreman_needed_we * sH;
                 a('Szerelésvezető óradíj', foreman_hours_wd, 'óra', r.szerelesvezeto_hetkoznap_oradij, r.szerelesvezeto_hetkoznap_oradij, false);
@@ -343,17 +386,8 @@
         }
         
         function handleManageRatesClick() {
-            if (state.isAuthenticated) {
-                openRateEditor();
-                return;
-            }
-            const password = prompt('Kérem, adja meg a jelszót az árlisták szerkesztéséhez:');
-            if (password === ADMIN_PASSWORD) {
-                state.isAuthenticated = true; // Authenticate for the current session
-                openRateEditor();
-            } else if (password) { // only show error if user entered something and it was wrong
-                alert('Hibás jelszó!');
-            }
+            if (!state.isAuthenticated) return;
+            openRateEditor();
         }
 
         function openRateEditor(){
@@ -377,6 +411,7 @@
                 </div>`;
             modal.querySelector('.modal-close-btn').onclick = () => modal.style.display = 'none';
             const s=D('rate-editor-select');
+            s.innerHTML = '';
             state.rates.forEach(p=>s.add(new Option(p.name,p.id)));
             s.value=state.activeRatePackage.id;
             populateRateForm();
@@ -480,7 +515,38 @@
             calculateAndDisplay();
         }
 
-        function handleNewRatePackage(){const n=prompt("Új árlista neve:",new Date().getFullYear()+1);if(n&&n.trim()){const newId=`csomag-${Date.now()}`;const p={id:newId,name:n,rates:{...state.activeRatePackage.rates}, isProtected: false};state.rates.push(p);localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(newId);openRateEditor();}}
+        function handleNewRatePackage(){
+            const modal = D('new-rate-modal');
+            const templateSelect = D('new-rate-template');
+            templateSelect.innerHTML = '<option value="empty">-- Üres árlista --</option>';
+            state.rates.forEach(p => templateSelect.add(new Option(p.name, p.id)));
+            modal.style.display = 'block';
+            const form = D('new-rate-form');
+            form.onsubmit = (e) => {
+                e.preventDefault();
+                const name = D('new-rate-name').value;
+                const templateId = templateSelect.value;
+                if (name && name.trim()) {
+                    const newId = `csomag-${Date.now()}`;
+                    let newRates = {};
+                    if (templateId !== 'empty') {
+                        const templatePackage = state.rates.find(r => r.id === templateId);
+                        newRates = { ...templatePackage.rates };
+                    } else {
+                        Object.keys(RATE_KEY_LABELS).forEach(key => { newRates[key] = key.includes('_szorzo') ? 1 : 0; });
+                    }
+                    const newPackage = { id: newId, name: name.trim(), rates: newRates, isProtected: false };
+                    state.rates.push(newPackage);
+                    localStorage.setItem('rates', JSON.stringify(state.rates));
+                    updateRatePackagesUI(newId);
+                    openRateEditor();
+                    modal.style.display = 'none';
+                    form.reset();
+                }
+            };
+            modal.querySelector('.modal-close-btn').onclick = () => { modal.style.display = 'none'; form.reset(); };
+        }
+        
         function handleDeleteRatePackage(){if(state.rates.length<=1)return alert("Az utolsó árlista nem törölhető.");const i=D('rate-editor-select').value;if(confirm(`Biztosan törli a "${state.rates.find(r=>r.id===i).name}" árlistát?`)){state.rates=state.rates.filter(r=>r.id!==i);localStorage.setItem('rates',JSON.stringify(state.rates));D('rate-modal').style.display='none';updateRatePackagesUI();calculateAndDisplay();}}
         function updateRatePackagesUI(selectedId=null){const s=D('rate-package-select');const currentVal=selectedId||(s?s.value:null)||(state.rates.length>0?state.rates[0].id:null);s.innerHTML='';state.rates.forEach(p=>s.add(new Option(p.name,p.id)));if(currentVal)s.value=currentVal;if(!s.value&&state.rates.length>0)s.value=state.rates[0].id;state.activeRatePackage=state.rates.find(r=>r.id===s.value);}
         
@@ -492,7 +558,7 @@
             const date = new Date();
             const dateFormatted = date.toLocaleDateString('hu-HU');
             const dateForFilename = `${date.getFullYear().toString()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-            const filename = `Arlista_${pkg.name}_${dateForFilename}.pdf`;
+            const filename = `Arlista_${pkg.name.replace(/\s/g, '_')}_${dateForFilename}.pdf`;
 
             const groups = {'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};
             let tablesHtml = '';
@@ -503,7 +569,7 @@
                         const isMultiplier = key.includes('_szorzo');
                         let valueDisplay;
                         if (isMultiplier) {
-                            valueDisplay = `${((pkg.rates[key] || 1) - 1) * 100}%`;
+                            valueDisplay = `${Math.round(((pkg.rates[key] || 1) - 1) * 100)}%`;
                         } else {
                             valueDisplay = formatCustomCurrency(pkg.rates[key] || 0);
                         }
@@ -695,8 +761,8 @@
             calculateAndDisplay();
         }
         
-        async function init(){
-            const version = "v2.5.0";
+        async function initializeApp() {
+            const version = "v2.6.0";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -709,7 +775,6 @@
             if(dates.length>0)D('exchange-rate-manual').value=state.exchangeRates[dates[0]].HUF.toFixed(2);
             calculateAndDisplay();
 
-            D('theme-switcher').onclick=()=>{document.body.classList.toggle('light-mode');localStorage.setItem('theme',document.body.classList.contains('light-mode')?'light':'dark');};
             D('refresh-btn').onclick = calculateAndDisplay;
             D('reset-btn').onclick = handleReset;
             D('manage-rates-btn').onclick=handleManageRatesClick;
@@ -761,6 +826,29 @@
             };
             setupDynamicList('other-costs-list', 'otherCosts', 'add-other-cost-btn', [ { id: 'description', label: 'Tétel neve' }, { id: 'quantity', label: 'Mennyiség', type: 'number' }, { id: 'unit', label: 'Egység', type: 'text' }, { id: 'amount', label: 'Egységár', type: 'currency' }, ]);
         }
+
+        function init() {
+            D('password-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = D('password-input').value;
+                if (password === ADMIN_PASSWORD) {
+                    D('landing-page').style.display = 'none';
+                    D('app-container').style.display = 'block';
+                    state.isAuthenticated = true;
+                    initializeApp();
+                } else {
+                    alert('Hibás jelszó!');
+                    D('password-input').value = '';
+                }
+            });
+
+            if(localStorage.getItem('theme')==='light') document.body.classList.add('light-mode');
+            D('theme-switcher').onclick = () => {
+                document.body.classList.toggle('light-mode');
+                localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+            };
+        }
+
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

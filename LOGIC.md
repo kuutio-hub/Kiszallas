@@ -90,5 +90,5 @@ A rendszer automatikusan kezeli, hogy mikor van szükség külön szerelésvezet
 ## 3. Egyéb Költségek Számítása
 
 - **Utazás:** A kilométerdíj és a kiszállási díj (utazási idő óradíja) a megadott távolság, idő, utak száma és járművek száma alapján kerül kiszámításra. Mindig oda-vissza úttal számol.
-- **Ellátás:** A szállás és a kiküldetési díj (csak külföldön) a létszám és az éjszakák/napok száma alapján kalkulálódik. A szállásnál a rendszer figyelembe veszi a beállított továbbértékesítési szorzót.
-- **Eszközök:** Az emelőgép és egyéb eszközök napidíja és szállítási díja is a beállított továbbértékesítési szorzóval kerül a végösszegbe.
+- **Ellátás:** A szállás és a kiküldetési díj (csak külföldön) a létszám és az éjszakák/napok száma alapján kalkulálódik. A szállásnál a rendszer figyelembe veszi a beállított ár szorzót.
+- **Emelőgép:** Az emelőgép napidíja és szállítási díja is a beállított ár szorzóval kerül a végösszegbe.
