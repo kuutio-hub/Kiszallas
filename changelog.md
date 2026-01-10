@@ -2,6 +2,13 @@
 
 Ez a dokumentum az alkalmazás verzióinak változásait követi nyomon.
 
+## [v1.7.0] - 2024-10-28
+### Hozzáadva
+- **Dinamikus Betűtípus-betöltés PDF-hez:** A PDF generálás mostantól külső `.ttf` fájlokat tölt be futásidőben. Ez a robusztus módszer véglegesen megoldja a magyar `ő` és `ű` karakterek helyes megjelenítését anélkül, hogy a kódot nagy Base64 stringek terhelnék.
+
+### Módosítva
+- **Kód Refaktorálás - Modularizáció:** A teljes JavaScript kód logikai egységek mentén különálló fájlokba (`main.js`, `ui.js`, `calculation.js`, `state.js`, `config.js`, `utils.js`, `pdfGenerator.js`) lett szervezve. Ez jelentősen javítja a kód olvashatóságát, karbantarthatóságát és skálázhatóságát. Az alkalmazás továbbra is 100%-ban GitHub Pages kompatibilis.
+
 ## [v1.6.4] - 2024-10-27
 ### Javítva
 - **PDF Generálás Visszaállítása:** A felhasználói visszajelzés alapján a PDF generálás visszatért a stabil, beépített 'helvetica' betűtípus használatához.

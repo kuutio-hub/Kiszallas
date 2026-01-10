@@ -19,7 +19,7 @@ async function init() {
     if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
     
     // Lábléc és dátum beállítása.
-    D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | v1.7.0`;
+    D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | v1.8.0`;
     D('calculation_date').value = new Date().toISOString().split('T')[0];
     
     // Beviteli mezők generálása.
@@ -47,17 +47,17 @@ async function init() {
     D('manage-rates-btn').onclick = openRateEditor;
     D('show-chart-btn').onclick = openChartModal;
     
-    D('generate-pdf-btn').onclick = async () => {
+    D('generate-pdf-btn').onclick = () => {
         D('pdf-preview-modal').style.display = 'block';
-        pdfDoc = await previewPdf();
+        pdfDoc = previewPdf();
         if (pdfDoc) {
             D('pdf-preview-iframe').src = pdfDoc.output('datauristring');
         }
     };
 
-    D('pdf-view-toggle').onchange = async (e) => {
+    D('pdf-view-toggle').onchange = (e) => {
         state.pdfViewMode = e.target.checked ? 'detailed' : 'simple';
-        pdfDoc = await previewPdf();
+        pdfDoc = previewPdf();
         if (pdfDoc) {
             D('pdf-preview-iframe').src = pdfDoc.output('datauristring');
         }
