@@ -168,8 +168,13 @@
     <div id="chart-modal" class="modal"><div class="modal-content"><div class="modal-header"><h2>EUR/HUF Árfolyam Előzmények</h2><button class="modal-close-btn">&times;</button></div><div class="modal-body"><div id="chart-filters" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;"></div><canvas id="exchange-rate-chart"></canvas></div></div></div>
     
     <script type="module">
+        // --- KONFIGURÁCIÓ ---
+        // A jelszó itt módosítható! Ez a jelszó védi az "Árlisták kezelése" funkciót.
+        const ADMIN_PASSWORD = 'kalkulator2024';
+        // --- KONFIGURÁCIÓ VÉGE ---
+
         let chartInstance = null;
-        let state = { rates: [], otherCosts: [], exchangeRates: {}, activeRatePackage: null, calculationResults: null, activeCurrency: 'HUF' };
+        let state = { rates: [], otherCosts: [], exchangeRates: {}, activeRatePackage: null, calculationResults: null, activeCurrency: 'HUF', isAuthenticated: false };
         const RATE_KEY_LABELS = { szerelo_hetkoznap_oradij: "Óradíj - Szerelő", szerelo_hetvege_oradij: "Óradíj - Szerelő (hétvége)", szerelesvezeto_hetkoznap_oradij: "Óradíj - Szerelésvezető", szerelesvezeto_hetvege_oradij: "Óradíj - Szerelésvezető (hétvége)", mernok_hetkoznap_oradij: "Óradíj - Mérnök", mernok_hetvege_oradij: "Óradíj - Mérnök (hétvége)", kiszallasi_dij_szerelo: "Kiszállási díj - Szerelő", kiszallasi_dij_mernok: "Kiszállási díj - Mérnök", kikuldeles_dij_szerelo: "Kiküldetési díj - Szerelő", kikuldeles_dij_mernok: "Kiküldetési díj - Mérnök", km_dij: "Kilométerdíj", szallas_dij: "Szállás önköltség", szallas_szorzo: "Szállás továbbértékesítés", emelogep_napidij: "Emelőgép napidíj", emelogep_szallitas_dij: "Emelőgép szállítás", emelogep_szorzo: "Eszköz továbbértékesítés" };
         const INPUT_CONFIG = {
             szerelo: [{ id: 'szerelo_fo', label: 'Szerelők (fő)' }, { id: 'szerelo_munkaora', label: 'Napi munkaóra' }, { id: 'szerelo_munkanap', label: 'Munkanapok' }, { id: 'szerelo_hetvegi_nap', label: 'Ebből hétvégi nap' }, { id: 'szerelo_szallas_ejszaka', label: 'Szállás (éj)' }, { id: 'utazas_odautak_szama_szerelo', label: 'Kiszállások (db)' }, { id: 'utazas_jarmuvek_szama_szerelo', label: 'Járművek (db)' }, { id: 'location_type', label: 'Munkavégzés helye', type: 'select', options: [{value:'belfold', text:'Belföld'},{value:'kulfold',text:'Külföld'}] }],
@@ -231,6 +236,20 @@
 
         function calculateAndDisplay(){state.calculationResults=calculateCosts();const{breakdown,totalHuf,totalCostHuf,hasCostItems}=state.calculationResults;const tbody=D('breakdown-body'),thead=D('breakdown-head'),tfoot=D('breakdown-foot');const currency=state.activeCurrency;const currencySymbol=currency==='EUR'?'€':'Ft';const discount=parseFloat(D('discount-input').value)||0;const discountMultiplier=1-(discount/100);tbody.innerHTML=thead.innerHTML=tfoot.innerHTML='';let headHtml=`<tr><th>Költségnem</th><th>Menny.</th><th>Egys.</th><th>Egységár</th>`;if(discount>0){headHtml+=`<th>Kedv. Egységár</th>`;}if(hasCostItems){headHtml+=`<th>Önköltség</th>`;}headHtml+=`<th>Összesen</th></tr>`;thead.innerHTML=headHtml;breakdown.forEach(i=>{const r=tbody.insertRow();const u=convertPrice(i.unitPriceHuf,currency);const dU=u*discountMultiplier;const t=convertPrice(i.totalHuf,currency);const dT=t*discountMultiplier;let rowHtml=`<td>${i.label}</td><td style="text-align:right;">${i.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${i.unit}</td><td style="text-align:right;">${formatCustomCurrency(u,currencySymbol)}</td>`;if(discount>0){rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(dU,currencySymbol)}</td>`;}if(hasCostItems){const tc=convertPrice(i.totalCostHuf,currency);rowHtml+=`<td style="text-align:right;">${i.isCostItem?formatCustomCurrency(tc,currencySymbol):'-'}</td>`;}rowHtml+=`<td style="text-align:right;">${formatCustomCurrency(discount>0?dT:t,currencySymbol)}</td>`;r.innerHTML=rowHtml;});const totalFinal=convertPrice(totalHuf,currency);const totalCostFinal=convertPrice(totalCostHuf,currency);let totalCols=3+1+(discount>0?1:0)+(hasCostItems?1:0)+1;const labelColspan=totalCols-1;let footHtml=``;if(hasCostItems){footHtml+=`<tr class="cost-total-row" style="border-top: 2px solid var(--border-color);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Önköltség összesen (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal,currencySymbol)}</td></tr>`;}footHtml+=`<tr class="total-row" style="border-top: 1px solid var(--seahawks-green);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalFinal,currencySymbol)}</td></tr>`;const discountedTotal=totalFinal*discountMultiplier;if(discount>0){footHtml+=`<tr class="discount-row" style="color: var(--success-primary);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Kedvezményes végösszeg (${discount}%)</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(discountedTotal,currencySymbol)}</td></tr>`;}tfoot.innerHTML=footHtml;updateCalculationSummary();}
         
+        function handleManageRatesClick() {
+            if (state.isAuthenticated) {
+                openRateEditor();
+                return;
+            }
+            const password = prompt('Kérem, adja meg a jelszót az árlisták szerkesztéséhez:');
+            if (password === ADMIN_PASSWORD) {
+                state.isAuthenticated = true; // Authenticate for the current session
+                openRateEditor();
+            } else if (password) { // only show error if user entered something and it was wrong
+                alert('Hibás jelszó!');
+            }
+        }
+
         function openRateEditor(){const b=D('rate-modal-body');b.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;const s=D('rate-editor-select');state.rates.forEach(p=>s.add(new Option(p.name,p.id)));s.value=state.activeRatePackage.id;populateRateForm();s.onchange=populateRateForm;D('new-rate-btn').onclick=handleNewRatePackage;D('delete-rate-btn').onclick=handleDeleteRatePackage;D('save-rate-btn').onclick=handleSaveRatePackage;D('rate-modal').style.display='block';}
         function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{const format=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};input.onfocus=()=>input.select();input.onblur=format;});}
         
@@ -377,7 +396,7 @@
         }
         
         async function init(){
-            const version = "v2.0.7";
+            const version = "v2.0.8";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -392,7 +411,7 @@
 
             D('theme-switcher').onclick=()=>{document.body.classList.toggle('light-mode');localStorage.setItem('theme',document.body.classList.contains('light-mode')?'light':'dark');};
             D('refresh-btn').onclick = calculateAndDisplay;
-            D('manage-rates-btn').onclick=openRateEditor;
+            D('manage-rates-btn').onclick=handleManageRatesClick;
             D('show-chart-btn').onclick=openChartModal;
             D('downloadPdfFull').addEventListener('click', () => generatePdf({ simplified: false }));
             D('downloadPdfSimple').addEventListener('click', () => generatePdf({ simplified: true }));

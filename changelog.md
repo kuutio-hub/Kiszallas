@@ -1,11 +1,17 @@
 # Változási Napló
 
+## v2.0.8 - Jelszavas Védelem
+*Dátum: 2024-05-22*
+
+### Új funkciók
+- **Jelszó az árlistákhoz:** Az "Árlisták kezelése" funkció mostantól jelszót kér a megnyitás előtt, hogy megakadályozza a véletlen módosításokat. A jelszó a kódban könnyen módosítható.
+
 ## v2.0.7 - Felhasználói Felület Finomhangolása
 *Dátum: 2024-05-22*
 
 ### Fejlesztések
-- **Frissítés Gomb:** A fejléc kapott egy új "Frissítés" gombot, amivel manuálisan újraszámoltatható a kalkuláció. Ez hasznos például az árfolyam kézi átírása után.
-- **Áthelyezett Összesítő:** A felső menüből el lett távolítva a projekt-összesítő sáv. Helyette a jobb oldali kalkulációs táblázat kapott egy dinamikus fejlécet, ami kontextusban, reszponzívan jeleníti meg a projekt főbb adatait.
+- **Frissítés Gomb:** A fejléc kapott egy új "Frissítés" gombot, amivel manuálisan újraszámoltatható a kalkuláció.
+- **Áthelyezett Összesítő:** A felső menüből el lett távolítva a projekt-összesítő sáv. Helyette a jobb oldali kalkulációs táblázat kapott egy dinamikus fejlécet.
 - **Projektfájlok Tisztítása:** A felesleges `index.tsx` és `templates.json` fájlok törlésre kerültek a projektből.
 
 ## v2.0.6 - PDF Generálás Javítások és Finomítások
