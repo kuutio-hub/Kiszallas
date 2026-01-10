@@ -1,5 +1,13 @@
 # Változási Napló
 
+## v2.2.0 - Funkcionális Bővítések és Finomítások
+*Dátum: 2024-05-22*
+
+### Új funkciók és fejlesztések
+- **'Egység' Mező Egyéb Költségeknél:** Az "Egyéb költségek" szekcióban a tételekhez mostantól megadható egyéni mértékegység (pl. db, l, m, klt), ami a kalkulációban és a PDF exportokban is megjelenik.
+- **Automatikus Kijelölés Fókuszkor:** A felhasználói élmény javítása érdekében minden numerikus és pénzügyi beviteli mező tartalma automatikusan kijelölésre kerül, amint a felhasználó belekattint, megkönnyítve az adatok gyors módosítását.
+- **Feltételes Árfolyamváltó:** Az "Árlisták kezelése" ablakban egy "HUF ⇄ EUR" gomb jelenik meg, de csak akkor, ha a fő pénznem EUR-ra van állítva. Ez lehetővé teszi az árak gyors átváltását és szerkesztését EUR-ban anélkül, hogy az alapértelmezett (HUF) árakat módosítani kellene a mentéskor.
+
 ## v2.1.0 - Felhasználói Élmény és Logikai Finomítások
 *Dátum: 2024-05-22*
 

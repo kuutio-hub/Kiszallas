@@ -83,7 +83,7 @@
         .item-list-controls { margin-top: 1rem; }
         #other-costs-list .dynamic-item { 
             display: grid; 
-            grid-template-columns: 3fr 1fr 2fr auto; 
+            grid-template-columns: 2.5fr 0.8fr 0.8fr 1.5fr auto; 
             gap: 0.8rem;
             align-items: end;
             margin-bottom: 1rem;
@@ -185,7 +185,7 @@
     </div>
 
     <!-- Modals -->
-    <div id="rate-modal" class="modal"><div class="modal-content"><div class="modal-header"><h2>Árlisták kezelése</h2><button class="modal-close-btn">&times;</button></div><div class="modal-body" id="rate-modal-body"></div></div></div>
+    <div id="rate-modal" class="modal"><div class="modal-content"><div class="modal-header"></div><div class="modal-body" id="rate-modal-body"></div></div></div>
     <div id="chart-modal" class="modal"><div class="modal-content"><div class="modal-header"><h2>EUR/HUF Árfolyam Előzmények</h2><button class="modal-close-btn">&times;</button></div><div class="modal-body"><div id="chart-filters" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;"></div><canvas id="exchange-rate-chart"></canvas></div></div></div>
     
     <script type="module">
@@ -232,7 +232,7 @@
         const travelTimeInput=D('utazas_ido_ora'); const travelTimeHours=travelTimeInput.dataset.unit==='perc'?(i.utazas_ido_ora/60):i.utazas_ido_ora;
         const kszdsz=r.kiszallasi_dij_szerelo;a('Kiszállási díj - Szerelő',travelTimeHours*2*i.utazas_odautak_szama_szerelo*i.szerelo_fo,'óra',kszdsz,kszdsz,false);const kszdm=r.kiszallasi_dij_mernok;a('Kiszállási díj - Mérnök',travelTimeHours*2*i.utazas_odautak_szama_mernok*i.mernok_fo,'óra',kszdm,kszdm,false);const kmd=r.km_dij;a('Jármű km díj',i.utazas_tavolsag_km*2*(i.utazas_odautak_szama_szerelo*i.utazas_jarmuvek_szama_szerelo+i.utazas_odautak_szama_mernok*i.utazas_jarmuvek_szama_mernok),'km',kmd,kmd,false);const szallasCost=r.szallas_dij;const szallasSell=szallasCost*(r.szallas_szorzo||1);a('Szállás költség',i.szerelo_szallas_ejszaka*i.szerelo_fo+i.mernok_szallas_ejszaka*i.mernok_fo,'éj',szallasSell,szallasCost,true);
         const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true); const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
-        state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity,'tétel',c.amount,c.amount,false);});return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};}
+        state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity, c.unit || 'tétel',c.amount,c.amount,false);});return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};}
         
         function updateCalculationSummary() {
             const i = getInputs();
@@ -319,10 +319,94 @@
             }
         }
 
-        function openRateEditor(){const b=D('rate-modal-body');b.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;const s=D('rate-editor-select');state.rates.forEach(p=>s.add(new Option(p.name,p.id)));s.value=state.activeRatePackage.id;populateRateForm();s.onchange=populateRateForm;D('new-rate-btn').onclick=handleNewRatePackage;D('delete-rate-btn').onclick=handleDeleteRatePackage;D('save-rate-btn').onclick=handleSaveRatePackage;D('rate-modal').style.display='block';}
-        function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{const format=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};input.onfocus=()=>input.select();input.onblur=format;});}
+        function handleRateConversion() {
+            const form = D('rate-editor-form');
+            const inputs = form.querySelectorAll('.currency-input');
+            const exchangeRate = parseFloat(D('exchange-rate-manual').value) || 1;
+            const currentMode = form.dataset.currencyMode || 'HUF';
+
+            if (currentMode === 'HUF') {
+                inputs.forEach(input => {
+                    const hufValue = parseCurrency(input.value);
+                    const eurValue = hufValue / exchangeRate;
+                    input.value = formatCustomCurrency(eurValue, '€');
+                });
+                form.dataset.currencyMode = 'EUR';
+            } else { // currentMode is 'EUR'
+                inputs.forEach(input => {
+                    const eurValue = parseCurrency(input.value);
+                    const hufValue = eurValue * exchangeRate;
+                    input.value = formatCustomCurrency(hufValue, 'Ft');
+                });
+                form.dataset.currencyMode = 'HUF';
+            }
+        }
+
+        function openRateEditor(){
+            const modal = D('rate-modal');
+            const header = modal.querySelector('.modal-header');
+            const body = D('rate-modal-body');
+
+            header.innerHTML = `<h2>Árlisták kezelése</h2>
+                ${state.activeCurrency === 'EUR' ? `<button id="rate-converter-btn" class="btn" style="margin-left: auto; margin-right: 1rem;">HUF ⇄ EUR</button>` : ''}
+                <button class="modal-close-btn">&times;</button>`;
+            
+            body.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-end;gap:1rem;margin-bottom:1.5rem"><div class="form-group" style="flex-grow:1"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div><button id="new-rate-btn" class="btn">Új</button><button id="delete-rate-btn" class="btn" style="background-color:var(--danger-primary);">Törlés</button></div><form id="rate-editor-form" data-currency-mode="HUF"></form><div style="text-align:right;margin-top:1.5rem;"><button id="save-rate-btn" class="btn" style="background-color:var(--success-primary);color:var(--text-on-accent);">Mentés</button></div>`;
+            
+            modal.querySelector('.modal-close-btn').onclick = () => modal.style.display = 'none';
+
+            if (state.activeCurrency === 'EUR') {
+                D('rate-converter-btn').onclick = handleRateConversion;
+            }
+
+            const s=D('rate-editor-select');
+            state.rates.forEach(p=>s.add(new Option(p.name,p.id)));
+            s.value=state.activeRatePackage.id;
+            populateRateForm();
+            s.onchange=populateRateForm;
+            D('new-rate-btn').onclick=handleNewRatePackage;
+            D('delete-rate-btn').onclick=handleDeleteRatePackage;
+            D('save-rate-btn').onclick=handleSaveRatePackage;
+            modal.style.display='block';
+        }
+
+        function populateRateForm(){const selectedId=D('rate-editor-select').value;const pkg=state.rates.find(r=>r.id===selectedId);if(!pkg)return;const form=D('rate-editor-form');form.dataset.currencyMode = 'HUF';form.innerHTML=`<div class="form-group" style="grid-column:1/-1;"><label for="rate-package-name">Árlista neve</label><input type="text" id="rate-package-name" value="${pkg.name}"></div>`;const groups={'Személyi díjak':['szerelo_hetkoznap_oradij','szerelo_hetvege_oradij','szerelesvezeto_hetkoznap_oradij','szerelesvezeto_hetvege_oradij','mernok_hetkoznap_oradij','mernok_hetvege_oradij'],'Kiszállás és Utazás':['kiszallasi_dij_szerelo','kiszallasi_dij_mernok','km_dij'],'Ellátás':['kikuldeles_dij_szerelo','kikuldeles_dij_mernok','szallas_dij','szallas_szorzo'],'Eszközök':['emelogep_napidij','emelogep_szallitas_dij','emelogep_szorzo']};Object.entries(groups).forEach(([title,keys])=>{let html=`<fieldset><legend>${title}</legend><div class="form-grid">`;keys.forEach(key=>{if(RATE_KEY_LABELS[key]){const isMultiplier=key.includes('_szorzo');if(isMultiplier){const val=((pkg.rates[key]||1)-1)*100;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><div class="percent-input-wrapper"><input type="number" step="1" id="${key}" value="${val.toFixed(0)}"><span>%</span></div></div>`;}else{const val=pkg.rates[key]||0;html+=`<div class="form-group"><label for="${key}">${RATE_KEY_LABELS[key]}</label><input type="text" id="${key}" class="currency-input" value="${formatCustomCurrency(val)}"></div>`;}}});html+='</div></fieldset>';form.innerHTML+=html;});form.querySelectorAll('.currency-input').forEach(input=>{input.onblur=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};});}
         
-        function handleSaveRatePackage() {const selectedId=D('rate-editor-select').value;const packageName=D('rate-package-name').value;const pkg=state.rates.find(r=>r.id===selectedId);if(pkg){pkg.name=packageName;Object.keys(RATE_KEY_LABELS).forEach(key=>{const input=D(key);if(input){if(key.includes('_szorzo')){pkg.rates[key]=(parseFloat(input.value)||0)/100+1;}else{pkg.rates[key]=parseCurrency(input.value);}}});localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(selectedId);state.activeRatePackage=state.rates.find(r=>r.id===selectedId);calculateAndDisplay();D('rate-modal').style.display='none';alert(`"${packageName}" árlista sikeresen mentve!`);}}
+        function handleSaveRatePackage() {
+            const selectedId = D('rate-editor-select').value;
+            const packageName = D('rate-package-name').value;
+            const pkg = state.rates.find(r => r.id === selectedId);
+            const form = D('rate-editor-form');
+            const isEurMode = form.dataset.currencyMode === 'EUR';
+            const exchangeRate = parseFloat(D('exchange-rate-manual').value) || 1;
+
+            if (pkg) {
+                pkg.name = packageName;
+                Object.keys(RATE_KEY_LABELS).forEach(key => {
+                    const input = D(key);
+                    if (input) {
+                        if (key.includes('_szorzo')) {
+                            pkg.rates[key] = (parseFloat(input.value) || 0) / 100 + 1;
+                        } else if (input.classList.contains('currency-input')) {
+                            let hufValue;
+                            const rawValue = parseCurrency(input.value);
+                            if (isEurMode) {
+                                hufValue = rawValue * exchangeRate;
+                            } else {
+                                hufValue = rawValue;
+                            }
+                            pkg.rates[key] = hufValue;
+                        }
+                    }
+                });
+                localStorage.setItem('rates', JSON.stringify(state.rates));
+                updateRatePackagesUI(selectedId);
+                state.activeRatePackage = state.rates.find(r => r.id === selectedId);
+                calculateAndDisplay();
+                D('rate-modal').style.display = 'none';
+                alert(`"${packageName}" árlista sikeresen mentve!`);
+            }
+        }
         function handleNewRatePackage(){const n=prompt("Új árlista neve:",new Date().getFullYear()+1);if(n&&n.trim()){const newId=`csomag-${Date.now()}`;const p={id:newId,name:n,rates:{...state.activeRatePackage.rates}};state.rates.push(p);localStorage.setItem('rates',JSON.stringify(state.rates));updateRatePackagesUI(newId);openRateEditor();}}
         function handleDeleteRatePackage(){if(state.rates.length<=1)return alert("Az utolsó árlista nem törölhető.");const i=D('rate-editor-select').value;if(confirm(`Biztosan törli a "${state.rates.find(r=>r.id===i).name}" árlistát?`)){state.rates=state.rates.filter(r=>r.id!==i);localStorage.setItem('rates',JSON.stringify(state.rates));D('rate-modal').style.display='none';updateRatePackagesUI();calculateAndDisplay();}}
         function updateRatePackagesUI(selectedId=null){const s=D('rate-package-select');const currentVal=selectedId||(s?s.value:null)||(state.rates.length>0?state.rates[0].id:null);s.innerHTML='';state.rates.forEach(p=>s.add(new Option(p.name,p.id)));if(currentVal)s.value=currentVal;if(!s.value&&state.rates.length>0)s.value=state.rates[0].id;state.activeRatePackage=state.rates.find(r=>r.id===s.value);}
@@ -443,7 +527,7 @@
             
             const opt = {
                 margin: [15, 10, 15, 10],
-                filename: `Kalkulacio_${simplified ? 'egyszerusitett_' : ''}${i.offer_number || 'ajanlat'}_${i.project_name || 'projekt'}.pdf`.replace(/[\\s/\\?%*:|"<>]/g, '_'),
+                filename: `Kalkulacio_${i.offer_number || 'ajanlat'}_${i.project_name || 'projekt'}.pdf`.replace(/[\\s/\\?%*:|"<>]/g, '_'),
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2, useCORS: true, letterRendering: true },
                 jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -456,7 +540,7 @@
         }
         
         async function init(){
-            const version = "v2.1.0";
+            const version = "v2.2.0";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -493,7 +577,7 @@
             D('rate-package-select').onchange=(e)=>{state.activeRatePackage=state.rates.find(r=>r.id===e.target.value);calculateAndDisplay();};
             D('currency-select').onchange=(e)=>{state.activeCurrency=e.target.value;calculateAndDisplay();};
 
-            document.querySelector('.inputs-container').addEventListener('focusin', (e) => { if(e.target.matches('input, select')) { const parentDetails = e.target.closest('details'); if(parentDetails && !parentDetails.open) { document.querySelectorAll('.inputs-container details').forEach(d => d.open = false); parentDetails.open = true; } } });
+            document.body.addEventListener('focusin', e => { if (e.target.matches('input[type="number"], .currency-input, input[type="text"]')) { e.target.select(); } });
             document.querySelectorAll('.close-details-btn').forEach(btn => btn.onclick = (e) => e.target.closest('details').open = false);
             document.querySelector('.inputs-container').addEventListener('click', e => { if (e.target.classList.contains('travel-unit-toggle')) { const input = D('utazas_ido_ora'); const currentUnit = input.dataset.unit || 'óra'; const isHour = currentUnit === 'óra'; const val = parseFloat(input.value) || 0; input.dataset.unit = isHour ? 'perc' : 'óra'; input.value = isHour ? (val * 60).toFixed(0) : (val / 60).toFixed(2); e.target.textContent = isHour ? 'perc' : 'óra'; calculateAndDisplay(); } });
 
@@ -512,7 +596,7 @@
                                 inputHtml = `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" value="${formatCustomCurrency(item[field.id] || 0, state.activeCurrency === 'EUR' ? '€' : 'Ft')}">`;
                             } else if (field.type === 'number') {
                                 inputHtml = `<input type="number" data-index="${index}" data-field="${field.id}" value="${item[field.id] || 1}">`;
-                            } else {
+                            } else { // text
                                 inputHtml = `<input type="text" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`;
                             }
                             fieldsHtml += `<div class="form-group"><label>${field.label}</label>${inputHtml}</div>`;
@@ -524,7 +608,7 @@
                     });
                 };
 
-                D(addButtonId).onclick = () => { state[stateKey].push({quantity: 1}); renderList(); };
+                D(addButtonId).onclick = () => { state[stateKey].push({quantity: 1, unit: 'db'}); renderList(); };
                 D(listId).addEventListener('input', e => { const i = e.target.dataset.index; if(i !== undefined) { const field = e.target.dataset.field; const val = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value; state[stateKey][i][field] = e.target.type === 'number' ? parseFloat(val) || 0 : val; if(!e.target.classList.contains('currency-input')) calculateAndDisplay(); } });
                 D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), state.activeCurrency === 'EUR' ? '€' : 'Ft'); calculateAndDisplay(); }});
                 D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });
@@ -535,6 +619,7 @@
             setupDynamicList('other-costs-list', 'otherCosts', 'add-other-cost-btn', [
                 { id: 'description', label: 'Tétel neve' },
                 { id: 'quantity', label: 'Mennyiség', type: 'number' },
+                { id: 'unit', label: 'Egység', type: 'text' },
                 { id: 'amount', label: 'Egységár', type: 'currency' },
             ]);
         }
