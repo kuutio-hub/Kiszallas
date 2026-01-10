@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -27,10 +28,12 @@
             --bg-primary: #f4f7f6; --bg-secondary: #ffffff; --bg-tertiary: #e2e8f0;
             --text-primary: #1a202c; --text-secondary: #4a5568; --text-on-accent: #ffffff;
             --border-color: #d1d5db; --accent-primary: #3b82f6; --accent-secondary: #2563eb;
+            --seahawks-navy: #ffffff; --seahawks-green: #69BE28; --seahawks-gray: #4a5568;
         }
 
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number], input[type=text].currency-input { -moz-appearance: textfield; text-align: right; }
+        .light-mode input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(0.3); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-primary); font-size: 14px; transition: background-color 0.3s, color 0.3s; }
@@ -45,6 +48,7 @@
         .header-item:has(#discount-input) { flex-grow: 0; flex-basis: auto; }
         #discount-input { max-width: 100px; }
         .seahawks-select { background-color: var(--seahawks-navy) !important; color: var(--seahawks-green) !important; font-weight: bold; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
+        .light-mode .seahawks-select { background-color: var(--bg-tertiary) !important; color: var(--text-primary) !important; font-weight: normal; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%231a202c'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); }
         .header-action-btn { cursor: pointer; background: var(--bg-secondary); border-left: 1px solid var(--border-color); padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
         #theme-switcher svg, #refresh-btn svg, #reset-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
         .sun-icon, .moon-icon { transition: opacity 0.3s ease; }
@@ -110,7 +114,14 @@
         #password-input { width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); text-align: center; font-size: 1rem; }
         #password-form .btn { background-color: var(--seahawks-green); color: var(--text-on-accent); }
         
+        .modal-body .form-group input { max-width: none; }
+        .confirmation-checkbox { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; cursor: pointer; user-select: none;}
+        .confirmation-checkbox input { width: auto; max-width: none; }
+        .btn-safe-action { background-color: var(--seahawks-green); color: var(--text-on-accent); }
+        
         footer { text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.8rem; margin-top: auto; }
+        
+        .light-mode #breakdown-head { background-color: #e2e8f0; color: #1a202c; }
     </style>
 </head>
 <body>
@@ -188,7 +199,7 @@
                      <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
                          <button id="manage-rates-btn" class="btn">Árlisták kezelése</button>
                          <button id="downloadPdfSimple" class="btn">Egyszerűsített PDF</button>
-                         <button id="downloadPdfFull" class="btn" style="background-color: var(--seahawks-green); color: var(--text-on-accent);">Részletes PDF</button>
+                         <button id="downloadPdfFull" class="btn btn-safe-action">Részletes PDF</button>
                      </div>
                 </div>
                 <div class="card calculation-table">
@@ -208,19 +219,50 @@
     <!-- Modals -->
     <div id="rate-modal" class="modal"><div class="modal-content"><div class="modal-header"></div><div class="modal-body" id="rate-modal-body"></div></div></div>
     <div id="chart-modal" class="modal"><div class="modal-content"><div class="modal-header"><h2>EUR/HUF Árfolyam Előzmények</h2><button class="modal-close-btn">&times;</button></div><div class="modal-body"><div id="chart-filters" style="display: flex; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap;"></div><canvas id="exchange-rate-chart"></canvas></div></div></div>
+    
     <div id="save-confirm-modal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
           <div class="modal-header"><h2>Mentés megerősítése</h2></div>
           <div class="modal-body">
-            <p id="save-confirm-message" style="margin-bottom: 1.5rem;"></p>
-            <div style="display: flex; gap: 1rem; justify-content: flex-end;">
-              <button id="confirm-overwrite-btn" class="btn">Felülírás</button>
-              <button id="confirm-save-as-btn" class="btn">Mentés másként...</button>
-              <button id="confirm-cancel-btn" class="btn" style="background-color: var(--bg-tertiary);">Mégse</button>
-            </div>
+            <form id="save-confirm-form">
+                <p id="save-confirm-message" style="margin-bottom: 1rem;"></p>
+                <div class="form-group">
+                    <label for="save-password">Admin jelszó a felülíráshoz</label>
+                    <input type="password" id="save-password" required>
+                </div>
+                <label class="confirmation-checkbox">
+                    <input type="checkbox" id="save-irreversible-confirm" required>
+                    Megértettem, hogy a módosítás visszavonhatatlan.
+                </label>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                  <button type="submit" id="confirm-overwrite-btn" class="btn">Felülírás jelszóval</button>
+                  <button type="button" id="confirm-save-as-btn" class="btn">Mentés másként...</button>
+                  <button type="button" id="confirm-cancel-btn" class="btn btn-safe-action">Mégse</button>
+                </div>
+            </form>
           </div>
         </div>
     </div>
+    
+    <div id="protection-confirm-modal" class="modal">
+        <div class="modal-content" style="max-width: 500px;">
+          <div class="modal-header"><h2>Védelem feloldása</h2></div>
+          <div class="modal-body">
+            <form id="protection-confirm-form">
+                <p style="margin-bottom: 1rem; color: var(--danger-primary); font-weight: bold;">FIGYELEM: A védelem feloldásával az árlista szerkeszthetővé válik. A mentett módosítások véglegesek és nem visszaállíthatók!</p>
+                <div class="form-group">
+                    <label for="protection-password">Admin jelszó a feloldáshoz</label>
+                    <input type="password" id="protection-password" required>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
+                    <button type="submit" class="btn">Feloldás</button>
+                    <button type="button" id="protection-cancel-btn" class="btn btn-safe-action">Mégse</button>
+                </div>
+            </form>
+          </div>
+        </div>
+    </div>
+
     <div id="new-rate-modal" class="modal">
         <div class="modal-content" style="max-width: 500px;">
           <div class="modal-header">
@@ -238,7 +280,7 @@
                     <select id="new-rate-template"></select>
                 </div>
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-                  <button type="submit" class="btn" style="background-color: var(--seahawks-green); color: var(--text-on-accent);">Létrehozás</button>
+                  <button type="submit" class="btn btn-safe-action">Létrehozás</button>
                 </div>
             </form>
           </div>
@@ -412,7 +454,7 @@
                 <form id="rate-editor-form"></form>
                 <div style="text-align:right; margin-top:1.5rem; display:flex; justify-content:flex-end; gap:1rem;">
                     <button id="export-rate-pdf-btn" class="btn">PDF Export</button>
-                    <button id="save-rate-btn" class="btn" style="background-color:var(--seahawks-green);color:var(--text-on-accent);">Mentés</button>
+                    <button id="save-rate-btn" class="btn btn-safe-action">Mentés</button>
                 </div>`;
             modal.querySelector('.modal-close-btn').onclick = () => modal.style.display = 'none';
             const s=D('rate-editor-select');
@@ -429,13 +471,23 @@
             modal.style.display='block';
         }
         
-        function handleProtectionToggle() {
+        function handleProtectionToggle(event) {
+            const toggle = event.target;
             const selectedId = D('rate-editor-select').value;
             const pkg = state.rates.find(r => r.id === selectedId);
             if (!pkg) return;
-            pkg.isProtected = D('rate-protection-toggle').checked;
-            localStorage.setItem('rates', JSON.stringify(state.rates));
-            populateRateForm();
+        
+            if (toggle.checked) { // Védelem BEkapcsolása
+                pkg.isProtected = true;
+                localStorage.setItem('rates', JSON.stringify(state.rates));
+                populateRateForm();
+            } else { // Védelem KIKAPCSOLÁSA
+                event.preventDefault(); 
+                const modal = D('protection-confirm-modal');
+                modal.dataset.packageId = selectedId;
+                modal.style.display = 'block';
+                D('protection-password').focus();
+            }
         }
 
         function populateRateForm(){
@@ -476,9 +528,10 @@
             const modal = D('save-confirm-modal');
             const selectedId = D('rate-editor-select').value;
             const pkg = state.rates.find(r => r.id === selectedId);
-            D('save-confirm-message').textContent = `Biztosan felülírja a(z) "${pkg.name}" árlistát? Vagy szeretné más néven menteni?`;
+            D('save-confirm-message').textContent = `Biztosan felülírja a(z) "${pkg.name}" árlistát? A művelet nem vonható vissza.`;
             modal.dataset.packageId = selectedId;
             modal.style.display = 'block';
+            D('save-password').focus();
         }
 
         function getRatesFromForm() {
@@ -791,7 +844,7 @@
         }
         
         async function initializeApp() {
-            const version = "v2.7.0";
+            const version = "v2.9.0";
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
@@ -810,11 +863,39 @@
             D('downloadPdfFull').addEventListener('click', () => generatePdf({ simplified: false }));
             D('downloadPdfSimple').addEventListener('click', () => generatePdf({ simplified: true }));
             
-            D('confirm-overwrite-btn').onclick = () => { executeSave({ isSaveAs: false }); D('save-confirm-modal').style.display = 'none'; };
+            D('save-confirm-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = D('save-password').value;
+                if (password === ADMIN_PASSWORD) {
+                    executeSave({ isSaveAs: false });
+                    D('save-confirm-modal').style.display = 'none';
+                    e.target.reset();
+                } else {
+                    alert('Hibás jelszó!');
+                }
+            });
             D('confirm-save-as-btn').onclick = () => { const newName = prompt("Adja meg az új árlista nevét:"); if (newName && newName.trim()) { executeSave({ isSaveAs: true, newName: newName.trim() }); D('save-confirm-modal').style.display = 'none'; } };
-            D('confirm-cancel-btn').onclick = () => { D('save-confirm-modal').style.display = 'none'; };
+            D('confirm-cancel-btn').onclick = () => { D('save-confirm-modal').style.display = 'none'; D('save-confirm-form').reset(); };
 
-            D('save-other-cost-btn').onclick = () => { const btn = D('save-other-cost-btn'); const originalText = btn.textContent; btn.textContent = 'Mentve!'; btn.style.backgroundColor = 'var(--seahawks-green)'; btn.style.color = 'var(--text-on-accent)'; setTimeout(() => { btn.textContent = originalText; btn.style.backgroundColor = ''; btn.style.color = ''; }, 1500); };
+            D('protection-confirm-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const password = D('protection-password').value;
+                const modal = D('protection-confirm-modal');
+                if (password === ADMIN_PASSWORD) {
+                    const selectedId = modal.dataset.packageId;
+                    const pkg = state.rates.find(r => r.id === selectedId);
+                    pkg.isProtected = false;
+                    localStorage.setItem('rates', JSON.stringify(state.rates));
+                    populateRateForm();
+                    modal.style.display = 'none';
+                    e.target.reset();
+                } else {
+                    alert('Hibás jelszó!');
+                }
+            });
+            D('protection-cancel-btn').onclick = () => { D('protection-confirm-modal').style.display = 'none'; D('protection-confirm-form').reset(); };
+
+            D('save-other-cost-btn').onclick = () => { const btn = D('save-other-cost-btn'); const originalText = btn.textContent; btn.textContent = 'Mentve!'; btn.classList.add('btn-safe-action'); setTimeout(() => { btn.textContent = originalText; btn.classList.remove('btn-safe-action'); }, 1500); };
             
             document.querySelectorAll('.modal-close-btn').forEach(b=>b.onclick=(e)=>e.target.closest('.modal').style.display='none');
             document.querySelector('.inputs-container').oninput=calculateAndDisplay;
@@ -880,131 +961,4 @@
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
-</html>--- START OF FILE LOGIC.md ---
-
-# Kalkulációs Logika Dokumentáció
-
-Ez a dokumentum a Kiszállási Kalkulátor motorjának számítási logikáját részletezi, különös tekintettel a személyi költségek, azon belül is a szerelésvezetői díjak meghatározására.
-
-## 1. Alapelvek
-
-- **Forint Alapú Számítás:** Minden belső számítás és az árlistákban tárolt érték forintban (HUF) történik. Az euróra (EUR) való átváltás csak a megjelenítéskor, az utolsó lépésben történik, a felhasználó által megadott árfolyam alapján.
-- **Költségnemek:** A kalkuláció főbb kategóriákra bontja a költségeket: Személyi díjak, Utazás, Ellátás, Eszközök, és Egyéb költségek.
-
-## 2. Személyi Díjak Számítása
-
-Ez a legösszetettebb része a kalkulációnak. A cél, hogy a rendszer a lehető legpontosabban modellezze a valós helyszíni felállást.
-
-### 2.1. A Szerelésvezetői Logika
-
-A rendszer automatikusan kezeli, hogy mikor van szükség külön szerelésvezetői díj felszámítására.
-
-**A szabály:** Mindig van egy szerelésvezető a területen.
-- **Ha van mérnök a helyszínen:** A mérnök(ök) látják el a szerelésvezetői feladatokat. Ilyenkor nincs külön szerelésvezetői díj, a mérnökök a saját óradíjukon vannak elszámolva.
-- **Ha nincs mérnök:** A szerelők közül egy fő automatikusan szerelésvezetővé válik, és az ő munkaórái a magasabb, szerelésvezetői óradíjon kerülnek elszámolásra.
-
-### 2.2. A Számítás Menete
-
-1.  **Adatgyűjtés:** A rendszer beolvassa a "Szerelők" és "Mérnökök" paneleken megadott adatokat:
-    - `sF`: Szerelők száma (fő)
-    - `sN`: Szerelők munkanapjainak száma
-    - `sW`: Ebből hétvégi napok száma (szerelő)
-    - `sH`: Napi munkaórák (szerelő)
-    - `mF`: Mérnökök száma (fő)
-    - `mN`: Mérnökök munkanapjainak száma
-    - `mW`: Ebből hétvégi napok száma (mérnök)
-    - `mH`: Napi munkaórák (mérnök)
-
-2.  **Hétköznapok és Hétvégék Szétválasztása:**
-    - Szerelő hétköznapok: `sWd = sN - sW`
-    - Mérnök hétköznapok: `mWd = mN - mW`
-
-3.  **Mérnöki Költségek:** Ha `mF > 0`, a mérnökök költségei egyszerűen kiszámolhatók:
-    - Hétköznapi mérnök órák: `mF * mWd * mH`
-    - Hétvégi mérnök órák: `mF * mW * mH`
-
-4.  **Felügyelet Nélküli Napok Meghatározása:** A rendszer kiszámolja, hogy a szerelők hány napot dolgoznak mérnöki felügyelet nélkül. Ezeken a napokon van szükség szerelésvezetőre a szerelők közül.
-    - Felügyelet nélküli hétköznapok: `foreman_needed_wd = max(0, sWd - mWd)`
-    - Felügyelet nélküli hétvégék: `foreman_needed_we = max(0, sW - mW)`
-
-5.  **Szerelésvezetői Órák Számítása:**
-    - Hétköznapi szerelésvezetői órák: `foreman_hours_wd = foreman_needed_wd * sH`
-    - Hétvégi szerelésvezetői órák: `foreman_hours_we = foreman_needed_we * sH`
-
-6.  **Szerelői Órák Számítása:**
-    - Először kiszámoljuk az összes szerelői órát (mintha mindannyian sima szerelők lennének).
-    - Összes hétköznapi szerelői óra: `sF * sWd * sH`
-    - Összes hétvégi szerelői óra: `sF * sW * sH`
-    - Ebből kivonjuk a már szerelésvezetőként elszámolt órákat, hogy megkapjuk a "sima" szerelők óraszámát.
-    - Normál hétköznapi szerelői órák: `(sF * sWd * sH) - foreman_hours_wd`
-    - Normál hétvégi szerelői órák: `(sF * sW * sH) - foreman_hours_we`
-
-### 2.3. Példák
-
-**Példa 1: Csak szerelők**
-- Adatok: 3 szerelő, 7 nap, ebből 2 hétvége, 10 óra/nap. Nincs mérnök.
-- Számítás:
-    - `sWd = 5`, `sW = 2`. `mWd = 0`, `mW = 0`.
-    - Felügyelet nélküli hétköznapok: `max(0, 5 - 0) = 5`
-    - Felügyelet nélküli hétvégék: `max(0, 2 - 0) = 2`
-    - Szerelésvezetői órák: 50 óra hétköznap, 20 óra hétvége.
-    - Szerelői órák (a másik 2 főre): 100 óra hétköznap, 40 óra hétvége.
-
-**Példa 2: Több szerelőnap, mint mérnöknap**
-- Adatok: 3 szerelő (7 nap, 2 hétvége), 1 mérnök (3 nap, 0 hétvége), 10 óra/nap.
-- Számítás:
-    - `sWd = 5`, `sW = 2`. `mWd = 3`, `mW = 0`.
-    - Felügyelet nélküli hétköznapok: `max(0, 5 - 3) = 2`
-    - Felügyelet nélküli hétvégék: `max(0, 2 - 0) = 2`
-    - Eredmény: A mérnök 3 hétköznapon felügyel. A maradék 2 hétköznapon és a 2 hétvégén a szerelők közül kell egy főnek vezetnie.
-    - Szerelésvezetői órák: 20 óra hétköznap, 20 óra hétvége.
-    - Szerelői órák: A többi óra a normál szerelői díjon kerül elszámolásra.
-    - Mérnöki órák: 30 óra hétköznap.
-
-**Példa 3: A mérnök végig jelen van**
-- Adatok: 3 szerelő (7 nap, 2 hétvége), 1 mérnök (7 nap, 2 hétvége), 10 óra/nap.
-- Számítás:
-    - `sWd = 5`, `sW = 2`. `mWd = 5`, `mW = 2`.
-    - Felügyelet nélküli hétköznapok: `max(0, 5 - 5) = 0`
-    - Felügyelet nélküli hétvégék: `max(0, 2 - 2) = 0`
-    - Eredmény: Nincs felügyelet nélküli nap, ezért nincs külön szerelésvezetői díj.
-    - Szerelői órák: Az összes szerelői óra (210 óra) a normál szerelői díjon kerül elszámolásra.
-    - Mérnöki órák: Az összes mérnöki óra (70 óra) a mérnöki díjon kerül elszámolásra.
-
-## 3. Egyéb Költségek Számítása
-
-- **Utazás:** A kilométerdíj és a kiszállási díj (utazási idő óradíja) a megadott távolság, idő, utak száma és járművek száma alapján kerül kiszámításra. Mindig oda-vissza úttal számol.
-- **Ellátás:** A szállás és a kiküldetési díj (csak külföldön) a létszám és az éjszakák/napok száma alapján kalkulálódik. A szállásnál a rendszer figyelembe veszi a beállított ár szorzót.
-- **Emelőgép:** Az emelőgép napidíja és szállítási díja is a beállított ár szorzóval kerül a végösszegbe.--- START OF FILE VALIDATION_RULES.md ---
-
-# Javaslatok a Kalkulátor Logikai Ellenőrzéseire
-
-Ez a dokumentum olyan lehetséges logikai ellenőrzéseket és figyelmeztetéseket vázol fel, amelyek beépítésével a kalkulátor még pontosabbá és a felhasználói hibákkal szemben ellenállóbbá tehető.
-
-## 1. Járművek és Személyzet Aránya
-
-- **Szabály:** A kiszálláshoz rendelt járművek száma nem haladhatja meg a kiszálló személyzet (szerelők vagy mérnökök) létszámát. Egy ember nem tud két autót vezetni egyszerre.
-- **Javasolt Működés:** Ha a felhasználó több járművet ad meg, mint ahány ember utazik az adott csoportban (pl. 3 járművet 2 szerelőhöz), a rendszer egy **nem-blokkoló figyelmeztetést** jelenít meg az érintett mező mellett.
-- **Figyelmeztetés Szövege:** _"Figyelem: A járművek száma meghaladja a személyzet létszámát. Biztosan helyesek az adatok?"_
-- **Indoklás:** Előfordulhatnak speciális esetek (pl. tréler, anyagbeszállító jármű), de az esetek többségében ez egy elgépelésre utalhat.
-
-## 2. Munkanapok és Hétvégi Napok Konzisztenciája
-
-- **Szabály:** A hétvégi napok száma nem lehet több, mint az összes munkanap.
-- **Javasolt Működés:** Ez egy **blokkoló hiba**. Ha a felhasználó egy olyan értéket ír be a "hétvégi nap" mezőbe, ami magasabb, mint a "munkanapok" mezőben lévő érték, a mező pirosra vált, és egy hibaüzenet jelenik meg alatta, a kalkuláció pedig nem frissül, amíg a hiba fennáll.
-- **Hibaüzenet Szövege:** _"Hiba: A hétvégi napok száma nem lehet több, mint az összes munkanap."_
-- **Indoklás:** Ez egy egyértelmű logikai ellentmondás, amit mindenképpen javítani kell a helyes számításhoz.
-
-## 3. Szállás és Munkanapok Aránya
-
-- **Szabály:** A szállással töltött éjszakák száma általában kevesebb, mint a munkanapok száma (pl. egy 5 napos munkához tipikusan 4 éjszaka szállás tartozik).
-- **Javasolt Működés:** Ha a szállások száma eléri vagy meghaladja a munkanapok számát, a rendszer egy **nem-blokkoló figyelmeztetést** jelenít meg.
-- **Figyelmeztetés Szövege:** _"Figyelem: A szállással töltött éjszakák száma szokatlanul magas a munkanapok számához képest."_
-- **Indoklás:** Bár lehetséges, hogy az utazás miatt van szükség plusz egy éjszakára, ez a figyelmeztetés segíthet elkerülni a téves adatbevitelt.
-
-## 4. Utazási Idő és Távolság Aránya
-
-- **Szabály:** Az utazási időnek és a távolságnak reális arányban kell állnia egymással.
-- **Javasolt Működés:** A rendszer kiszámol egy átlagsebességet (`távolság / idő`). Ha ez az érték egy megadott küszöbérték alá esik (pl. 30 km/h) vagy fölé (pl. 150 km/h), egy **nem-blokkoló figyelmeztetés** jelenik meg.
-- **Figyelmeztetés Szövege:** _"Figyelem: A megadott utazási idő aránytalanul hosszúnak/rövidnek tűnik a távolsághoz képest."_
-- **Indoklás:** Segít kiszűrni az elgépeléseket (pl. óra helyett percben megadott érték, vagy egy plusz nulla a távolságnál).
+</html>

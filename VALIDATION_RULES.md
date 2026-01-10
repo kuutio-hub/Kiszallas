@@ -1,3 +1,4 @@
+
 # Javaslatok a Kalkulátor Logikai Ellenőrzéseire
 
 Ez a dokumentum olyan lehetséges logikai ellenőrzéseket és figyelmeztetéseket vázol fel, amelyek beépítésével a kalkulátor még pontosabbá és a felhasználói hibákkal szemben ellenállóbbá tehető.
