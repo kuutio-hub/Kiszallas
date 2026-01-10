@@ -252,36 +252,30 @@
             
             const sN=i.szerelo_munkanap, sF=i.szerelo_fo, sH=i.szerelo_munkaora, sW=i.szerelo_hetvegi_nap;
             const mN=i.mernok_munkanap, mF=i.mernok_fo, mH=i.mernok_munkaora, mW=i.mernok_hetvegi_nap;
+            const sWd = sN - sW; // Assembler weekdays
+            const mWd = mN - mW; // Engineer weekdays
 
+            // --- Personnel Costs ---
             if (mF > 0 && mN > 0) {
-                const mernokWeekdayDays = mN - mW;
-                a('Mérnök óradíj', mF * mernokWeekdayDays * mH, 'óra', r.mernok_hetkoznap_oradij, r.mernok_hetkoznap_oradij, false);
+                a('Mérnök óradíj', mF * mWd * mH, 'óra', r.mernok_hetkoznap_oradij, r.mernok_hetkoznap_oradij, false);
                 a('Mérnök óradíj (hétvége)', mF * mW * mH, 'óra', r.mernok_hetvege_oradij, r.mernok_hetvege_oradij, false);
             }
 
             if (sF > 0 && sN > 0) {
-                const szerelo_only_days = (mF > 0 && mN > 0) ? Math.max(0, sN - mN) : sN;
-                let leader_weekday_hours = 0, leader_weekend_hours = 0;
-                let regular_assembler_weekday_hours = sF * (sN - sW) * sH;
-                let regular_assembler_weekend_hours = sF * sW * sH;
+                const foreman_needed_wd = Math.max(0, sWd - mWd);
+                const foreman_needed_we = Math.max(0, sW - mW);
 
-                if (szerelo_only_days > 0) {
-                    const weekend_ratio = sN > 0 ? sW / sN : 0;
-                    const leader_weekend_days = Math.round(szerelo_only_days * weekend_ratio);
-                    const leader_weekday_days = szerelo_only_days - leader_weekend_days;
-                    
-                    leader_weekday_hours = leader_weekday_days * sH;
-                    leader_weekend_hours = leader_weekend_days * sH;
-
-                    regular_assembler_weekday_hours -= leader_weekday_hours;
-                    regular_assembler_weekend_hours -= leader_weekend_hours;
-                    
-                    a('Szerelésvezető óradíj', leader_weekday_hours, 'óra', r.szerelesvezeto_hetkoznap_oradij, r.szerelesvezeto_hetkoznap_oradij, false);
-                    a('Szerelésvezető óradíj (hétvége)', leader_weekend_hours, 'óra', r.szerelesvezeto_hetvege_oradij, r.szerelesvezeto_hetvege_oradij, false);
-                }
+                const foreman_hours_wd = foreman_needed_wd * sH;
+                const foreman_hours_we = foreman_needed_we * sH;
+                a('Szerelésvezető óradíj', foreman_hours_wd, 'óra', r.szerelesvezeto_hetkoznap_oradij, r.szerelesvezeto_hetkoznap_oradij, false);
+                a('Szerelésvezető óradíj (hétvége)', foreman_hours_we, 'óra', r.szerelesvezeto_hetvege_oradij, r.szerelesvezeto_hetvege_oradij, false);
                 
-                a('Szerelő óradíj', regular_assembler_weekday_hours, 'óra', r.szerelo_hetkoznap_oradij, r.szerelo_hetkoznap_oradij, false);
-                a('Szerelő óradíj (hétvége)', regular_assembler_weekend_hours, 'óra', r.szerelo_hetvege_oradij, r.szerelo_hetvege_oradij, false);
+                const total_assembler_hours_wd = sF * sWd * sH;
+                const total_assembler_hours_we = sF * sW * sH;
+                const regular_assembler_hours_wd = total_assembler_hours_wd - foreman_hours_wd;
+                const regular_assembler_hours_we = total_assembler_hours_we - foreman_hours_we;
+                a('Szerelő óradíj', regular_assembler_hours_wd, 'óra', r.szerelo_hetkoznap_oradij, r.szerelo_hetkoznap_oradij, false);
+                a('Szerelő óradíj (hétvége)', regular_assembler_hours_we, 'óra', r.szerelo_hetvege_oradij, r.szerelo_hetvege_oradij, false);
             }
 
             if(i.location_type==='kulfold'){a('Kiküldetési díj - Szerelő',sF*sN,'nap',r.kikuldeles_dij_szerelo,r.kikuldeles_dij_szerelo,true);a('Kiküldetési díj - Mérnök',mF*mN,'nap',r.kikuldeles_dij_mernok,r.kikuldeles_dij_mernok,true);}
@@ -638,7 +632,7 @@
         }
         
         async function init(){
-            const version = "v2.4.0";
+            const version = "v2.4.1";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];

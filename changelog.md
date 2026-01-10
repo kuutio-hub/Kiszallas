@@ -1,5 +1,11 @@
 # Változási Napló
 
+## v2.4.1 - Logikai Javítás
+*Dátum: 2024-05-22*
+
+### Javítások
+- **Szerelésvezetői Logika Pontosítása:** Kijavításra került egy kritikus hiba a szerelésvezetői díj számításában, amely helytelenül kezelte a mérnökök és szerelők hétvégi napjainak átfedését. A kalkulációs motor most már precízen, a felügyelet nélküli napok alapján számolja a szerelésvezetői órákat, így a kalkuláció minden esetben a valós helyzetet tükrözi.
+
 ## v2.4.0 - Kalkulációs Logika és Felhasználói Felület Finomhangolása
 *Dátum: 2024-05-22*
 
