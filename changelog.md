@@ -1,5 +1,13 @@
 # Változási Napló
 
+## v2.4.0 - Kalkulációs Logika és Felhasználói Felület Finomhangolása
+*Dátum: 2024-05-22*
+
+### Főbb változások
+- **Új Szerelésvezetői Logika:** A személyi költségek számítása teljesen megújult, hogy pontosabban kövesse a valós üzleti logikát. A rendszer mostantól dinamikusan kezeli a szerelésvezetői díjakat attól függően, hogy van-e mérnök a helyszínen, illetve a szerelők és mérnökök jelenlétének időbeli átfedése alapján.
+- **Átláthatóbb Árfolyamgrafikon:** Az árfolyamgrafikon szűrője egy letisztultabb, gyorsgombokkal ("1H", "3H", "6H", "1É") ellátott felületet kapott a könnyebb és gyorsabb használat érdekében.
+- **Stabil, Forint Alapú Árlistakezelés:** Az árlistakezelő funkció logikája megerősítésre került, hogy garantáltan és kizárólag Forint alapon működjön, függetlenül a fő felület pénznem-beállításától, ezzel elkerülve a potenciális konverziós hibákat.
+
 ## v2.3.1 - Felhasználói Kényelem és Biztonsági Funkciók
 *Dátum: 2024-05-22*
 

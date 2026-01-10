@@ -243,35 +243,67 @@
         
         function getInputs(){const i={};document.querySelectorAll('.inputs-container input,.inputs-container select').forEach(e=>{if(e.id)i[e.id]=(e.type==='number')?parseFloat(e.value)||0:e.value;});return i;}
         
-        function calculateCosts(){const i=getInputs();const r=state.activeRatePackage?.rates;if(!r)return{totalHuf:0,totalCostHuf:0,breakdown:[],hasCostItems:false};let b=[],t_sell=0,t_cost=0,hasCost=false;const a=(l,q,u,p_sell,p_cost,isCostItem)=>{if(q>0&&p_sell>0){const o_sell=q*p_sell;const o_cost=q*p_cost;b.push({label:l,quantity:q,unit:u,costPriceHuf:p_cost,totalCostHuf:o_cost,unitPriceHuf:p_sell,totalHuf:o_sell,isCostItem:isCostItem});t_sell+=o_sell;t_cost+=o_cost;if(isCostItem)hasCost=true;}};
-            const sN=i.szerelo_munkanap,mN=i.mernok_munkanap;const szereloVezetoNapok=(i.mernok_fo===0&&i.szerelo_fo>0)?sN:0;const szereloVezetoFo=szereloVezetoNapok>0?1:0;
-            if(szereloVezetoFo>0){const sVezHkN=Math.max(0,szereloVezetoNapok-i.szerelo_hetvegi_nap);const sVezHvN=Math.min(szereloVezetoNapok,i.szerelo_hetvegi_nap);const szvHk=r.szerelesvezeto_hetkoznap_oradij;a('Szerelésvezető óradíj',sVezHkN*i.szerelo_munkaora*szereloVezetoFo,'óra',szvHk,szvHk,false);const szvHv=r.szerelesvezeto_hetvege_oradij;a('Szerelésvezető óradíj (hétvége)',sVezHvN*i.szerelo_munkaora*szereloVezetoFo,'óra',szvHv,szvHv,false);}
-            const normSzereloFo=i.szerelo_fo-szereloVezetoFo;if(normSzereloFo>0){const normSzereloHkN=sN-i.szerelo_hetvegi_nap;const szHk=r.szerelo_hetkoznap_oradij;a('Szerelő óradíj',normSzereloFo*normSzereloHkN*i.szerelo_munkaora,'óra',szHk,szHk,false);const szHv=r.szerelo_hetvege_oradij;a('Szerelő óradíj (hétvége)',normSzereloFo*i.szerelo_hetvegi_nap*i.szerelo_munkaora,'óra',szHv,szHv,false);}
-            if(i.mernok_fo>0){const mernokHkN=mN-i.mernok_hetvegi_nap;const mHk=r.mernok_hetkoznap_oradij;a('Mérnök óradíj',i.mernok_fo*mernokHkN*i.mernok_munkaora,'óra',mHk,mHk,false);const mHv=r.mernok_hetvege_oradij;a('Mérnök óradíj (hétvége)',i.mernok_fo*i.mernok_hetvegi_nap*i.mernok_munkaora,'óra',mHv,mHv,false);}
-            if(i.location_type==='kulfold'){const kdsz=r.kikuldeles_dij_szerelo;a('Kiküldetési díj - Szerelő',i.szerelo_fo*sN,'nap',kdsz,kdsz,true);const kdm=r.kikuldeles_dij_mernok;a('Kiküldetési díj - Mérnök',i.mernok_fo*mN,'nap',kdm,kdm,true);}
+        function calculateCosts() {
+            const i=getInputs();
+            const r=state.activeRatePackage?.rates;
+            if(!r)return{totalHuf:0,totalCostHuf:0,breakdown:[],hasCostItems:false};
+            let b=[],t_sell=0,t_cost=0,hasCost=false;
+            const a=(l,q,u,p_sell,p_cost,isCostItem)=>{if(q>0&&p_sell>0){const o_sell=q*p_sell;const o_cost=q*p_cost;b.push({label:l,quantity:q,unit:u,costPriceHuf:p_cost,totalCostHuf:o_cost,unitPriceHuf:p_sell,totalHuf:o_sell,isCostItem:isCostItem});t_sell+=o_sell;t_cost+=o_cost;if(isCostItem)hasCost=true;}};
+            
+            const sN=i.szerelo_munkanap, sF=i.szerelo_fo, sH=i.szerelo_munkaora, sW=i.szerelo_hetvegi_nap;
+            const mN=i.mernok_munkanap, mF=i.mernok_fo, mH=i.mernok_munkaora, mW=i.mernok_hetvegi_nap;
+
+            if (mF > 0 && mN > 0) {
+                const mernokWeekdayDays = mN - mW;
+                a('Mérnök óradíj', mF * mernokWeekdayDays * mH, 'óra', r.mernok_hetkoznap_oradij, r.mernok_hetkoznap_oradij, false);
+                a('Mérnök óradíj (hétvége)', mF * mW * mH, 'óra', r.mernok_hetvege_oradij, r.mernok_hetvege_oradij, false);
+            }
+
+            if (sF > 0 && sN > 0) {
+                const szerelo_only_days = (mF > 0 && mN > 0) ? Math.max(0, sN - mN) : sN;
+                let leader_weekday_hours = 0, leader_weekend_hours = 0;
+                let regular_assembler_weekday_hours = sF * (sN - sW) * sH;
+                let regular_assembler_weekend_hours = sF * sW * sH;
+
+                if (szerelo_only_days > 0) {
+                    const weekend_ratio = sN > 0 ? sW / sN : 0;
+                    const leader_weekend_days = Math.round(szerelo_only_days * weekend_ratio);
+                    const leader_weekday_days = szerelo_only_days - leader_weekend_days;
+                    
+                    leader_weekday_hours = leader_weekday_days * sH;
+                    leader_weekend_hours = leader_weekend_days * sH;
+
+                    regular_assembler_weekday_hours -= leader_weekday_hours;
+                    regular_assembler_weekend_hours -= leader_weekend_hours;
+                    
+                    a('Szerelésvezető óradíj', leader_weekday_hours, 'óra', r.szerelesvezeto_hetkoznap_oradij, r.szerelesvezeto_hetkoznap_oradij, false);
+                    a('Szerelésvezető óradíj (hétvége)', leader_weekend_hours, 'óra', r.szerelesvezeto_hetvege_oradij, r.szerelesvezeto_hetvege_oradij, false);
+                }
+                
+                a('Szerelő óradíj', regular_assembler_weekday_hours, 'óra', r.szerelo_hetkoznap_oradij, r.szerelo_hetkoznap_oradij, false);
+                a('Szerelő óradíj (hétvége)', regular_assembler_weekend_hours, 'óra', r.szerelo_hetvege_oradij, r.szerelo_hetvege_oradij, false);
+            }
+
+            if(i.location_type==='kulfold'){a('Kiküldetési díj - Szerelő',sF*sN,'nap',r.kikuldeles_dij_szerelo,r.kikuldeles_dij_szerelo,true);a('Kiküldetési díj - Mérnök',mF*mN,'nap',r.kikuldeles_dij_mernok,r.kikuldeles_dij_mernok,true);}
             const travelTimeInput=D('utazas_ido_ora'); const travelTimeHours=travelTimeInput.dataset.unit==='perc'?(i.utazas_ido_ora/60):i.utazas_ido_ora;
-            const kszdsz=r.kiszallasi_dij_szerelo;a('Kiszállási díj - Szerelő',travelTimeHours*2*i.utazas_odautak_szama_szerelo*i.szerelo_fo,'óra',kszdsz,kszdsz,false);const kszdm=r.kiszallasi_dij_mernok;a('Kiszállási díj - Mérnök',travelTimeHours*2*i.utazas_odautak_szama_mernok*i.mernok_fo,'óra',kszdm,kszdm,false);const kmd=r.km_dij;a('Jármű km díj',i.utazas_tavolsag_km*2*(i.utazas_odautak_szama_szerelo*i.utazas_jarmuvek_szama_szerelo+i.utazas_odautak_szama_mernok*i.utazas_jarmuvek_szama_mernok),'km',kmd,kmd,false);const szallasCost=r.szallas_dij;const szallasSell=szallasCost*(r.szallas_szorzo||1);a('Szállás költség',i.szerelo_szallas_ejszaka*i.szerelo_fo+i.mernok_szallas_ejszaka*i.mernok_fo,'éj',szallasSell,szallasCost,true);
-            const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true); const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
-            state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity, c.unit || 'tétel',c.amount,c.amount,false);});return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};
+            a('Kiszállási díj - Szerelő',travelTimeHours*2*i.utazas_odautak_szama_szerelo*sF,'óra',r.kiszallasi_dij_szerelo,r.kiszallasi_dij_szerelo,false);
+            a('Kiszállási díj - Mérnök',travelTimeHours*2*i.utazas_odautak_szama_mernok*mF,'óra',r.kiszallasi_dij_mernok,r.kiszallasi_dij_mernok,false);
+            a('Jármű km díj',i.utazas_tavolsag_km*2*(i.utazas_odautak_szama_szerelo*i.utazas_jarmuvek_szama_szerelo+i.utazas_odautak_szama_mernok*i.utazas_jarmuvek_szama_mernok),'km',r.km_dij,r.km_dij,false);
+            const szallasCost=r.szallas_dij; const szallasSell=szallasCost*(r.szallas_szorzo||1);a('Szállás költség',i.szerelo_szallas_ejszaka*sF+i.mernok_szallas_ejszaka*mF,'éj',szallasSell,szallasCost,true);
+            const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true);
+            const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
+            state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity, c.unit || 'tétel',c.amount,c.amount,false);});
+            return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};
         }
-        
+
         function updateCalculationSummary() {
             const i = getInputs();
             const summaryParts = [];
             if (i.feladat) summaryParts.push(`<strong>Feladat:</strong> ${i.feladat}`);
-            
             const participants = [];
-            if (i.szerelo_fo > 0) {
-                participants.push(`${i.szerelo_fo} fő szerelő (${i.szerelo_munkanap} nap, ${i.szerelo_hetvegi_nap} hétvége)`);
-            }
-            if (i.mernok_fo > 0) {
-                participants.push(`${i.mernok_fo} fő mérnök (${i.mernok_munkanap} nap, ${i.mernok_hetvegi_nap} hétvége)`);
-            }
-            
-            if (participants.length > 0) {
-                 summaryParts.push(`<strong>Személyzet:</strong> ${participants.join('; ')}`);
-            }
-
+            if (i.szerelo_fo > 0) { participants.push(`${i.szerelo_fo} fő szerelő (${i.szerelo_munkanap} nap, ${i.szerelo_hetvegi_nap} hétvége)`); }
+            if (i.mernok_fo > 0) { participants.push(`${i.mernok_fo} fő mérnök (${i.mernok_munkanap} nap, ${i.mernok_hetvegi_nap} hétvége)`); }
+            if (participants.length > 0) { summaryParts.push(`<strong>Személyzet:</strong> ${participants.join('; ')}`); }
             if (i.work_location) summaryParts.push(`<strong>Helyszín:</strong> ${i.work_location}`);
             D('calculation-summary-header').innerHTML = summaryParts.join('<br>');
         }
@@ -411,7 +443,51 @@
         function handleDeleteRatePackage(){if(state.rates.length<=1)return alert("Az utolsó árlista nem törölhető.");const i=D('rate-editor-select').value;if(confirm(`Biztosan törli a "${state.rates.find(r=>r.id===i).name}" árlistát?`)){state.rates=state.rates.filter(r=>r.id!==i);localStorage.setItem('rates',JSON.stringify(state.rates));D('rate-modal').style.display='none';updateRatePackagesUI();calculateAndDisplay();}}
         function updateRatePackagesUI(selectedId=null){const s=D('rate-package-select');const currentVal=selectedId||(s?s.value:null)||(state.rates.length>0?state.rates[0].id:null);s.innerHTML='';state.rates.forEach(p=>s.add(new Option(p.name,p.id)));if(currentVal)s.value=currentVal;if(!s.value&&state.rates.length>0)s.value=state.rates[0].id;state.activeRatePackage=state.rates.find(r=>r.id===s.value);}
 
-        function openChartModal(){D('chart-modal').style.display='block';const f=D('chart-filters');f.innerHTML=`<input type="date" id="chart-start-date" class="form-group" title="Kezdődátum"> <input type="date" id="chart-end-date" class="form-group" title="Végdátum"> <input type="date" id="chart-single-date" class="form-group" title="Konkrét nap">`;const today=new Date();const oneYearAgo=new Date(new Date().setFullYear(today.getFullYear()-1));D('chart-start-date').value=oneYearAgo.toISOString().split('T')[0];D('chart-end-date').value=today.toISOString().split('T')[0];const draw=()=>{const d=Object.keys(state.exchangeRates).sort();const s=D('chart-start-date').value;const e=D('chart-end-date').value;const fD=d.filter(dt=>dt>=s&&dt<=e);const c=D('exchange-rate-chart').getContext('2d');const l=fD.map(dt=>new Date(dt));const v=fD.map(dt=>state.exchangeRates[dt].HUF);if(chartInstance)chartInstance.destroy();chartInstance=new Chart(c,{type:'line',data:{datasets:[{label:'EUR/HUF',data:v.map((val,idx)=>({x:l[idx],y:val})),borderColor:'rgba(99,179,237,1)',borderWidth:2,pointRadius:0,tension:0.1}]},options:{onClick:(e)=>{const p=chartInstance.getElementsAtEventForMode(e,'nearest',{intersect:true},true);if(p.length){const i=p[0].index;const r=chartInstance.data.datasets[0].data[i].y;D('exchange-rate-manual').value=r.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}},interaction:{mode:'index',intersect:false},scales:{x:{type:'time',time:{unit:'month'},ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}},y:{ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}}},plugins:{tooltip:{enabled:true},legend:{display:false}}}});};D('chart-start-date').onchange=draw;D('chart-end-date').onchange=draw;D('chart-single-date').onchange=(e)=>{const rate=state.exchangeRates[e.target.value]?.HUF;if(rate){D('exchange-rate-manual').value=rate.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}};draw();}
+        function openChartModal() {
+            D('chart-modal').style.display = 'block';
+            const f = D('chart-filters');
+            f.innerHTML = `
+                <input type="date" id="chart-start-date" class="form-group" title="Kezdődátum" style="flex-grow:1;">
+                <input type="date" id="chart-end-date" class="form-group" title="Végdátum" style="flex-grow:1;">
+                <div style="margin-left:auto; display:flex; gap:0.5rem;">
+                    <button class="btn chart-filter-btn" data-days="30">1H</button>
+                    <button class="btn chart-filter-btn" data-days="90">3H</button>
+                    <button class="btn chart-filter-btn" data-days="180">6H</button>
+                    <button class="btn chart-filter-btn" data-days="365">1É</button>
+                </div>`;
+            
+            const draw = () => {
+                const d=Object.keys(state.exchangeRates).sort();
+                const s=D('chart-start-date').value;
+                const e=D('chart-end-date').value;
+                const fD=d.filter(dt=>dt>=s&&dt<=e);
+                const c=D('exchange-rate-chart').getContext('2d');
+                const l=fD.map(dt=>new Date(dt));
+                const v=fD.map(dt=>state.exchangeRates[dt].HUF);
+                if(chartInstance)chartInstance.destroy();
+                chartInstance=new Chart(c,{type:'line',data:{datasets:[{label:'EUR/HUF',data:v.map((val,idx)=>({x:l[idx],y:val})),borderColor:'rgba(99,179,237,1)',borderWidth:2,pointRadius:0,tension:0.1}]},options:{onClick:(e)=>{const p=chartInstance.getElementsAtEventForMode(e,'nearest',{intersect:true},true);if(p.length){const i=p[0].index;const r=chartInstance.data.datasets[0].data[i].y;D('exchange-rate-manual').value=r.toFixed(2);calculateAndDisplay();D('chart-modal').style.display='none';}},interaction:{mode:'index',intersect:false},scales:{x:{type:'time',time:{unit:'month'},ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}},y:{ticks:{color:document.body.classList.contains('light-mode')?'#1a202c':'#edf2f7'}}},plugins:{tooltip:{enabled:true},legend:{display:false}}}});
+            };
+
+            const today = new Date();
+            const oneYearAgo = new Date(new Date().setFullYear(today.getFullYear() - 1));
+            D('chart-start-date').value = oneYearAgo.toISOString().split('T')[0];
+            D('chart-end-date').value = today.toISOString().split('T')[0];
+            
+            D('chart-start-date').onchange = draw;
+            D('chart-end-date').onchange = draw;
+            document.querySelectorAll('.chart-filter-btn').forEach(btn => {
+                btn.onclick = () => {
+                    const days = parseInt(btn.dataset.days, 10);
+                    const endDate = new Date();
+                    const startDate = new Date();
+                    startDate.setDate(endDate.getDate() - days);
+                    D('chart-end-date').value = endDate.toISOString().split('T')[0];
+                    D('chart-start-date').value = startDate.toISOString().split('T')[0];
+                    draw();
+                };
+            });
+            draw();
+        }
         
         function generatePdf({ simplified = false }) {
             const btnId = simplified ? 'downloadPdfSimple' : 'downloadPdfFull';
@@ -562,7 +638,7 @@
         }
         
         async function init(){
-            const version = "v2.3.1";
+            const version = "v2.4.0";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -628,7 +704,7 @@
                         itemFields.forEach(field => {
                             let inputHtml = '';
                             if (field.type === 'currency') {
-                                inputHtml = `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" value="${formatCustomCurrency(item[field.id] || 0, state.activeCurrency === 'EUR' ? '€' : 'Ft')}">`;
+                                inputHtml = `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" value="${formatCustomCurrency(item[field.id] || 0, 'Ft')}">`;
                             } else if (field.type === 'number') {
                                 inputHtml = `<input type="number" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`;
                             } else { // text
@@ -645,7 +721,7 @@
 
                 D(addButtonId).onclick = () => { state[stateKey].push({}); renderList(); };
                 D(listId).addEventListener('input', e => { const i = e.target.dataset.index; if(i !== undefined) { const field = e.target.dataset.field; const val = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value; state[stateKey][i][field] = e.target.type === 'number' ? parseFloat(val) || 0 : val; if(!e.target.classList.contains('currency-input')) calculateAndDisplay(); } });
-                D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), state.activeCurrency === 'EUR' ? '€' : 'Ft'); calculateAndDisplay(); }});
+                D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), 'Ft'); calculateAndDisplay(); }});
                 D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });
                 
                 renderList();
