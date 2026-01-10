@@ -1,6 +1,12 @@
 
 # Változási Napló
 
+## v3.0.1 - PDF Generálási Javítás
+*Dátum: 2024-05-26*
+
+### Javítások
+- **Üres Árlista PDF:** Kijavításra került egy kritikus hiba, amely miatt az árlista exportálása üres PDF dokumentumot eredményezett. A probléma a külső betűtípusok hibás betöltéséből adódott. A PDF generálási beállítások mostantól egységesek és stabilan működnek az összes export funkciónál.
+
 ## v3.0.0 - "Partner PDF" és Vizuális Megújulás
 *Dátum: 2024-05-25*
 

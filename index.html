@@ -675,7 +675,7 @@
             pdfContainer.innerHTML = htmlContent;
             document.body.appendChild(pdfContainer);
 
-            const opt = { margin: 15, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2 }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            const opt = { margin: 15, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
             html2pdf().set(opt).from(pdfContainer).save().finally(() => {
                 document.body.removeChild(pdfContainer);
                 btn.textContent = originalText;
@@ -856,7 +856,7 @@
         }
         
         async function initializeApp() {
-            const version = "v3.0.0";
+            const version = "v3.0.1";
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
