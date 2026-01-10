@@ -81,8 +81,25 @@
         .modal-close-btn { font-size: 2rem; font-weight: bold; cursor: pointer; background: none; border: none; color: var(--text-primary); line-height: 1; padding: 0 0 0 1rem; }
 
         .item-list-controls { margin-top: 1rem; }
-        .dynamic-item { display: grid; gap: 0.8rem; align-items: center; margin-bottom: 0.5rem; padding: 0.5rem; border-radius: 0.3rem; background-color: var(--bg-primary); }
-        #other-costs-list .dynamic-item { grid-template-columns: 3fr 1fr 2fr auto; }
+        #other-costs-list .dynamic-item { 
+            display: grid; 
+            grid-template-columns: 3fr 1fr 2fr auto; 
+            gap: 0.8rem;
+            align-items: end;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #other-costs-list .dynamic-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        .item-delete {
+            padding: 0.5rem;
+            width: 100%;
+            line-height: 1;
+        }
         
         #rate-editor-form fieldset { border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1rem; margin-top: 1.5rem; }
         #rate-editor-form legend { padding: 0 0.5rem; color: var(--text-secondary); }
@@ -120,16 +137,20 @@
 
         <main class="main-grid">
             <div class="inputs-container">
-                 <details class="card" open><summary>Alapadatok</summary><div class="card-content form-grid">
-                    <div class="form-group"><label for="offer_number">Ajánlatszám</label><input type="text" id="offer_number"></div>
-                    <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number"></div>
-                    <div class="form-group"><label for="project_name">Projekt neve</label><input type="text" id="project_name" placeholder="Opcionális"></div>
-                    <div class="form-group"><label for="customer">Megrendelő</label><input type="text" id="customer"></div>
-                    <div class="form-group"><label for="work_location">Munkavégzés helyszíne</label><input type="text" id="work_location"></div>
-                    <div class="form-group"><label for="calculation_date">Kalkuláció dátuma</label><input type="date" id="calculation_date"></div>
-                    <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat"></div>
-                    <button class="close-details-btn" title="Bezárás">↑</button>
-                </div></details>
+                 <details class="card" open><summary>Alapadatok</summary>
+                    <div class="card-content">
+                        <div class="form-grid">
+                            <div class="form-group"><label for="offer_number">Ajánlatszám</label><input type="text" id="offer_number"></div>
+                            <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number"></div>
+                            <div class="form-group"><label for="project_name">Projekt neve</label><input type="text" id="project_name" placeholder="Opcionális"></div>
+                            <div class="form-group"><label for="customer">Megrendelő</label><input type="text" id="customer"></div>
+                            <div class="form-group"><label for="work_location">Munkavégzés helyszíne</label><input type="text" id="work_location"></div>
+                            <div class="form-group"><label for="calculation_date">Kalkuláció dátuma</label><input type="date" id="calculation_date"></div>
+                            <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat"></div>
+                        </div>
+                        <button class="close-details-btn" title="Bezárás">↑</button>
+                    </div>
+                </details>
                  <details class="card"><summary>Szerelők</summary><div class="card-content"><div class="form-grid" id="szerelo-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
                  <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
                  <details class="card"><summary>Utazás</summary><div class="card-content"><div class="form-grid" id="utazas-inputs"></div><button class="close-details-btn" title="Bezárás">↑</button></div></details>
@@ -170,7 +191,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         // A jelszó itt módosítható! Ez a jelszó védi az "Árlisták kezelése" funkciót.
-        const ADMIN_PASSWORD = 'kalkulator2024';
+        const ADMIN_PASSWORD = 'kalkulator2026';
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -236,7 +257,7 @@
 
         function calculateAndDisplay(){
             state.calculationResults = calculateCosts();
-            const { breakdown, totalHuf, totalCostHuf, hasCostItems } = state.calculationResults;
+            const { breakdown, totalHuf, hasCostItems } = state.calculationResults;
             const tbody = D('breakdown-body'), thead = D('breakdown-head'), tfoot = D('breakdown-foot');
             const currency = state.activeCurrency;
             const currencySymbol = currency === 'EUR' ? '€' : 'Ft';
@@ -246,7 +267,6 @@
             tbody.innerHTML = thead.innerHTML = tfoot.innerHTML = '';
             
             let headHtml=`<tr><th>Költségnem</th><th>Menny.</th><th>Egys.</th><th>Egységár</th>`;
-            if (discount > 0) { headHtml += `<th>Kedv. Egységár</th>`; }
             if (hasCostItems) { headHtml += `<th>Önköltség</th>`; }
             headHtml += `<th>Összesen</th></tr>`;
             thead.innerHTML = headHtml;
@@ -254,16 +274,13 @@
             breakdown.forEach(i => {
                 const r = tbody.insertRow();
                 const u = convertPrice(i.unitPriceHuf, currency);
-                const dU = u * discountMultiplier;
                 const t = convertPrice(i.totalHuf, currency);
-                const dT = t * discountMultiplier;
                 let rowHtml = `<td>${i.label}</td><td style="text-align:right;">${i.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${i.unit}</td><td style="text-align:right;">${formatCustomCurrency(u, currencySymbol)}</td>`;
-                if (discount > 0) { rowHtml += `<td style="text-align:right;">${formatCustomCurrency(dU, currencySymbol)}</td>`; }
                 if (hasCostItems) {
                     const tc = convertPrice(i.totalCostHuf, currency);
                     rowHtml += `<td style="text-align:right;">${i.isCostItem ? formatCustomCurrency(tc, currencySymbol) : '-'}</td>`;
                 }
-                rowHtml += `<td style="text-align:right;">${formatCustomCurrency(discount > 0 ? dT : t, currencySymbol)}</td>`;
+                rowHtml += `<td style="text-align:right;">${formatCustomCurrency(t, currencySymbol)}</td>`;
                 r.innerHTML = rowHtml;
             });
 
@@ -271,7 +288,7 @@
             const visibleTotalCost = breakdown.reduce((acc, item) => item.isCostItem ? acc + item.totalCostHuf : acc, 0);
             const totalCostFinal = convertPrice(visibleTotalCost, currency);
 
-            let totalCols = 3 + 1 + (discount > 0 ? 1 : 0) + (hasCostItems ? 1 : 0) + 1;
+            let totalCols = 3 + 1 + (hasCostItems ? 1 : 0) + 1;
             const labelColspan = totalCols - 1;
             let footHtml = ``;
 
@@ -350,7 +367,7 @@
             let tableBodyHtml = '';
             res.breakdown.forEach(item => {
                 const unitPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.unitPriceHuf, c), currencySymbol);
-                const totalRowPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.totalHuf, c) * (1 - (discount / 100)), currencySymbol);
+                const totalRowPriceDisplay = simplified ? '-' : formatCustomCurrency(convertPrice(item.totalHuf, c), currencySymbol);
                 const costPriceDisplay = showCostColumn ? (item.isCostItem ? formatCustomCurrency(convertPrice(item.totalCostHuf, c), currencySymbol) : '-') : '';
                 
                 let costColumnHtml = showCostColumn ? `<td class="align-right">${costPriceDisplay}</td>` : '';
@@ -376,7 +393,7 @@
             totalsTableHtml += `<tr><td class="final-total">Nettó végösszeg:</td><td class="align-right final-total">${formatCustomCurrency(finalTotal, currencySymbol)}</td></tr>`;
 
             const dateFormatted = i.calculation_date ? new Date(i.calculation_date).toLocaleDateString('hu-HU') : '';
-            const mainTitle = `<h1>Kiszállás kalkuláció ${simplified ? '(Egyszerűsített)' : ''} <span class="date">(${dateFormatted})</span></h1>`;
+            const mainTitle = `<h1>Kiszállás kalkuláció <span class="date">(${dateFormatted})</span></h1>`;
 
             const htmlContent = `
                 <!DOCTYPE html><html><head><meta charset="UTF-8">
@@ -439,7 +456,7 @@
         }
         
         async function init(){
-            const version = "v2.0.9";
+            const version = "v2.1.0";
             if(localStorage.getItem('theme')==='light')document.body.classList.add('light-mode');
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
@@ -487,25 +504,32 @@
                     state[stateKey].forEach((item, index) => {
                         const itemEl = document.createElement('div');
                         itemEl.className = 'dynamic-item';
+
                         let fieldsHtml = '';
                         itemFields.forEach(field => {
-                            if(field.type === 'currency'){
-                                fieldsHtml += `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" placeholder="${field.label}" value="${formatCustomCurrency(item[field.id] || 0)}">`;
-                            } else if(field.type === 'number'){
-                                fieldsHtml += `<input type="number" data-index="${index}" data-field="${field.id}" placeholder="${field.label}" value="${item[field.id] || ''}">`;
+                            let inputHtml = '';
+                            if (field.type === 'currency') {
+                                inputHtml = `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" value="${formatCustomCurrency(item[field.id] || 0, state.activeCurrency === 'EUR' ? '€' : 'Ft')}">`;
+                            } else if (field.type === 'number') {
+                                inputHtml = `<input type="number" data-index="${index}" data-field="${field.id}" value="${item[field.id] || 1}">`;
                             } else {
-                                fieldsHtml += `<input type="text" data-index="${index}" data-field="${field.id}" placeholder="${field.label}" value="${item[field.id] || ''}">`;
+                                inputHtml = `<input type="text" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`;
                             }
+                            fieldsHtml += `<div class="form-group"><label>${field.label}</label>${inputHtml}</div>`;
                         });
-                        itemEl.innerHTML = `${fieldsHtml}<button data-index="${index}" class="btn item-delete" style="background:var(--danger-primary);padding:0.4rem;flex-grow:0;">×</button>`;
+
+                        const buttonHtml = `<div class="form-group"><button data-index="${index}" class="btn item-delete" title="Tétel törlése">×</button></div>`;
+                        itemEl.innerHTML = fieldsHtml + buttonHtml;
                         container.appendChild(itemEl);
                     });
                 };
 
-                D(addButtonId).onclick = () => { state[stateKey].push({}); renderList(); };
+                D(addButtonId).onclick = () => { state[stateKey].push({quantity: 1}); renderList(); };
                 D(listId).addEventListener('input', e => { const i = e.target.dataset.index; if(i !== undefined) { const field = e.target.dataset.field; const val = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value; state[stateKey][i][field] = e.target.type === 'number' ? parseFloat(val) || 0 : val; if(!e.target.classList.contains('currency-input')) calculateAndDisplay(); } });
                 D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), state.activeCurrency === 'EUR' ? '€' : 'Ft'); calculateAndDisplay(); }});
                 D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });
+                
+                renderList(); // Initial render
             };
 
             setupDynamicList('other-costs-list', 'otherCosts', 'add-other-cost-btn', [

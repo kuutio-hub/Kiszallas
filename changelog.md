@@ -1,5 +1,16 @@
 # Változási Napló
 
+## v2.1.0 - Felhasználói Élmény és Logikai Finomítások
+*Dátum: 2024-05-22*
+
+### Fejlesztések és Javítások
+- **Jelszó Frissítve:** Az adminisztrátori jelszó `kalkulator2026`-ra változott.
+- **Kedvezménykezelés Javítva:** A kedvezmény logikája megváltozott. A "Kedvezményes Egységár" oszlop eltávolításra került a táblázatból, a kedvezmény levonása mostantól kizárólag a végösszegnél történik, ami átláthatóbbá teszi a kalkulációt.
+- **Egységes Dizájn:** Az "Egyéb költségek" szekció kinézete a többi panelhez lett igazítva, mostantól címkéket használ a placeholderek helyett, egységesítve a felhasználói felületet.
+- **UI Konzisztencia:** Az "Alapadatok" panel bezáró gombja a többi panelhez hasonlóan a jobb oldalra került.
+- **PDF Cím Egyszerűsítve:** Az egyszerűsített PDF export címéből eltávolításra került az "(Egyszerűsített)" jelző a letisztultabb megjelenés érdekében.
+- **Felesleges Fájlok Törlése:** A projektből törlésre kerültek a már nem használt `index.tsx`, `templates.json` és `exchange_rates.json` fájlok.
+
 ## v2.0.9 - Pontosság és Egyszerűsítés
 *Dátum: 2024-05-22*
 
@@ -7,7 +18,6 @@
 - **EUR Pontosság:** Az EUR pénznemre váltáskor az alkalmazás mostantól mindenhol két tizedesjegy pontossággal jeleníti meg az árakat, mind a felületen, mind a PDF exportokban.
 - **Egyszerűsített Összesítő:** Az adatösszesítő (a jobb oldali táblázat fejléce és a PDF) már nem bontja meg a szerelőket és szerelésvezetőket, hanem egységesen "szerelőként" és "mérnökként" összegzi a résztvevőket a könnyebb átláthatóság érdekében.
 - **Önköltség Javítás:** A felhasználói felületen a részletező táblázat láblécében az "Önköltség összesen" sor számítása javítva lett, hogy pontosan csak a tényleges önköltségi tételeket vegye figyelembe, összhangban a PDF export logikájával.
-- **Projekt Tisztítása:** Eltávolításra kerültek a már nem használt `index.tsx`, `templates.json` és `exchange_rates.json` fájlok.
 
 ## v2.0.8 - Jelszavas Védelem
 *Dátum: 2024-05-22*
@@ -21,7 +31,6 @@
 ### Fejlesztések
 - **Frissítés Gomb:** A fejléc kapott egy új "Frissítés" gombot, amivel manuálisan újraszámoltatható a kalkuláció.
 - **Áthelyezett Összesítő:** A felső menüből el lett távolítva a projekt-összesítő sáv. Helyette a jobb oldali kalkulációs táblázat kapott egy dinamikus fejlécet.
-- **Projektfájlok Tisztítása:** A felesleges `index.tsx` és `templates.json` fájlok törlésre kerültek a projektből.
 
 ## v2.0.6 - PDF Generálás Javítások és Finomítások
 *Dátum: 2024-05-22*
@@ -55,9 +64,6 @@
 - **PDF Bővítés:** A PDF mostantól tartalmazza a "Feladat leírása" mezőt.
 - **"Mentés" Gomb:** Az "Egyéb költségek" szekció kapott egy "Mentés" gombot.
 - **Árfolyam címke:** Az árfolyam mező mellett "Ft/EUR" címke jelzi a mértékegységet.
-
-### Javítások
-- **Projekt tisztítása:** Felesleges fájlok eltávolítva.
 
 ## v2.0.2 - Hibajavítások
 *Dátum: 2024-05-22*
