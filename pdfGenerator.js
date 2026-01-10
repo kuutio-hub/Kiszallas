@@ -1,15 +1,10 @@
 import { state } from './state.js';
 import { getInputs } from './ui.js';
-import { D, formatCustomCurrency, convertPrice, loadPdfFont } from './utils.js';
+import { D, formatCustomCurrency, convertPrice } from './utils.js';
 
-const { jsPDF } = window.jspdf;
-
-// PDF előnézet generálása az aktuális adatokkal és a kiválasztott nézettel.
-export async function previewPdf() {
+// PDF dokumentum definíciót hoz létre a pdfmake számára az aktuális adatok alapján.
+export function createPdfDefinition() {
     try {
-        const doc = new jsPDF();
-        await loadPdfFont(doc); // Egyedi betűtípus betöltése a helyes ékezetekhez
-
         const i = getInputs();
         const res = state.calculationResults;
         const c = state.activeCurrency;
@@ -18,108 +13,177 @@ export async function previewPdf() {
         const totalBeforeDiscount = convertPrice(res.totalHuf, c);
         const finalTotal = totalBeforeDiscount * (1 - (discount / 100));
 
-        // --- PDF Fejléc ---
-        doc.setFont('Roboto', 'bold');
-        doc.setFontSize(28);
-        doc.setTextColor(45, 55, 72);
-        doc.text('Kiszállás', 14, 22);
+        const summary = `${i.feladat || 'Feladat leírása'} | ${i.szerelo_fo + i.mernok_fo} Fő | ${i.szerelo_munkanap} Nap (napi ${i.szerelo_munkaora} óra, ebből ${i.szerelo_hetvegi_nap} hétvége)`;
 
-        doc.setFont('Roboto', 'normal');
-        doc.setFontSize(9);
-        doc.setTextColor(100, 116, 139);
-        doc.text(`Ajánlatszám: ${i.offer_number || '-'}`, 14, 30);
-        doc.text(`Dátum: ${i.calculation_date ? new Date(i.calculation_date).toLocaleDateString('hu-HU') : '-'}`, 14, 35);
-
-        const pageWidth = doc.internal.pageSize.width;
-        const rightMargin = 14;
-        const rightX = pageWidth - rightMargin;
-        let rightY = 22;
-        doc.setFontSize(10);
-        doc.setTextColor(45, 55, 72);
-
-        const addRightMeta = (label, value) => {
-            doc.setFont('Roboto', 'bold');
-            doc.text(label, rightX, rightY, { align: 'right' });
-            doc.setFont('Roboto', 'normal');
-            const labelWidth = doc.getTextWidth(label);
-            doc.text(value || '-', rightX - labelWidth - 2, rightY, { align: 'right' });
-            rightY += 6;
+        const docDefinition = {
+            pageSize: 'A4',
+            pageMargins: [40, 50, 40, 50],
+            content: [
+                // --- Fejléc ---
+                {
+                    columns: [
+                        { text: 'Költségkalkuláció', style: 'header' },
+                        {
+                            stack: [
+                                { text: `Ajánlatszám: ${i.offer_number || '-'}`, style: 'meta' },
+                                { text: `Dátum: ${i.calculation_date ? new Date(i.calculation_date).toLocaleDateString('hu-HU') : '-'}`, style: 'meta' },
+                            ],
+                            width: 'auto'
+                        }
+                    ],
+                    marginBottom: 20
+                },
+                {
+                    columns: [
+                        {
+                            stack: [
+                                { text: 'Megrendelő', style: 'label' },
+                                { text: i.customer || '-', style: 'value' }
+                            ]
+                        },
+                        {
+                            stack: [
+                                { text: 'Projekt', style: 'label' },
+                                { text: i.project_name || '-', style: 'value' }
+                            ]
+                        },
+                        {
+                            stack: [
+                                { text: 'Helyszín', style: 'label' },
+                                { text: i.work_location || '-', style: 'value' }
+                            ]
+                        }
+                    ],
+                    columnGap: 20,
+                    marginBottom: 15
+                },
+                // --- Összefoglaló ---
+                {
+                    table: {
+                        widths: ['*'],
+                        body: [[{ text: summary, style: 'summary', alignment: 'center' }]]
+                    },
+                    layout: {
+                        hLineWidth: (i, node) => (i === 0 || i === node.table.body.length) ? 1 : 0,
+                        vLineWidth: () => 0,
+                        hLineColor: () => '#cccccc',
+                        paddingTop: () => 8,
+                        paddingBottom: () => 8,
+                    },
+                    marginBottom: 20
+                }
+            ],
+            styles: {
+                header: { fontSize: 24, bold: true, color: '#1a202c' },
+                meta: { fontSize: 9, color: '#4a5568' },
+                label: { fontSize: 9, bold: true, color: '#4a5568' },
+                value: { fontSize: 10, color: '#1a202c' },
+                summary: { fontSize: 10, bold: true, color: '#1a202c' },
+                tableHeader: { bold: true, fontSize: 9, color: 'white', fillColor: '#2d3748' },
+                totalLabel: { bold: true, fontSize: 10 },
+                finalTotal: { bold: true, fontSize: 12, color: '#002244' }
+            },
+            defaultStyle: {
+                font: 'Roboto',
+                fontSize: 9
+            }
         };
-        addRightMeta('Megrendelő:', i.customer);
-        addRightMeta('Projekt:', i.project_name);
-        addRightMeta('Helyszín:', i.work_location);
 
-        doc.setTextColor(0, 0, 0);
-        let tableStartY = Math.max(35, rightY) + 4;
-        const summary = `${i.feladat || 'Feladat'} | ${i.szerelo_fo + i.mernok_fo} Fő | ${i.szerelo_munkanap} Nap (napi ${i.szerelo_munkaora} óra, ebből ${i.szerelo_hetvegi_nap} hétvége)`;
-        doc.setDrawColor(180);
-        doc.setLineWidth(0.2);
-        doc.line(14, tableStartY, pageWidth - 14, tableStartY);
-        doc.setFontSize(9);
-        doc.setFont('Roboto', 'bold');
-        doc.text(summary, pageWidth / 2, tableStartY + 5, { align: 'center' });
-        doc.line(14, tableStartY + 9, pageWidth - 14, tableStartY + 9);
-        tableStartY += 13;
-
-        // --- Nézet specifikus tartalom ---
+        // --- Tartalom nézet szerint ---
         if (state.pdfViewMode === 'detailed') {
-            let head = [['Költségnem', 'Menny.', 'Egys.', 'Egységár']];
-            if (discount > 0) head[0].push('Kedv. Egységár');
-            if (res.hasCostItems) head[0].push('Önköltség');
-            head[0].push('Összesen');
+            const tableHeader = [
+                { text: 'Költségnem', style: 'tableHeader' },
+                { text: 'Menny.', style: 'tableHeader', alignment: 'right' },
+                { text: 'Egys.', style: 'tableHeader', alignment: 'center' },
+                { text: 'Egységár', style: 'tableHeader', alignment: 'right' }
+            ];
+            if (discount > 0) tableHeader.push({ text: 'Kedv. Egységár', style: 'tableHeader', alignment: 'right' });
+            if (res.hasCostItems) tableHeader.push({ text: 'Önköltség', style: 'tableHeader', alignment: 'right' });
+            tableHeader.push({ text: 'Összesen', style: 'tableHeader', alignment: 'right' });
 
-            const body = res.breakdown.map(item => {
+            const tableBody = res.breakdown.map(item => {
                 const unit = convertPrice(item.unitPriceHuf, c);
                 const discUnit = unit * (1 - (discount / 100));
                 const totalCost = convertPrice(item.totalCostHuf, c);
                 const total = convertPrice(item.totalHuf, c);
                 const discTotal = total * (1 - (discount / 100));
-                let row = [item.label, item.quantity.toLocaleString('hu-HU'), item.unit, formatCustomCurrency(unit, currencySymbol)];
-                if (discount > 0) row.push(formatCustomCurrency(discUnit, currencySymbol));
-                if (res.hasCostItems) row.push(item.isCostItem ? formatCustomCurrency(totalCost, currencySymbol) : '-');
-                row.push(formatCustomCurrency(discount > 0 ? discTotal : total, currencySymbol));
+
+                const row = [
+                    item.label,
+                    { text: item.quantity.toLocaleString('hu-HU'), alignment: 'right' },
+                    { text: item.unit, alignment: 'center' },
+                    { text: formatCustomCurrency(unit, currencySymbol), alignment: 'right' }
+                ];
+                if (discount > 0) row.push({ text: formatCustomCurrency(discUnit, currencySymbol), alignment: 'right' });
+                if (res.hasCostItems) row.push({ text: item.isCostItem ? formatCustomCurrency(totalCost, currencySymbol) : '-', alignment: 'right' });
+                row.push({ text: formatCustomCurrency(discount > 0 ? discTotal : total, currencySymbol), alignment: 'right' });
                 return row;
             });
+            
+            const widths = ['*', 'auto', 'auto', 'auto'];
+            if (discount > 0) widths.push('auto');
+            if (res.hasCostItems) widths.push('auto');
+            widths.push('auto');
 
-            const colStyles = {};
-            head[0].forEach((h, index) => {
-                if (h === 'Költségnem') colStyles[index] = { halign: 'left' };
-                else if (h === 'Egys.') colStyles[index] = { halign: 'center' };
-                else colStyles[index] = { halign: 'right' };
+            docDefinition.content.push({
+                table: {
+                    headerRows: 1,
+                    widths: widths,
+                    body: [tableHeader, ...tableBody]
+                },
+                layout: 'lightHorizontalLines'
             });
-
-            doc.autoTable({
-                head, body, startY: tableStartY,
-                headStyles: { fillColor: [45, 55, 72], font: 'Roboto', fontStyle: 'bold' },
-                styles: { cellPadding: 2, fontSize: 8, font: 'Roboto', fontStyle: 'normal' },
-                columnStyles: colStyles
-            });
-            tableStartY = doc.autoTable.previous.finalY;
-        } else {
-            tableStartY += 10;
-            doc.setFontSize(11);
-            const addSummaryLine = (label, value, isBold = false) => {
-                doc.setFont('Roboto', isBold ? 'bold' : 'normal');
-                doc.text(label, 14, tableStartY);
-                doc.text(value, pageWidth - 14, tableStartY, { align: 'right' });
-                tableStartY += 8;
-            };
-            addSummaryLine('Nettó összeg:', formatCustomCurrency(totalBeforeDiscount, currencySymbol));
-            if (discount > 0) {
-                addSummaryLine(`Engedmény (${discount}%):`, `- ${formatCustomCurrency(totalBeforeDiscount - finalTotal, currencySymbol)}`);
+            
+            // Összesítések
+            const colSpan = widths.length - 1;
+            const totalsTableBody = [];
+            if (res.hasCostItems) {
+                totalsTableBody.push([
+                    { text: `Önköltség összesen (${c})`, colSpan: colSpan, alignment: 'right', style: 'totalLabel' },
+                    { text: formatCustomCurrency(convertPrice(res.totalCostHuf, c), currencySymbol), alignment: 'right', style: 'totalLabel' }
+                ]);
             }
-            doc.setFontSize(12);
-            addSummaryLine('Végösszeg:', formatCustomCurrency(finalTotal, currencySymbol), true);
+            totalsTableBody.push([
+                { text: `Végösszeg (${c})`, colSpan: colSpan, alignment: 'right', style: 'totalLabel' },
+                { text: formatCustomCurrency(totalBeforeDiscount, currencySymbol), alignment: 'right', style: 'totalLabel' }
+            ]);
+            if (discount > 0) {
+                 totalsTableBody.push([
+                    { text: `Kedvezményes végösszeg (${discount}%)`, colSpan: colSpan, alignment: 'right', style: 'finalTotal' },
+                    { text: formatCustomCurrency(finalTotal, currencySymbol), alignment: 'right', style: 'finalTotal' }
+                ]);
+            }
+            
+            docDefinition.content.push({
+                table: { widths: ['*', 'auto'], body: totalsTableBody },
+                layout: 'noBorders',
+                marginTop: 10
+            });
+
+        } else { // Egyszerűsített nézet
+            const simpleBody = [
+                [{ text: 'Nettó összeg:', style: 'totalLabel' }, { text: formatCustomCurrency(totalBeforeDiscount, currencySymbol), alignment: 'right', style: 'totalLabel' }]
+            ];
+            if (discount > 0) {
+                simpleBody.push([{ text: `Engedmény (${discount}%):` }, { text: `- ${formatCustomCurrency(totalBeforeDiscount - finalTotal, currencySymbol)}`, alignment: 'right' }]);
+            }
+            simpleBody.push([{ text: 'Végösszeg:', style: 'finalTotal' }, { text: formatCustomCurrency(finalTotal, currencySymbol), alignment: 'right', style: 'finalTotal' }]);
+            
+            docDefinition.content.push({
+                table: {
+                    widths: ['*', 'auto'],
+                    body: simpleBody
+                },
+                layout: 'noBorders',
+                marginTop: 20
+            });
         }
 
-        doc.setFontSize(12);
-        doc.setFont('Roboto', 'bold');
-        doc.text(`Végösszeg: ${formatCustomCurrency(finalTotal, currencySymbol)}`, pageWidth - 14, tableStartY + 15, { align: 'right' });
+        return docDefinition;
 
-        return doc;
     } catch (e) {
-        console.error("PDF generálási hiba:", e);
-        alert("Hiba történt a PDF generálása közben.");
+        console.error("PDF definíció létrehozási hiba:", e);
+        alert("Hiba történt a PDF előkészítése közben.");
         return null;
     }
 }

@@ -26,7 +26,7 @@ export function calculateCosts() {
     const szereloNapok = i.szerelo_munkanap;
     const mernokNapok = i.mernok_munkanap;
     const mernokVezetoNapok = Math.min(szereloNapok, mernokNapok);
-    const mernokVezetoFo = mernokVezetoNapok > 0 ? 1 : 0;
+    const mernokVezetoFo = mernokVezetoNapok > 0 && i.mernok_fo > 0 ? 1 : 0;
     const szereloVezetoNapok = (i.mernok_fo === 0 && i.szerelo_fo > 0) ? szereloNapok : 0;
     const szereloVezetoFo = szereloVezetoNapok > 0 ? 1 : 0;
 

@@ -8,9 +8,9 @@ import {
     openChartModal,
     setupDynamicList
 } from './ui.js';
-import { previewPdf } from './pdfGenerator.js';
+import { createPdfDefinition } from './pdfGenerator.js';
 
-// Globális változók a PDF dokumentum tárolására
+// Globális változó a PDF dokumentum objektum tárolására
 let pdfDoc = null;
 
 // Az alkalmazás inicializálását végző fő függvény.
@@ -19,7 +19,7 @@ async function init() {
     if (localStorage.getItem('theme') === 'light') document.body.classList.add('light-mode');
     
     // Lábléc és dátum beállítása.
-    D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | v1.8.0`;
+    D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | v1.9.0`;
     D('calculation_date').value = new Date().toISOString().split('T')[0];
     
     // Beviteli mezők generálása.
@@ -39,6 +39,15 @@ async function init() {
     calculateAndDisplay();
 
     // --- ESEMÉNYKEZELŐK BEÁLLÍTÁSA ---
+    const generateAndShowPdf = () => {
+        const docDefinition = createPdfDefinition();
+        if (docDefinition) {
+            pdfDoc = pdfmake.createPdf(docDefinition);
+            pdfDoc.getDataUrl((dataUrl) => {
+                D('pdf-preview-iframe').src = dataUrl;
+            });
+        }
+    };
 
     D('theme-switcher').onclick = () => {
         document.body.classList.toggle('light-mode');
@@ -49,25 +58,19 @@ async function init() {
     
     D('generate-pdf-btn').onclick = () => {
         D('pdf-preview-modal').style.display = 'block';
-        pdfDoc = previewPdf();
-        if (pdfDoc) {
-            D('pdf-preview-iframe').src = pdfDoc.output('datauristring');
-        }
+        generateAndShowPdf();
     };
 
     D('pdf-view-toggle').onchange = (e) => {
         state.pdfViewMode = e.target.checked ? 'detailed' : 'simple';
-        pdfDoc = previewPdf();
-        if (pdfDoc) {
-            D('pdf-preview-iframe').src = pdfDoc.output('datauristring');
-        }
+        generateAndShowPdf();
     };
     
     D('pdf-download-btn').onclick = () => {
         if (pdfDoc) {
             const i = getInputs();
             const f = `Kalkulacio_${i.offer_number || 'ajanlat'}_${i.project_name || 'projekt'}.pdf`;
-            pdfDoc.save(f.replace(/[\\s/\\?%*:|"<>]/g, '_'));
+            pdfDoc.download(f.replace(/[\\s/\\?%*:|"<>]/g, '_'));
         }
     };
 
