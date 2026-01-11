@@ -1,6 +1,15 @@
 
 # Változási Napló
 
+## v2.5.2 - PDF Javítás és UI Finomítás
+*Dátum: 2024-05-28*
+
+### Javítások
+- **Kritikus PDF Hiba Javítva:** A PDF generálás ismételten javításra került. A hiba forrása a generálási metódusban volt; a rendszer most visszatér a stabil, HTML-sztring alapú feldolgozáshoz, ami garantálja a megbízható működést és a karakterek helyes megjelenítését.
+
+### Fejlesztések
+- **Interaktív Gomb Dizájn:** A felhasználói élmény javítása érdekében minden gomb vizuális visszajelzést ad, ha az egérkurzor föléjük kerül. A gombok egy finom "glow" effektet kapnak és a színük is megváltozik.
+
 ## v2.5.1 - Kritikus Hibajavítás: Visszaállítás Stabil Verzióra
 *Dátum: 2024-05-28*
 
