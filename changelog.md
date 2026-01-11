@@ -1,10 +1,16 @@
 
 # Változási Napló
 
-## v2.18.0 - Téma- és Nyomtatáskezelés Finomhangolása
+## v2.19.0 - Közvetlen PDF Generálás és Előnézet Javítás
 *Dátum: 2024-05-28*
 
 ### Főbb változások és fejlesztések
+- **PDF Letöltés Funkció:** A nyomtatási előnézeti ablakban egy új "PDF letöltése" gomb jelent meg. Ez a `html2pdf.js` könyvtár segítségével közvetlenül generál egy PDF dokumentumot a megjelenített tartalomból és elindítja a letöltését.
+- **Dinamikus PDF Fájlnév:** A generált PDF fájl neve automatikusan az ajánlatszámból képződik a könnyebb kezelhetőség érdekében.
+- **Garantált Világos Előnézet:** A nyomtatási előnézet HTML kódja mostantól expliciten beállítja a fehér hátteret, biztosítva, hogy minden böngészőben a valós nyomtatási kép jelenjen meg, függetlenül az applikáció sötét/világos témájától.
+
+## v2.18.0 - Téma- és Nyomtatáskezelés Finomhangolása
+*Dátum: 2024-05-28*
 - **Sötét Mód Konzisztencia:** Javítva a legördülő menük (`select`) opcióinak olvashatósága sötét módban. A lenyíló lista mostantól szintén a sötét téma színeit használja, egységesebb megjelenést biztosítva.
 - **Nyomtatási Előnézet Javítása:** A nyomtatási előnézet mostantól mindig a világos, nyomtatásra optimalizált témát jeleníti meg, függetlenül az alkalmazás aktuális sötét/világos beállításától. Ez biztosítja, hogy a felhasználó a valós végeredményt lássa.
 
@@ -26,7 +32,7 @@
     - A sötét mód egy még egységesebb, erőteljesebb arculatot kapott, amely a **Seahawks** palettára épül (élénkzöld, navy kék, szürke).
     - Minden interaktív elem **hangsúlyosabb, fényesebb zöld "glow" effektet** kapott `hover` és `focus` állapotban.
 - **Teljes UI Konzisztencia:**
-    - Az **"Árlisták kezelése" ablak dizájnja** teljes mértékben igazodik az alkalmazás többi részéhez, beleértve a legördülő menüket és a beviteli mezőket is.
+    - Az **"Árlisták kezelése" ablak dizsájnj** teljes mértékben igazodik az alkalmazás többi részéhez, beleértve a legördülő menüket és a beviteli mezőket is.
 - **Checkpoint Fájl Visszaállítása:** A felhasználó kérésére a `checkpoint.txt` egy korábbi, stabil verziót (v2.11.0) tükröz, míg a `changelog.md` naprakész marad.
 
 ## v2.14.0 - Seahawks Dizájn Rendszer és UI Konzisztencia

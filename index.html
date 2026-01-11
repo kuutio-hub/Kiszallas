@@ -7,6 +7,7 @@
     <title>Kiszállási Kalkulátor</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         @font-face {
             font-family: 'DejaVuSans';
@@ -371,6 +372,7 @@
                 <iframe id="print-preview-iframe"></iframe>
             </div>
             <div id="print-preview-footer" style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                <button id="download-pdf-btn" class="btn">PDF letöltése</button>
                 <button id="execute-print-btn" class="btn btn-success">Nyomtatás</button>
             </div>
         </div>
@@ -379,7 +381,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.18.0";
+        const APP_VERSION = "v2.19.0";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -768,7 +770,7 @@
                     <title>Árlista - ${pkg.name}</title>
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
-                    body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
+                    body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; background-color: #ffffff !important; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 5px; color: #002244; }
                     .sub-header { text-align: center; font-size: 12px; color: #666; margin-bottom: 30px; }
                     h3 { font-size: 14px; color: #002244; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px; }
@@ -900,7 +902,7 @@
                     <title>Kalkuláció - ${i.offer_number||'Nyomtatás'}</title>
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
-                    body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
+                    body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; background-color: #ffffff !important; }
                     .page { width: 100%; padding: 0; margin: 0; position: relative; }
                     .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; color: rgba(128, 0, 0, 0.08); font-weight: bold; pointer-events: none; z-index: -1; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
@@ -1009,6 +1011,20 @@
                     iframe.contentWindow.focus();
                     iframe.contentWindow.print();
                 }
+            };
+            D('download-pdf-btn').onclick = () => {
+                const iframe = D('print-preview-iframe');
+                const element = iframe.contentWindow.document.body;
+                const offerNumber = D('offer_number').value || 'ajanlat';
+                const filename = `Kalkulacio-${offerNumber}.pdf`;
+                const opt = {
+                    margin:       [20, 20, 20, 20],
+                    filename:     filename,
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, useCORS: true },
+                    jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                html2pdf().from(element).set(opt).save();
             };
 
             D('save-confirm-form').addEventListener('submit', (e) => {
