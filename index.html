@@ -736,14 +736,16 @@
         }
         
         function generatePdf({ simplified = false, showCost = true, isInternal = false }) {
+            const btnContainer = D('pdf-export-btn').parentElement;
             const btn = D('pdf-export-btn');
             const originalText = btn.textContent;
             btn.textContent = 'Generálás...';
+            btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'none');
             btn.disabled = true;
 
             const i = getInputs();
             const res = state.calculationResults;
-            if (!res) { alert("Nincs mit exportálni."); btn.textContent = originalText; btn.disabled = false; return; }
+            if (!res) { alert("Nincs mit exportálni."); btn.textContent = originalText; btn.disabled = false; btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'auto'); return; }
 
             const c = state.activeCurrency;
             const currencySymbol = c === 'EUR' ? '€' : 'Ft';
@@ -801,7 +803,7 @@
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
-                    .page { width: 100%; padding: 0; margin: 0; position: relative; }
+                    .page { width: 100%; padding: 0; margin: 0; position: relative; padding-bottom: 20mm; }
                     .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 80px; color: rgba(128, 0, 0, 0.1); font-weight: bold; pointer-events: none; z-index: -1; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
                     h1 span.date { font-size: 14px; font-weight: normal; color: #666; }
@@ -816,10 +818,10 @@
                     th { background-color: #f2f2f2; font-weight: bold; }
                     .align-right { text-align: right; }
                     .align-center { text-align: center; }
-                    .totals-table { width: 60%; margin-left: auto; }
+                    .totals-table { width: 60%; margin-left: auto; page-break-inside: avoid; }
                     .totals-table td { border: none; padding: 4px 8px; }
                     .totals-table .final-total { font-weight: bold; font-size: 12px; border-top: 2px solid #333; }
-                    .footer { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; }
+                    .signature-section { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; page-break-inside: avoid; }
                     .signature-block { border-top: 1px solid #999; padding-top: 5px; }
                 </style></head><body><div class="page">
                     ${watermarkHtml}
@@ -835,11 +837,29 @@
                     ${combinedBlock}
                     <table><thead><tr>${tableHeaderHtml}</tr></thead><tbody>${tableBodyHtml}</tbody></table>
                     <table class="totals-table">${totalsTableHtml}</table>
-                    <div class="footer"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó ${i.creator_name ? `(${i.creator_name})` : ''}</div></div>
+                    <div class="signature-section"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó ${i.creator_name ? `(${i.creator_name})` : ''}</div></div>
                 </div></body></html>`;
             
             const opt = { margin: 15, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
-            html2pdf().set(opt).from(htmlContent).save().finally(() => { btn.textContent = originalText; btn.disabled = false; });
+            
+            html2pdf().set(opt).from(htmlContent).toPdf().get('pdf').then(pdf => {
+                const totalPages = pdf.internal.getNumberOfPages();
+                const version = D('copyright-footer').textContent.match(/Verzió: (v[\d\.]+)/)[1] || '';
+
+                for (let i = 1; i <= totalPages; i++) {
+                    pdf.setPage(i);
+                    pdf.setFontSize(8);
+                    pdf.setTextColor(150);
+                    const footerText = `Költségkalkulátor ${version} | Oldal ${i} / ${totalPages}`;
+                    const pageWidth = pdf.internal.pageSize.getWidth();
+                    const pageHeight = pdf.internal.pageSize.getHeight();
+                    pdf.text(footerText, pageWidth / 2, pageHeight - 10, { align: 'center' });
+                }
+            }).save(filename).finally(() => {
+                btn.textContent = originalText;
+                btn.disabled = false;
+                btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'auto');
+            });
         }
 
         function handleReset() {
@@ -853,7 +873,7 @@
         }
         
         async function initializeApp() {
-            const version = "v2.7.0";
+            const version = "v2.8.0";
             D('copyright-footer').innerHTML = `&copy; 2024 Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();

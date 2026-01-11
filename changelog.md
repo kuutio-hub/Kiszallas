@@ -1,6 +1,21 @@
 
 # Változási Napló
 
+## v2.8.0 - Professzionális PDF Lábléc és Oldalkezelés
+*Dátum: 2024-05-28*
+
+### Új funkciók és fejlesztések
+- **Dinamikus PDF Lábléc:** Minden generált PDF dokumentum (Egyszerű, Bővített, Részletes) egy egységes, professzionális láblécet kapott.
+- **Tartalom:** A lábléc tartalmazza a "Költségkalkulátor" nevet, az alkalmazás aktuális verziószámát és a dinamikus oldalszámozást (pl. "Oldal 1 / 2").
+- **Teljes Oldal Garancia:** A lábléc bevezetése megoldja azt a problémát, hogy a rövidebb tartalmú kalkulációk ne generáljanak teljes A4-es oldalt. Mostantól minden exportált dokumentum garantáltan szabványos oldalméretű lesz.
+
+## v2.7.1 - Checkpoint
+*Dátum: 2024-05-28*
+
+### Változások
+- **Checkpoint Létrehozása:** Technikai verzióugrás egy stabil állapot rögzítésére a nagyobb PDF-fejlesztések előtt.
+- **Karbantartás:** Felesleges, üres `index.tsx` fájl törlése a projektből.
+
 ## v2.7.0 - PDF Export Bővítése és UI Finomhangolás
 *Dátum: 2024-05-28*
 
