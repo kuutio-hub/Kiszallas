@@ -1,6 +1,17 @@
 
 # Változási Napló
 
+## v2.9.0 - PDF Finomhangolás és UI Javítások
+*Dátum: 2024-05-28*
+
+### Új funkciók és fejlesztések
+- **Egységes PDF Lábléc:** Az "Árlista kivonat" PDF export is megkapta a professzionális, dinamikus láblécet (verziószám, oldalszám), biztosítva a konzisztens megjelenést és a teljes A4-es oldalméretet.
+- **Javított Vízjel:** A "BELSŐ HASZNÁLATRA" vízjel mérete optimalizálva lett, így már minden esetben garantáltan teljes egészében látható a generált PDF oldalakon.
+- **Átláthatóbb Kedvezmény Kijelzés:** A kalkulációs táblázat láblécében a kedvezmény mostantól külön sorban, negatív előjellel, összegszerűen is megjelenik a végösszeg levonása előtt, egyértelműsítve a számítást.
+- **Dinamikus Copyright Év:** Az alkalmazás láblécében a copyright évszám mostantól automatikusan frissül az aktuális évre.
+- **Árlista PDF Igazítása:** Az "Árlista kivonat" PDF tartalmának felső margója csökkentve lett, így a dokumentum a lap tetejétől indul, professzionálisabb megjelenést kölcsönözve.
+- **Karbantartás:** A projektből törlésre kerültek a feleslegessé vált `LOGIC.md` és `checkpoint.txt` fájlok.
+
 ## v2.8.0 - Professzionális PDF Lábléc és Oldalkezelés
 *Dátum: 2024-05-28*
 
