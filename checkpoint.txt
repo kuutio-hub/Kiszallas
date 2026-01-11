@@ -1,1 +1,0 @@
-Ez egy checkpoint a v2.7.1 verzióhoz.

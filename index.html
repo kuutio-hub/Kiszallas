@@ -228,6 +228,7 @@
                                 <a href="#" id="downloadPdfSimple">Egyszerű</a>
                                 <a href="#" id="downloadPdfExpanded">Bővített</a>
                                 <a href="#" id="downloadPdfFull" data-internal="true">Részletes (Belső)</a>
+                                <a href="#" id="printPreview" style="border-top: 1px solid var(--border-color);">Nyomtatási nézet</a>
                             </div>
                         </div>
                      </div>
@@ -497,7 +498,7 @@
             D('delete-rate-btn').onclick=handleDeleteRatePackage;
             D('save-rate-btn').onclick=handleSaveRatePackage;
             D('rate-protection-toggle').onchange = handleProtectionToggle;
-            D('export-rate-pdf-btn').onclick = handlePriceListPdfExport;
+            D('export-rate-pdf-btn').onclick = () => handlePriceListPdfExport({ forBrowserPrint: false });
             modal.style.display='block';
         }
         
@@ -679,7 +680,7 @@
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
-                    .page { width: 100%; padding: 0; margin: 0; position: relative; padding-bottom: 20mm; }
+                    .page { width: 100%; padding: 0; margin: 0; position: relative; min-height: 267mm; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 5px; color: #002244; }
                     .sub-header { text-align: center; font-size: 12px; color: #666; margin-bottom: 30px; }
                     h3 { font-size: 14px; color: #002244; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 20px; }
@@ -693,7 +694,7 @@
                     ${tablesHtml}
                 </div></body></html>`;
 
-            const opt = { margin: [10, 15, 15, 15], filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
+            const opt = { margin: 15, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
             
             html2pdf().set(opt).from(htmlContent).toPdf().get('pdf').then(pdf => {
                 const totalPages = pdf.internal.getNumberOfPages();
@@ -763,17 +764,11 @@
             draw();
         }
         
-        function generatePdf({ simplified = false, showCost = true, isInternal = false }) {
-            const btnContainer = D('pdf-export-btn').parentElement;
-            const btn = D('pdf-export-btn');
-            const originalText = btn.textContent;
-            btn.textContent = 'Generálás...';
-            btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'none');
-            btn.disabled = true;
-
+        function getPrintableHtml(options = {}) {
+            const { simplified = false, showCost = true, isInternal = false, forBrowserPrint = false } = options;
             const i = getInputs();
             const res = state.calculationResults;
-            if (!res) { alert("Nincs mit exportálni."); btn.textContent = originalText; btn.disabled = false; btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'auto'); return; }
+            if (!res) return '';
 
             const c = state.activeCurrency;
             const currencySymbol = c === 'EUR' ? '€' : 'Ft';
@@ -818,20 +813,15 @@
             const date = i.calculation_date ? new Date(i.calculation_date) : new Date();
             const dateFormatted = date.toLocaleDateString('hu-HU');
             const mainTitle = `<h1>Kiszállás kalkuláció <span class="date">(${dateFormatted})</span></h1>`;
-
-            const dateForFilename = `${date.getFullYear().toString().slice(-2)}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
-            let baseName = i.offer_number || 'Kalk';
-            if (i.project_number) { baseName += `_${i.project_number}`; }
-            const filename = `${baseName}_kiszallas_${dateForFilename}.pdf`.replace(/[\\/?%*:|"<>]/g, '_');
             
             const watermarkHtml = isInternal ? '<div class="watermark">BELSŐ HASZNÁLATRA</div>' : '';
-
-            const htmlContent = `
-                <!DOCTYPE html><html><head><meta charset="UTF-8">
+            
+            return `
+                <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kalkuláció - ${i.offer_number||'Nyomtatás'}</title>
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
-                    .page { width: 100%; padding: 0; margin: 0; position: relative; padding-bottom: 20mm; }
+                    .page { width: 100%; padding: 0; margin: 0; position: relative; ${!forBrowserPrint ? 'min-height: 267mm;' : ''} }
                     .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; color: rgba(128, 0, 0, 0.08); font-weight: bold; pointer-events: none; z-index: -1; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
                     h1 span.date { font-size: 14px; font-weight: normal; color: #666; }
@@ -844,16 +834,15 @@
                     table { width: 100%; border-collapse: collapse; font-size: 9px; margin-bottom: 20px; table-layout: fixed; }
                     th, td { border: 1px solid #ddd; padding: 6px; text-align: left; word-wrap: break-word; }
                     th { background-color: #f2f2f2; font-weight: bold; }
-                    .align-right { text-align: right; }
-                    .align-center { text-align: center; }
+                    .align-right { text-align: right; } .align-center { text-align: center; }
                     .totals-table { width: 60%; margin-left: auto; page-break-inside: avoid; }
                     .totals-table td { border: none; padding: 4px 8px; }
                     .totals-table .final-total { font-weight: bold; font-size: 12px; border-top: 2px solid #333; }
                     .signature-section { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; page-break-inside: avoid; }
                     .signature-block { border-top: 1px solid #999; padding-top: 5px; }
+                    @media print { body { -webkit-print-color-adjust: exact; } .task-description { background-color: #f8f8f8 !important; } th { background-color: #f2f2f2 !important; } }
                 </style></head><body><div class="page">
-                    ${watermarkHtml}
-                    ${mainTitle}
+                    ${watermarkHtml} ${mainTitle}
                     <table class="meta-table"><tr><td class="meta-item">
                         <p><span>Ajánlatszám:</span> <strong>${i.offer_number||'-'}</strong></p>
                         <p><span>Projektszám:</span> <strong>${i.project_number||'-'}</strong></p>
@@ -867,6 +856,38 @@
                     <table class="totals-table">${totalsTableHtml}</table>
                     <div class="signature-section"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó ${i.creator_name ? `(${i.creator_name})` : ''}</div></div>
                 </div></body></html>`;
+        }
+
+        function handlePrintPreview() {
+            const printWindow = window.open('', '_blank');
+            const htmlContent = getPrintableHtml({ simplified: false, showCost: true, isInternal: true, forBrowserPrint: true });
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.onload = function() {
+                printWindow.print();
+                printWindow.close();
+            };
+        }
+
+        function generatePdf(options = {}) {
+            const btnContainer = D('pdf-export-btn').parentElement;
+            const btn = D('pdf-export-btn');
+            const originalText = btn.textContent;
+            btn.textContent = 'Generálás...';
+            btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'none');
+            btn.disabled = true;
+
+            const i = getInputs();
+            const res = state.calculationResults;
+            if (!res) { alert("Nincs mit exportálni."); btn.textContent = originalText; btn.disabled = false; btnContainer.querySelectorAll('a').forEach(a => a.style.pointerEvents = 'auto'); return; }
+
+            const date = i.calculation_date ? new Date(i.calculation_date) : new Date();
+            const dateForFilename = `${date.getFullYear().toString().slice(-2)}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}`;
+            let baseName = i.offer_number || 'Kalk';
+            if (i.project_number) { baseName += `_${i.project_number}`; }
+            const filename = `${baseName}_kiszallas_${dateForFilename}.pdf`.replace(/[\\/?%*:|"<>]/g, '_');
+            
+            const htmlContent = getPrintableHtml(options);
             
             const opt = { margin: 15, filename: filename, image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true, letterRendering: true }, jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' } };
             
@@ -901,7 +922,7 @@
         }
         
         async function initializeApp() {
-            const version = "v2.9.0";
+            const version = "v2.10.0";
             D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
@@ -921,7 +942,8 @@
             D('downloadPdfSimple').addEventListener('click', (e) => { e.preventDefault(); generatePdf({ simplified: true, showCost: false, isInternal: false }); });
             D('downloadPdfExpanded').addEventListener('click', (e) => { e.preventDefault(); generatePdf({ simplified: false, showCost: false, isInternal: false }); });
             D('downloadPdfFull').addEventListener('click', (e) => { e.preventDefault(); generatePdf({ simplified: false, showCost: true, isInternal: true }); });
-            
+            D('printPreview').addEventListener('click', (e) => { e.preventDefault(); handlePrintPreview(); });
+
             D('save-confirm-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const password = D('save-password').value;
