@@ -183,7 +183,7 @@
         <div id="landing-content">
             <h1>Kiszállási Kalkulátor</h1>
             <form id="password-form">
-                <input type="password" id="password-input" placeholder="Jelszó" required>
+                <input type="password" id="password-input" placeholder="Jelszó" required autocomplete="new-password">
                 <button type="submit" class="btn btn-success">Belépés</button>
             </form>
             <footer id="landing-footer"></footer>
@@ -292,7 +292,7 @@
                 <p id="save-confirm-message" style="margin-bottom: 1rem;"></p>
                 <div class="form-group">
                     <label for="save-password">Admin jelszó a felülíráshoz</label>
-                    <input type="password" id="save-password" required>
+                    <input type="password" id="save-password" required autocomplete="new-password">
                 </div>
                 <label class="confirmation-checkbox">
                     <input type="checkbox" id="save-irreversible-confirm" required>
@@ -317,7 +317,7 @@
                 <p style="margin-bottom: 1rem; color: var(--danger-primary); font-weight: bold;">FIGYELEM: A törlés végleges és nem vonható vissza!</p>
                 <div class="form-group">
                     <label for="delete-password">Admin jelszó a törléshez</label>
-                    <input type="password" id="delete-password" required>
+                    <input type="password" id="delete-password" required autocomplete="new-password">
                 </div>
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
                   <button type="submit" class="btn btn-danger">Végleges törlés</button>
@@ -336,7 +336,7 @@
                 <p style="margin-bottom: 1rem; color: var(--danger-primary); font-weight: bold;">FIGYELEM: A védelem feloldásával az árlista szerkeszthetővé válik. A mentett módosítások véglegesek és nem visszaállíthatók!</p>
                 <div class="form-group">
                     <label for="protection-password">Admin jelszó a feloldáshoz</label>
-                    <input type="password" id="protection-password" required>
+                    <input type="password" id="protection-password" required autocomplete="new-password">
                 </div>
                 <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
                     <button type="submit" class="btn btn-danger">Feloldás</button>
