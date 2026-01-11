@@ -1,12 +1,4 @@
-
 # Változási Napló
-
-## v2.5.1 - Kritikus Hibajavítás: Visszaállítás Stabil Verzióra
-*Dátum: 2024-05-28*
-
-### Visszaállítás
-- **PDF Generálási Hiba:** A `v2.5.0` verzió után bevezetett módosítások kritikus regressziós hibát okoztak a PDF generálási logikában, amely üres vagy hibásan renderelt dokumentumokat eredményezett.
-- **Visszaállítás a Stabil Verzióra:** A megbízható működés helyreállítása érdekében a teljes alkalmazás visszaállításra került a `v2.5.0` verzió stabil, bizonyítottan működő állapotára. Ezzel a lépéssel a `v2.5.0` után bevezetett funkciók (pl. háromszintű PDF export, megújult UI, fokozott biztonsági funkciók) ideiglenesen kivezetésre kerültek a stabilitás javára.
 
 ## v2.5.0 - Árlista Menedzsment Bővítése és Hibajavítások
 *Dátum: 2024-05-23*
