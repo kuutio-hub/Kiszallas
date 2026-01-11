@@ -1,0 +1,3 @@
+Checkpoint: v2.11.0
+
+Ez egy fontos mérföldkő. A PDF generálás teljesen át lett alakítva, hogy kizárólag a böngésző megbízható "Nyomtatás / PDF Mentés" funkcióját használja. A korábbi direkt generálási opciók és a 'html2pdf.js' könyvtár el lettek távolítva. Az alkalmazás logikája letisztult, stabil. A `LOGIC.md` visszaállítva.
