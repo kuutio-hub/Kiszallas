@@ -1,10 +1,16 @@
 
 # Változási Napló
 
-## v2.16.0 - Felhasználói Felület Finomhangolása
+## v2.17.0 - Interaktív Nyomtatási Előnézet és Hibajavítások
 *Dátum: 2024-05-28*
 
 ### Főbb változások és fejlesztések
+- **Új Nyomtatási Előnézet:** A nyomtatás gombra kattintva a dokumentum egy reszponzív, felugró ablakban (modal) jelenik meg az alkalmazáson belül, nem pedig egy új böngészőfülön.
+- **Felhasználói Kontroll:** Az előnézeti ablakban egy külön "Nyomtatás" gomb található, így a nyomtatási párbeszédablak már nem ugrik fel automatikusan.
+- **Oldalszámozás Javítása:** Javítva a hiba, ami miatt a nyomtatott dokumentumok láblécében "Oldal 0 / 0" jelent meg. Mostantól a helyes oldalszám látható.
+
+## v2.16.0 - Felhasználói Felület Finomhangolása
+*Dátum: 2024-05-28*
 - **Hover Effektus a Beviteli Mezőkön:** Minden beviteli mező és legördülő menü egy finom `hover` effektet kapott (a keret színe kiemelkedik), ami javítja a felhasználói élményt és a vizuális visszajelzést.
 - **Verzióinformáció a Belépőképernyőn:** A belépőoldal lábléce mostantól dinamikusan megjeleníti az aktuális verziószámot és a copyright információt.
 - **Konzisztens Checkpoint:** A `checkpoint.txt` a felhasználó kérésének megfelelően egy korábbi, rögzített mérföldkövet mutat.

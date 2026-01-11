@@ -124,6 +124,10 @@
         .modal-content .form-group select { padding: 0.5rem; border: 1px solid var(--border-color); background-color: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; width: 100%; transition: box-shadow 0.2s, border-color 0.2s; border-radius: 0.3rem; }
         .modal-content .form-group select:focus { outline: none; box-shadow: 0 0 0 4px var(--glow-color); }
 
+        #print-preview-content { width: 90%; max-width: 840px; height: 90vh; display: flex; flex-direction: column; }
+        #print-preview-body { flex-grow: 1; padding: 0; overflow: hidden; }
+        #print-preview-iframe { width: 100%; height: 100%; border: none; }
+
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
         .modal-header h2 { font-size: 1.5rem; }
         .modal-close-btn { font-size: 2rem; font-weight: bold; cursor: pointer; background: none; border: none; color: var(--text-primary); line-height: 1; padding: 0 0 0 1rem; }
@@ -352,10 +356,25 @@
         </div>
     </div>
     
+    <div id="print-preview-modal" class="modal">
+        <div class="modal-content" id="print-preview-content">
+            <div class="modal-header">
+                <h2>Nyomtatási nézet</h2>
+                <button class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="print-preview-body">
+                <iframe id="print-preview-iframe"></iframe>
+            </div>
+            <div id="print-preview-footer" style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+                <button id="execute-print-btn" class="btn btn-success">Nyomtatás</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.16.0";
+        const APP_VERSION = "v2.17.0";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -692,7 +711,8 @@
             const css = `
                 <style>
                     @page { size: A4; margin: 20mm; }
-                    body { counter-reset: page pages; }
+                    body { counter-reset: page; }
+                    .page { counter-increment: page; }
                     .print-footer {
                         position: fixed;
                         bottom: 10mm;
@@ -704,7 +724,7 @@
                         justify-content: space-between;
                     }
                     .print-footer .page-number::after {
-                        content: "Oldal " counter(page) " / " counter(pages);
+                        content: "Oldal " counter(page);
                     }
                 </style>`;
             const html = `
@@ -751,17 +771,17 @@
                     @media print { h3, .rate-table { page-break-inside: avoid; } }
                 </style>
                 ${footerCss}
-                </head><body>
+                </head><body><div class="page">
                     <h1>Árlista Kivonat</h1>
                     <p class="sub-header">${pkg.name} (${dateFormatted})</p>
                     ${tablesHtml}
                     ${footerHtml}
-                </body></html>`;
+                </div></body></html>`;
             
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
-            printWindow.onload = () => { printWindow.print(); printWindow.close(); };
+            const printModal = D('print-preview-modal');
+            const iframe = D('print-preview-iframe');
+            iframe.srcdoc = htmlContent;
+            printModal.style.display = 'block';
         }
 
         function handleDeleteRatePackage(){if(state.rates.length<=1)return alert("Az utolsó árlista nem törölhető.");const i=D('rate-editor-select').value;if(confirm(`Biztosan törli a "${state.rates.find(r=>r.id===i).name}" árlistát?`)){state.rates=state.rates.filter(r=>r.id!==i);localStorage.setItem('rates',JSON.stringify(state.rates));D('rate-modal').style.display='none';updateRatePackagesUI();calculateAndDisplay();}}
@@ -915,32 +935,21 @@
             const printDetail = document.querySelector('input[name="print-detail"]:checked').value;
             let options = {};
             switch(printDetail) {
-                case 'simple':
-                    options = { simplified: true, showCost: false, isInternal: false };
-                    break;
-                case 'detailed':
-                    options = { simplified: false, showCost: false, isInternal: false };
-                    break;
-                case 'internal':
-                    options = { simplified: false, showCost: true, isInternal: true };
-                    break;
+                case 'simple': options = { simplified: true, showCost: false, isInternal: false }; break;
+                case 'detailed': options = { simplified: false, showCost: false, isInternal: false }; break;
+                case 'internal': options = { simplified: false, showCost: true, isInternal: true }; break;
             }
 
-            const printWindow = window.open('', '_blank');
             const htmlContent = getPrintableHtml(options);
             if (!htmlContent || !state.calculationResults) {
-                printWindow.close();
                 alert("Nincs mit nyomtatni.");
                 return;
             }
-            printWindow.document.write(htmlContent);
-            printWindow.document.close();
-            printWindow.onload = function() {
-                setTimeout(() => {
-                    printWindow.print();
-                    printWindow.close();
-                }, 100);
-            };
+
+            const modal = D('print-preview-modal');
+            const iframe = D('print-preview-iframe');
+            iframe.srcdoc = htmlContent;
+            modal.style.display = 'block';
         }
 
         function handleReset() {
@@ -979,6 +988,18 @@
             };
             
             D('print-btn').addEventListener('click', (e) => { e.preventDefault(); handleCalculationPrint(); });
+            const printModal = D('print-preview-modal');
+            printModal.querySelector('.modal-close-btn').onclick = () => {
+                printModal.style.display = 'none';
+                D('print-preview-iframe').srcdoc = ''; // Clear content
+            };
+            D('execute-print-btn').onclick = () => {
+                const iframe = D('print-preview-iframe');
+                if (iframe.contentWindow) {
+                    iframe.contentWindow.focus();
+                    iframe.contentWindow.print();
+                }
+            };
 
             D('save-confirm-form').addEventListener('submit', (e) => {
                 e.preventDefault();
@@ -1014,7 +1035,7 @@
 
             D('save-other-cost-btn').onclick = () => { const btn = D('save-other-cost-btn'); const originalText = btn.textContent; btn.textContent = 'Mentve!'; btn.classList.add('btn-success'); setTimeout(() => { btn.textContent = originalText; btn.classList.remove('btn-success'); }, 1500); };
             
-            document.querySelectorAll('.modal-close-btn').forEach(b=>b.onclick=(e)=>e.target.closest('.modal').style.display='none');
+            document.querySelectorAll('.modal-close-btn').forEach(b => { if(!b.closest('#print-preview-modal')) b.onclick=(e)=>e.target.closest('.modal').style.display='none' });
             document.querySelector('#app-container').addEventListener('input', calculateAndDisplay);
             D('rate-package-select').onchange=(e)=>{state.activeRatePackage=state.rates.find(r=>r.id===e.target.value);calculateAndDisplay();};
             D('currency-select').onchange=(e)=>{state.activeCurrency=e.target.value;calculateAndDisplay();};
