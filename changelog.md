@@ -1,26 +1,32 @@
 
 # Változási Napló
 
-## v2.12.0 - UI/UX Nagy-frissítés: Új Dizájn és Funkciók
+## v2.13.0 - Modernizációs Nagy-frissítés: Új Dizájn, Nyomtatás és UX
 *Dátum: 2024-05-28*
 
 ### Főbb változások és fejlesztések
-- **Újratervezett Világos Mód:** A világos téma teljesen megújult. Elhagyva a korábbi "Seahawks" stílust, egy professzionális, letisztult és magas kontrasztú dizájnt kapott, ami jelentősen javítja az olvashatóságot és a felhasználói élményt.
-- **Egységes Vizuális Stílus:** Az összes interaktív elem (gombok, beviteli mezők, legördülő listák) egységes `hover` és `focus` ("glow") effektet kapott. Ez modern és reszponzív érzetet kölcsönöz az egész alkalmazásnak, mind sötét, mind világos módban.
-- **Intelligens Nyomtatási Vezérlők:** A korábbi egyszerű gomb helyett egy új vezérlőpanel került bevezetésre, ahol a felhasználó először kiválaszthatja a nyomtatni kívánt riport részletességét (**Egyszerűsített**, **Részletes**, **Teljes (belső)**), majd a "Nyomtatás" gombra kattintva indíthatja a folyamatot.
-- **Görgethető Eredménytáblázat:** A jobb oldali kalkulációs táblázat mostantól dinamikus magasságú. Hosszabb kalkuláció esetén a tételek listája görgethetővé válik, miközben a táblázat fejléce és a végösszegeket tartalmazó lábléce **mindig látható marad**, ami sokkal átláthatóbbá teszi az eredményeket.
-- **Árlisták Nyomtatása:** Az "Árlisták kezelése" ablak egy új "Nyomtatás" gombbal bővült, amely a böngésző nyomtatási funkcióját használva lehetővé teszi a kiválasztott árlista gyors és egyszerű mentését vagy nyomtatását.
-- **Logikusabb Felületi Elrendezés:** A "Munkavégzés helye (Belföld/Külföld)" opció átkerült a "Szerelők" szekcióból az "Alapadatok" közé, a "Munkavégzés helyszíne" mellé, így az adatok megadása logikusabb sorrendben történhet.
-- **Verziószám a Belépőképernyőn:** A belépőoldal is megkapta a láblécet, amely megjeleníti az aktuális verziószámot és a copyright információt.
+- **Teljesen Újratervezett Világos Mód:** A világos téma elhagyta a "Seahawks" stílust, és egy professzionális, letisztult, magas kontrasztú dizájnt kapott, ami jelentősen javítja az olvashatóságot és a modern megjelenést.
+- **Egységes és Kiemelt Vizuális Visszajelzések:**
+    - Minden interaktív elem (gombok, beviteli mezők) egységes `hover` és `focus` ("glow") effektet kapott a konzisztens felhasználói élményért.
+    - Sötét módban a `hover` effektek hangsúlyosabbak lettek, hogy jobban kitűnjenek.
+- **Professzionális Nyomtatási Lábléc:** Minden nyomtatott dokumentum (kalkuláció és árlista is) egy egységes láblécet kapott, amely dinamikusan tartalmazza a **Copyright információt, az aktuális verziószámot és az oldalszámozást** (`Oldal X / Y`).
+- **Javított Felhasználói Felület:**
+    - **Teljes Nézetű Eredménytáblázat:** A jobb oldali kalkulációs táblázat mostantól mindig a teljes tartalmát mutatja, megszüntetve a belső görgetést. Hosszabb kalkuláció esetén az egész oldal görgethető.
+    - **Visszajelzés a Kedvezménynél:** A kedvezmény mező mellé egy pipa (✓) gomb került, ami egy finom vizuális effekttel jelzi a felhasználónak a kedvezmény alkalmazását.
+    - **Verziószám a Belépőképernyőn:** A belépőoldal is megkapta a láblécet, amely megjeleníti az aktuális verziószámot és a copyright információt.
+
+## v2.12.0 - UI/UX Nagy-frissítés: Új Dizájn és Funkciók
+*Dátum: 2024-05-28*
+- **Újratervezett Világos Mód:** A világos téma teljesen megújult, professzionális, letisztult és magas kontrasztú dizájnt kapott.
+- **Intelligens Nyomtatási Vezérlők:** Új vezérlőpanel a nyomtatási riport részletességének kiválasztásához.
+- **Görgethető Eredménytáblázat:** A jobb oldali kalkulációs táblázat görgethetővé vált, miközben a fejléc és a lábléc látható maradt.
+- **Árlisták Nyomtatása:** Nyomtatás gomb az "Árlisták kezelése" ablakban.
+- **Logikusabb Felületi Elrendezés:** A "Munkavégzés helye" opció átkerült az "Alapadatok" közé.
 
 ## v2.11.0 - Egyszerűsített PDF Export és Dokumentáció Visszaállítása
 *Dátum: 2024-05-28*
-
-### Főbb változások és fejlesztések
-- **PDF Export Egyszerűsítése:** A PDF exportálás radikálisan leegyszerűsödött egyetlen **"Nyomtatás / PDF Mentés"** gombra, amely a böngésző beépített, megbízható nyomtatási funkcióját hívja meg.
-- **Kritikus Fájlok Visszaállítása:** Visszaállításra került a `LOGIC.md` és a `checkpoint.txt` fájl.
-- **Kódkarbantartás:** A felesleges `html2pdf.js` könyvtár eltávolításra került.
-- **Checkpoint Rögzítése:** A `checkpoint.txt` frissült az új mérföldkővel.
+- **PDF Export Egyszerűsítése:** A PDF exportálás egyetlen "Nyomtatás / PDF Mentés" gombra váltott, amely a böngésző funkcióját használja.
+- **Kritikus Fájlok Visszaállítása:** Visszaállításra került a `LOGIC.md` és a `checkpoint.txt`.
 
 ## v2.10.0 - Hibrid PDF Export és Oldalkezelési Garancia
 *Dátum: 2024-05-28*
@@ -54,10 +60,6 @@
 ## v2.4.0 - Kalkulációs Logika és Felhasználói Felület Finomhangolása
 *Dátum: 2024-05-22*
 - **Új Szerelésvezetői Logika, Átláthatóbb Árfolyamgrafikon, Stabil, Forint Alapú Árlistakezelés.**
-
-## v2.1.0 - v2.3.1 - Funkcionális Bővítések és Finomítások
-*Dátum: 2024-05-22*
-- Sok apróbb fejlesztés.
 
 ## v2.0.0 - A PDF Forradalom: Stabil és ékezetbiztos generálás
 *Dátum: 2024-05-22*

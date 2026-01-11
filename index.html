@@ -22,6 +22,7 @@
             --border-radius: 0.5rem;
             --seahawks-navy: #002244; --seahawks-green: #69BE28; --seahawks-gray: #A5ACAF;
             --glow-color: color-mix(in srgb, var(--seahawks-green) 40%, transparent);
+            --glow-color-darker: color-mix(in srgb, var(--seahawks-green) 60%, black 30%);
         }
 
         .light-mode {
@@ -30,6 +31,7 @@
             --border-color: #dee2e6; --accent-primary: #0d6efd; --accent-secondary: #0b5ed7;
             --danger-primary: #dc3545; --success-primary: #198754;
             --glow-color: color-mix(in srgb, var(--accent-primary) 40%, transparent);
+            --glow-color-darker: color-mix(in srgb, var(--accent-primary) 60%, black 20%);
         }
 
         input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -39,15 +41,22 @@
         body { font-family: var(--font-family); background-color: var(--bg-primary); color: var(--text-primary); font-size: 14px; transition: background-color 0.3s, color 0.3s; }
         
         #app-container { display: none; }
-        .container { max-width: 1800px; margin: 1rem auto; padding: 1rem; display: flex; flex-direction: column; height: calc(100vh - 2rem); }
+        .container { max-width: 1800px; margin: 1rem auto; padding: 1rem; }
+
         .header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-bottom: 1rem; }
         .header-item { display: flex; align-items: center; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); flex-grow: 1; }
         .header-item-title { padding: 0.5rem 1rem; font-weight: bold; color: var(--text-primary); background-color: var(--bg-tertiary); white-space: nowrap; }
         .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; transition: box-shadow 0.2s; }
         .header input:focus, .header select:focus { outline: none; box-shadow: 0 0 0 3px var(--glow-color) inset; }
+        
+        .input-with-button { display: flex; align-items: center; flex-grow: 1; }
+        .input-with-button.flash-success { animation: flash-success-anim 1s ease-out; }
+        @keyframes flash-success-anim { 0%, 100% { box-shadow: none; } 50% { box-shadow: 0 0 0 4px color-mix(in srgb, var(--success-primary) 50%, transparent) inset; } }
+        #discount-apply-btn { padding: 0 0.75rem; border: none; background-color: var(--bg-tertiary); color: var(--text-primary); cursor: pointer; transition: background-color 0.2s; font-size: 1rem; }
+        #discount-apply-btn:hover { background-color: var(--accent-secondary); color: var(--text-on-accent); }
 
-        .seahawks-select { background-color: var(--seahawks-navy) !important; color: var(--seahawks-green) !important; font-weight: bold; -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
-        .light-mode .seahawks-select { background-color: var(--bg-tertiary) !important; color: var(--text-primary) !important; font-weight: normal; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23212529'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); }
+        .seahawks-select { -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
+        .light-mode .seahawks-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23212529'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); }
 
         .header-action-btn { cursor: pointer; background: var(--bg-secondary); border-left: 1px solid var(--border-color); padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
         #theme-switcher svg, #refresh-btn svg, #reset-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
@@ -66,12 +75,14 @@
         .btn-danger:hover:not(:disabled) { background-color: color-mix(in srgb, var(--danger-primary) 85%, black); }
         .btn-success { background-color: var(--success-primary); color: #ffffff; }
         .btn-success:hover:not(:disabled) { background-color: color-mix(in srgb, var(--success-primary) 85%, black); }
+        .header-action-btn:hover { background-color: var(--glow-color-darker); }
 
-        .main-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; flex-grow: 1; min-height: 0; }
+        .main-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
         @media (min-width: 1024px) { .main-grid { grid-template-columns: 1fr 1.5fr; } }
 
         .card { background-color: var(--bg-secondary); border-radius: var(--border-radius); box-shadow: var(--shadow); }
-        details.card { padding: 0; overflow: hidden; }
+        details.card { padding: 0; overflow: hidden; margin-bottom: 1.5rem; }
+        details.card:last-of-type { margin-bottom: 0; }
         details.card summary { padding: 1rem; cursor: pointer; font-size: 1.1rem; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; list-style: none; }
         details.card summary::-webkit-details-marker { display: none; }
         details.card summary::after { content: ''; display: inline-block; width: 24px; height: 24px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: center; transition: transform 0.2s ease-in-out; }
@@ -84,13 +95,14 @@
         #calculation-summary-header strong { color: var(--seahawks-gray); margin-right: 0.5rem;}
         .light-mode #calculation-summary-header strong { color: var(--text-secondary); }
 
-        .calculation-table { display: flex; flex-direction: column; min-height: 0; }
-        .table-wrapper { flex-grow: 1; overflow-y: auto; }
         .table-wrapper table { width: 100%; border-collapse: collapse; }
-        .table-wrapper thead, .table-wrapper tfoot { position: sticky; z-index: 1; }
-        .table-wrapper thead { top: 0; } .table-wrapper tfoot { bottom: 0; }
         .light-mode .table-wrapper tbody tr:nth-child(odd) { background-color: var(--bg-tertiary); }
         .table-wrapper td, .table-wrapper th { padding: 0.5rem; }
+        .table-wrapper thead { background-color: var(--seahawks-navy); color: var(--text-primary); }
+        .light-mode .table-wrapper thead { background-color: var(--bg-tertiary); }
+        .table-wrapper tfoot { background-color: var(--seahawks-navy); color: var(--text-primary); }
+        .light-mode .table-wrapper tfoot { background-color: var(--bg-secondary); }
+
         
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
         .form-group label { margin-bottom: 0.3rem; font-size: 0.8rem; color: var(--text-secondary); display: block; }
@@ -132,12 +144,12 @@
         .confirmation-checkbox { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; cursor: pointer; user-select: none;}
         .confirmation-checkbox input { width: auto; }
         
-        #print-controls { display: flex; align-items: flex-end; gap: 1rem; margin-top: 1rem; }
+        #print-controls { display: flex; align-items: flex-end; gap: 1rem; margin-top: 1.5rem; }
         #print-options { border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 0.5rem 1rem; display: flex; gap: 1.5rem; }
         #print-options legend { font-size: 0.8rem; color: var(--text-secondary); padding: 0 0.5rem; }
         .radio-group { display: flex; align-items: center; gap: 0.5rem; }
         
-        footer { text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.8rem; margin-top: auto; }
+        footer { text-align: center; padding: 1rem; color: var(--text-secondary); font-size: 0.8rem; margin-top: 2rem; }
     </style>
 </head>
 <body>
@@ -166,7 +178,13 @@
                     </div>
                     <div id="show-chart-btn" class="header-action-btn" title="Árfolyam grafikon">📈</div>
                 </div>
-                <div class="header-item"><span class="header-item-title">Engedmény (%)</span><input type="number" id="discount-input" placeholder="0" min="0" max="100"></div>
+                <div class="header-item">
+                    <span class="header-item-title">Engedmény (%)</span>
+                    <div class="input-with-button">
+                        <input type="number" id="discount-input" placeholder="0" min="0" max="100">
+                        <button id="discount-apply-btn" title="Kedvezmény alkalmazása">✓</button>
+                    </div>
+                </div>
                 <div class="header-item" style="border:none; box-shadow:none; background:transparent; flex-grow:0; display:flex; gap: 1rem;">
                     <div id="reset-btn" class="header-action-btn" title="Visszaállítás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color);">
                         <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-80q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q134 0 227 93t93 227h-60q0-117-76.5-198.5T480-820q-117 0-198.5 81.5T200-540v80h140v60H160v-180h60v80q0-75 44-137.5T377-740q53-42 121-42 100 0 170 70t70 170q0 100-70 170t-170 70q-46 0-88-18t-73-50l-51 34q36 43 85 66.5T480-80Z"/></svg>
@@ -214,7 +232,7 @@
                         </div>
                         <button class="close-details-btn" title="Bezárás">↑</button>
                     </div></details>
-                     <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1rem;">
+                     <div class="controls" style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
                         <button id="manage-rates-btn" class="btn">Árlisták</button>
                         <div id="print-controls">
                             <fieldset id="print-options">
@@ -230,10 +248,10 @@
                 <div class="card calculation-table">
                     <div id="calculation-summary-header"></div>
                     <div class="table-wrapper">
-                        <table style="background-color: var(--seahawks-navy); color: var(--seahawks-gray);">
-                            <thead id="breakdown-head" style="background-color: #001a33; color: white;"></thead>
+                        <table>
+                            <thead id="breakdown-head"></thead>
                             <tbody id="breakdown-body"></tbody>
-                            <tfoot id="breakdown-foot" style="background-color: var(--seahawks-navy);"></tfoot>
+                            <tfoot id="breakdown-foot"></tfoot>
                         </table>
                     </div>
                 </div>
@@ -317,6 +335,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
+        const APP_VERSION = "v2.13.0";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -472,8 +491,6 @@
                 footHtml += `<tr class="discount-total-row" style="color: var(--success-primary);"><td colspan="${labelColspan}" style="text-align:right; font-weight:bold;">Kedvezményes végösszeg</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(discountedTotal, currencySymbol)}</td></tr>`;
             }
             tfoot.innerHTML = footHtml;
-            const tfootStyle = document.body.classList.contains('light-mode') ? 'background-color: var(--bg-secondary);' : 'background-color: var(--seahawks-navy);';
-            tfoot.style = tfootStyle;
             updateCalculationSummary();
         }
         
@@ -649,6 +666,34 @@
             modal.querySelector('.modal-close-btn').onclick = () => { modal.style.display = 'none'; form.reset(); };
         }
         
+        function getPrintFooterHtmlAndCss() {
+            const copyright = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva.`;
+            const css = `
+                <style>
+                    @page { size: A4; margin: 20mm; }
+                    body { counter-reset: page pages; }
+                    .print-footer {
+                        position: fixed;
+                        bottom: 10mm;
+                        left: 20mm;
+                        right: 20mm;
+                        font-size: 8px;
+                        color: #6c757d;
+                        display: flex;
+                        justify-content: space-between;
+                    }
+                    .print-footer .page-number::after {
+                        content: "Oldal " counter(page) " / " counter(pages);
+                    }
+                </style>`;
+            const html = `
+                <div class="print-footer">
+                    <span>${copyright} | Verzió: ${APP_VERSION}</span>
+                    <span class="page-number"></span>
+                </div>`;
+            return { css, html };
+        }
+
         function handlePriceListPrint() {
             const selectedId = D('rate-editor-select').value;
             const pkg = state.rates.find(r => r.id === selectedId);
@@ -669,6 +714,7 @@
                 });
                 tablesHtml += '</table>';
             });
+            const { css: footerCss, html: footerHtml } = getPrintFooterHtmlAndCss();
 
             const htmlContent = `
                 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Árlista - ${pkg.name}</title>
@@ -682,10 +728,13 @@
                     .rate-table td { border: 1px solid #ddd; padding: 6px 8px; }
                     .rate-table tr td:first-child { width: 70%; } .align-right { text-align: right; font-weight: bold; }
                     @media print { h3, .rate-table { page-break-inside: avoid; } }
-                </style></head><body>
+                </style>
+                ${footerCss}
+                </head><body>
                     <h1>Árlista Kivonat</h1>
                     <p class="sub-header">${pkg.name} (${dateFormatted})</p>
                     ${tablesHtml}
+                    ${footerHtml}
                 </body></html>`;
             
             const printWindow = window.open('', '_blank');
@@ -794,6 +843,7 @@
             const mainTitle = `<h1>Kiszállás kalkuláció <span class="date">(${dateFormatted})</span></h1>`;
             
             const watermarkHtml = isInternal ? '<div class="watermark">BELSŐ HASZNÁLATRA</div>' : '';
+            const { css: footerCss, html: footerHtml } = getPrintFooterHtmlAndCss();
             
             return `
                 <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kalkuláció - ${i.offer_number||'Nyomtatás'}</title>
@@ -820,7 +870,9 @@
                     .signature-section { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; page-break-inside: avoid; }
                     .signature-block { border-top: 1px solid #999; padding-top: 5px; }
                     @media print { body { -webkit-print-color-adjust: exact; } .task-description { background-color: #f8f8f8 !important; } th { background-color: #f2f2f2 !important; } }
-                </style></head><body><div class="page">
+                </style>
+                ${footerCss}
+                </head><body><div class="page">
                     ${watermarkHtml} ${mainTitle}
                     <table class="meta-table"><tr><td class="meta-item">
                         <p><span>Ajánlatszám:</span> <strong>${i.offer_number||'-'}</strong></p>
@@ -834,6 +886,7 @@
                     <table><thead><tr>${tableHeaderHtml}</tr></thead><tbody>${tableBodyHtml}</tbody></table>
                     <table class="totals-table">${totalsTableHtml}</table>
                     <div class="signature-section"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó ${i.creator_name ? `(${i.creator_name})` : ''}</div></div>
+                    ${footerHtml}
                 </div></body></html>`;
         }
 
@@ -880,9 +933,10 @@
         }
         
         async function initializeApp() {
-            const version = "v2.12.0";
-            D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | Verzió: ${version}`;
-            D('landing-footer').innerHTML = D('copyright-footer').innerHTML;
+            const footerText = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | Verzió: ${APP_VERSION}`;
+            D('copyright-footer').innerHTML = footerText;
+            D('landing-footer').innerHTML = footerText;
+
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
             state.rates=await loadData('rates','rates.json');
@@ -897,6 +951,12 @@
             D('reset-btn').onclick = handleReset;
             D('manage-rates-btn').onclick=handleManageRatesClick;
             D('show-chart-btn').onclick=openChartModal;
+            D('discount-apply-btn').onclick = () => {
+                const wrapper = D('discount-apply-btn').parentElement;
+                wrapper.classList.remove('flash-success');
+                void wrapper.offsetWidth; // Trigger reflow
+                wrapper.classList.add('flash-success');
+            };
             
             D('print-btn').addEventListener('click', (e) => { e.preventDefault(); handleCalculationPrint(); });
 
@@ -991,7 +1051,7 @@
             D('theme-switcher').onclick = () => {
                 document.body.classList.toggle('light-mode');
                 localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
-                calculateAndDisplay(); // Recalculate to update sticky footer color
+                if(state.isAuthenticated) calculateAndDisplay();
             };
         }
 
