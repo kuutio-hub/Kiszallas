@@ -1,10 +1,15 @@
 
 # Változási Napló
 
-## v2.17.0 - Interaktív Nyomtatási Előnézet és Hibajavítások
+## v2.18.0 - Téma- és Nyomtatáskezelés Finomhangolása
 *Dátum: 2024-05-28*
 
 ### Főbb változások és fejlesztések
+- **Sötét Mód Konzisztencia:** Javítva a legördülő menük (`select`) opcióinak olvashatósága sötét módban. A lenyíló lista mostantól szintén a sötét téma színeit használja, egységesebb megjelenést biztosítva.
+- **Nyomtatási Előnézet Javítása:** A nyomtatási előnézet mostantól mindig a világos, nyomtatásra optimalizált témát jeleníti meg, függetlenül az alkalmazás aktuális sötét/világos beállításától. Ez biztosítja, hogy a felhasználó a valós végeredményt lássa.
+
+## v2.17.0 - Interaktív Nyomtatási Előnézet és Hibajavítások
+*Dátum: 2024-05-28*
 - **Új Nyomtatási Előnézet:** A nyomtatás gombra kattintva a dokumentum egy reszponzív, felugró ablakban (modal) jelenik meg az alkalmazáson belül, nem pedig egy új böngészőfülön.
 - **Felhasználói Kontroll:** Az előnézeti ablakban egy külön "Nyomtatás" gomb található, így a nyomtatási párbeszédablak már nem ugrik fel automatikusan.
 - **Oldalszámozás Javítása:** Javítva a hiba, ami miatt a nyomtatott dokumentumok láblécében "Oldal 0 / 0" jelent meg. Mostantól a helyes oldalszám látható.

@@ -60,6 +60,11 @@
 
         .seahawks-select { -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
         .light-mode .seahawks-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23212529'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); }
+        
+        select option {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
 
         .header-action-btn { cursor: pointer; background: var(--bg-secondary); border-left: 1px solid var(--border-color); padding: 0.5rem; display: flex; align-items: center; justify-content: center; }
         #theme-switcher svg, #refresh-btn svg, #reset-btn svg { width: 24px; height: 24px; fill: var(--text-primary); }
@@ -374,7 +379,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.17.0";
+        const APP_VERSION = "v2.18.0";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -712,7 +717,6 @@
                 <style>
                     @page { size: A4; margin: 20mm; }
                     body { counter-reset: page; }
-                    .page { counter-increment: page; }
                     .print-footer {
                         position: fixed;
                         bottom: 10mm;
@@ -758,7 +762,10 @@
             const { css: footerCss, html: footerHtml } = getPrintFooterHtmlAndCss();
 
             const htmlContent = `
-                <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Árlista - ${pkg.name}</title>
+                <!DOCTYPE html><html><head>
+                    <meta charset="UTF-8">
+                    <meta name="color-scheme" content="light">
+                    <title>Árlista - ${pkg.name}</title>
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
@@ -887,7 +894,10 @@
             const { css: footerCss, html: footerHtml } = getPrintFooterHtmlAndCss();
             
             return `
-                <!DOCTYPE html><html><head><meta charset="UTF-8"><title>Kalkuláció - ${i.offer_number||'Nyomtatás'}</title>
+                <!DOCTYPE html><html><head>
+                    <meta charset="UTF-8">
+                    <meta name="color-scheme" content="light">
+                    <title>Kalkuláció - ${i.offer_number||'Nyomtatás'}</title>
                 <style>
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
