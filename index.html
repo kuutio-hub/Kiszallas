@@ -146,7 +146,15 @@
         #rate-editor-form fieldset { border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1rem; margin-top: 1.5rem; }
         #rate-editor-form legend { padding: 0 0.5rem; color: var(--text-secondary); }
         #rate-editor-form input { padding: 0.5rem; }
-        .percent-input-wrapper { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 0.3rem; color: var(--text-primary); transition: box-shadow 0.2s, border-color 0.2s; display: flex; align-items: center; padding-right: 0.5rem; }
+        .percent-input-wrapper {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            color: var(--text-primary);
+            transition: box-shadow 0.2s, border-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
         .percent-input-wrapper:focus-within, #rate-editor-form input:focus { outline: none; box-shadow: 0 0 0 3px var(--glow-color); border-color: var(--accent-primary); }
         #rate-editor-form input:not([type=checkbox]):not(:disabled):hover, .percent-input-wrapper:hover { border-color: var(--accent-primary); }
         
@@ -154,7 +162,22 @@
         .compact-form-group { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
         .compact-form-group label { flex-shrink: 0; margin-bottom: 0; }
         .compact-form-group input, .compact-form-group .percent-input-wrapper { max-width: 160px; }
-        .percent-input-wrapper input { border: none; background: transparent; padding: 0.5rem; box-shadow: none !important; }
+        .percent-input-wrapper input {
+            border: none;
+            background: transparent;
+            padding: 0.5rem;
+            padding-right: 0.25rem;
+            box-shadow: none !important;
+            width: 100%;
+            color: inherit;
+            font-size: inherit;
+            text-align: right;
+            -moz-appearance: textfield;
+        }
+        .percent-input-wrapper span {
+            color: var(--text-secondary);
+            padding-right: 0.5rem;
+        }
         
         .protection-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;}
         .protection-switch input { width: auto; }
@@ -181,7 +204,7 @@
 
     <div id="landing-page">
         <div id="landing-content">
-            <h1>Kiszállási Kalkulátor</h1>
+            <h1>Költségkalkulátor</h1>
             <form id="password-form">
                 <input type="password" id="password-input" placeholder="Jelszó" required autocomplete="new-password">
                 <button type="submit" class="btn btn-success">Belépés</button>
@@ -387,7 +410,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.22.1";
+        const APP_VERSION = "v2.22.2";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;

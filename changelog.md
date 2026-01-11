@@ -1,6 +1,19 @@
 
 # Változási Napló
 
+## v2.22.2 - UI Konzisztencia és Logikai Átrendezés
+*Dátum: 2024-05-29*
+
+### Főbb változások és fejlesztések
+- **UI Átszervezés:** A "Munkavégzés helyszíne" és a "Hely típusa" mezők az "Alapadatok" szekcióból átkerültek az "Utazás" szekcióba, mivel logikailag szorosabban kapcsolódnak az utazási költségekhez. A kód refaktorálva lett, hogy ezek a mezők is dinamikusan generálódjanak.
+- **Vizuális Egységesítés:** Az árlistakezelő felületén a százalékos beviteli mezők ("továbbértékesítés") stílusa javítva lett, hogy vizuálisan megegyezzen a többi mezővel. A százalékjel (`%`) most már a kereten belül, egységesen jelenik meg.
+- **Szöveg Pontosítása:** A belépőképernyő főcíme "Költségkalkulátor"-ra módosult, jobban lefedve az alkalmazás teljes funkcionalitását.
+
+## v2.22.1 - Felhasználói Felület Logikájának Javítása
+*Dátum: 2024-05-29*
+- **Logikusabb Adatbevitel:** A "Munkavégzés helyszíne" és a "Hely típusa" mezők átkerültek az "Alapadatok" szekcióból az "Utazás" szekcióba, hogy a felhasználói munkafolyamat természetesebb legyen.
+- **Kód Refaktorálás:** Az áthelyezett mezők mostantól a többi elemhez hasonlóan dinamikusan, JavaScriptből generálódnak, ami egységesíti a kódbázist.
+
 ## v2.22.0 - Biztonsági Finomhangolás
 *Dátum: 2024-05-28*
 
