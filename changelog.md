@@ -1,6 +1,21 @@
 
 # Változási Napló
 
+## v2.6.0 - Felhasználói Felület és Funkcionális Fejlesztések
+*Dátum: 2024-05-28*
+
+### Új funkciók és fejlesztések
+- **Háromszintű PDF Export:** A két PDF gomb helyett egyetlen, lenyíló menüvel ellátott "PDF Export" gomb került bevezetésre, három opcióval:
+    1.  **Egyszerű:** Csak a költségnemeket és mennyiségeket tartalmazza.
+    2.  **Bővített:** Részletes nézet egységárakkal és összesítésekkel, de az önköltségi tételek nélkül (ideális partnereknek).
+    3.  **Részletes (Belső):** Minden adatot tartalmaz, beleértve az önköltséget is, és egy "BELSŐ HASZNÁLATRA" vízjellel van ellátva.
+- **Árlista PDF Export:** Az "Árlisták kezelése" ablakban megjelent egy "PDF Export" gomb, amellyel a kiválasztott árlista egy letisztult, nyomtatható formátumban exportálható.
+- **Modernizált Dizájn és Interaktivitás:**
+    - **Hover Effektek:** Minden gomb és interaktív elem egységes, "Seahawks" stílusú hover effektet kapott (finom ragyogás, keret), ami javítja a vizuális visszajelzést.
+    - **Reszponzív Mezők:** A beviteli mezők maximális szélességet kaptak, így nagy képernyőkön is esztétikusak maradnak.
+- **Kontrasztosabb Világos Mód:** A világos téma színhasználata finomhangolásra került a jobb olvashatóság és a magasabb kontraszt érdekében.
+- **Százalékos Pontosság:** Az árlistákban a szorzók (pl. szállás, eszköz) mostantól két tizedesjegy pontossággal is megadhatók (pl. 12,25%).
+
 ## v2.5.0 - Felhasználói Felület Modernizálása és Biztonsági Funkciók
 *Dátum: 2024-05-28*
 
