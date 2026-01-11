@@ -1,6 +1,12 @@
 
 # Változási Napló
 
+## v2.22.0 - Biztonsági Finomhangolás
+*Dátum: 2024-05-28*
+
+### Főbb változások és fejlesztések
+- **Jelszómentés Letiltása:** Biztonsági okokból az összes jelszó beviteli mező (`<input type="password">`) megkapta az `autocomplete="new-password"` attribútumot. Ez a szabványos módszer megakadályozza, hogy a böngészők felajánlják az alkalmazás-specifikus (nem személyes) jelszavak elmentését, ezzel csökkentve a biztonsági kockázatokat.
+
 ## v2.21.0 - UI/UX Finomhangolás és Biztonsági Frissítés
 *Dátum: 2024-05-28*
 

@@ -228,8 +228,6 @@
                                 <div class="form-group"><label for="project_number">Projektszám</label><input type="text" id="project_number" placeholder="Opcionális"></div>
                                 <div class="form-group"><label for="project_name">Projekt neve</label><input type="text" id="project_name" placeholder="Opcionális"></div>
                                 <div class="form-group"><label for="customer">Megrendelő</label><input type="text" id="customer"></div>
-                                <div class="form-group"><label for="work_location">Munkavégzés helyszíne</label><input type="text" id="work_location"></div>
-                                <div class="form-group"><label for="location_type">Hely típusa</label><select id="location_type"><option value="belfold">Belföld</option><option value="kulfold">Külföld</option></select></div>
                                 <div class="form-group"><label for="calculation_date">Kalkuláció dátuma</label><input type="date" id="calculation_date"></div>
                                 <div class="form-group"><label for="creator_name">Készítő</label><input type="text" id="creator_name" placeholder="Opcionális"></div>
                                 <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat" style="max-width: none;"></div>
@@ -389,7 +387,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.21.0";
+        const APP_VERSION = "v2.22.1";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -398,7 +396,7 @@
         const INPUT_CONFIG = {
             szerelo: [{ id: 'szerelo_fo', label: 'Szerelők (fő)' }, { id: 'szerelo_munkaora', label: 'Napi munkaóra' }, { id: 'szerelo_munkanap', label: 'Munkanapok' }, { id: 'szerelo_hetvegi_nap', label: 'Ebből hétvégi nap' }, { id: 'szerelo_szallas_ejszaka', label: 'Szállás (éj)' }, { id: 'utazas_odautak_szama_szerelo', label: 'Kiszállások (db)' }, { id: 'utazas_jarmuvek_szama_szerelo', label: 'Járművek (db)' }],
             mernok: [{ id: 'mernok_fo', label: 'Mérnökök (fő)' }, { id: 'mernok_munkaora', label: 'Napi munkaóra' }, { id: 'mernok_munkanap', label: 'Munkanapok' }, { id: 'mernok_hetvegi_nap', label: 'Ebből hétvégi nap' }, { id: 'mernok_szallas_ejszaka', label: 'Szállás (éj)' }, { id: 'utazas_odautak_szama_mernok', label: 'Kiszállások (db)' }, { id: 'utazas_jarmuvek_szama_mernok', label: 'Járművek (db)' }],
-            utazas: [{ id: 'utazas_tavolsag_km', label: 'Távolság (km, oda)' }, { id: 'utazas_ido_ora', label: 'Utazási idő (<span class="travel-unit-toggle">óra</span>, oda)', unit: 'óra' }],
+            utazas: [{ id: 'work_location', label: 'Munkavégzés helyszíne', type: 'text' }, { id: 'location_type', label: 'Hely típusa', type: 'select', options: [{ text: 'Belföld', value: 'belfold' }, { text: 'Külföld', value: 'kulfold' }] }, { id: 'utazas_tavolsag_km', label: 'Távolság (km, oda)' }, { id: 'utazas_ido_ora', label: 'Utazási idő (<span class="travel-unit-toggle">óra</span>, oda)', unit: 'óra' }],
             emelogep: [{ id: 'emelogep_db', label: 'Emelőgépek (db)' }, { id: 'emelogep_napok', label: 'Napok száma' }, { id: 'emelogep_szallitasok', label: 'Szállítások (oda-vissza)' }]
         };
 
@@ -421,7 +419,31 @@
         const loadData = async (k,f) => { try {const d=localStorage.getItem(k); if(d)return JSON.parse(d);const r=await fetch(f);const j=await r.json();localStorage.setItem(k,JSON.stringify(j));return j;}catch(e){console.error(`Hiba: ${k} betöltése`,e);return[];}};
         const updateAndFetchExchangeRates = async()=>{let r=JSON.parse(localStorage.getItem('exchangeRates'))||{};const d=Object.keys(r);const l=d.length>0?d.sort().pop():'2000-01-01';const t=new Date().toISOString().split('T')[0];if(l>=t)return r;try{const s=new Date(l);s.setDate(s.getDate()+1);const e=await fetch(`https://api.frankfurter.app/${s.toISOString().split('T')[0]}..${t}?to=HUF`);const n=(await e.json()).rates;r={...r,...n};localStorage.setItem('exchangeRates',JSON.stringify(r));return r;}catch(e){console.error("Hiba árfolyam frissítésekor:",e);}return r;};
         
-        function renderInputs() { Object.entries(INPUT_CONFIG).forEach(([g,c])=>{const co=D(`${g}-inputs`);if(co){co.innerHTML='';c.forEach(cf=>{const gr=document.createElement('div');gr.className='form-group';gr.innerHTML=`<label for="${cf.id}">${cf.label}</label>`;let el;if(cf.type==='select'){el=document.createElement('select');cf.options.forEach(o=>el.add(new Option(o.text,o.value)));}else{el=document.createElement('input');el.type='number';}el.id=cf.id;if(cf.unit)el.dataset.unit=cf.unit;gr.appendChild(el);co.appendChild(gr);});}}); }
+        function renderInputs() {
+            Object.entries(INPUT_CONFIG).forEach(([g, c]) => {
+                const co = D(`${g}-inputs`);
+                if (co) {
+                    co.innerHTML = '';
+                    c.forEach(cf => {
+                        const gr = document.createElement('div');
+                        gr.className = 'form-group';
+                        gr.innerHTML = `<label for="${cf.id}">${cf.label}</label>`;
+                        let el;
+                        if (cf.type === 'select') {
+                            el = document.createElement('select');
+                            cf.options.forEach(o => el.add(new Option(o.text, o.value)));
+                        } else {
+                            el = document.createElement('input');
+                            el.type = cf.type === 'text' ? 'text' : 'number';
+                        }
+                        el.id = cf.id;
+                        if (cf.unit) el.dataset.unit = cf.unit;
+                        gr.appendChild(el);
+                        co.appendChild(gr);
+                    });
+                }
+            });
+        }
         
         function getInputs(){
             const i={};
