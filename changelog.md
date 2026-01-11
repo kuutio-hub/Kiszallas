@@ -1,10 +1,16 @@
 
 # Változási Napló
 
-## v2.19.0 - Közvetlen PDF Generálás és Előnézet Javítás
+## v2.20.0 - PDF Generálás Racionalizálása a Minőség Javítása Érdekében
 *Dátum: 2024-05-28*
 
 ### Főbb változások és fejlesztések
+- **Megbízhatatlan PDF Generátor Eltávolítva:** A "PDF letöltése" gomb és a mögötte álló `html2pdf.js` könyvtár eltávolításra került. Az eszköz nem tudta következetesen és pontosan renderelni a komplex HTML/CSS struktúrát, ami gyenge minőségű PDF dokumentumokat eredményezett.
+- **Ajánlott Eljárás: Böngésző Alapú Mentés:** A PDF dokumentumok létrehozásának hivatalos és javasolt módja mostantól a "Nyomtatás" gomb használata, majd a böngésző nyomtatási ablakában a **"Mentés PDF-ként"** opció kiválasztása. Ez a módszer garantálja a legmagasabb vizuális hűséget és minőséget.
+- **Tisztább Felhasználói Felület:** A nyomtatási előnézeti ablak most egyetlen, egyértelmű gombot tartalmaz, csökkentve a felhasználói zavart.
+
+## v2.19.0 - Közvetlen PDF Generálás és Előnézet Javítás
+*Dátum: 2024-05-28*
 - **PDF Letöltés Funkció:** A nyomtatási előnézeti ablakban egy új "PDF letöltése" gomb jelent meg. Ez a `html2pdf.js` könyvtár segítségével közvetlenül generál egy PDF dokumentumot a megjelenített tartalomból és elindítja a letöltését.
 - **Dinamikus PDF Fájlnév:** A generált PDF fájl neve automatikusan az ajánlatszámból képződik a könnyebb kezelhetőség érdekében.
 - **Garantált Világos Előnézet:** A nyomtatási előnézet HTML kódja mostantól expliciten beállítja a fehér hátteret, biztosítva, hogy minden böngészőben a valós nyomtatási kép jelenjen meg, függetlenül az applikáció sötét/világos témájától.
