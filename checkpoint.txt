@@ -1,9 +1,10 @@
 
-Checkpoint: v2.11.0 - PDF Export Simplification and Stability
+Checkpoint: v2.22.2 - UI Finomítás és Logikai Egységesítés
 
-This version represents a major stabilization point and architectural shift for document generation.
+Ez a verzió egy új, stabil alapot képez az alkalmazás számára. Jelentős UI/UX finomításokat, a beviteli űrlapok logikusabbá tételét és a dokumentáció naprakésszé tételét foglalja magában. Az alkalmazás jelenlegi formájában funkcionálisan teljesnek és stabilnak tekinthető.
 
 Főbb pontok:
-- **PDF Export Simplification:** The PDF export feature was radically simplified to a single "Print / Save PDF" button. This removes external libraries and relies on the browser's stable, built-in printing functionality, ensuring cross-platform consistency and reliability.
-- **Documentation Restoration:** Critical documentation files (`LOGIC.md`, `checkpoint.txt`) were restored to the project, ensuring that the core business logic and project milestones are properly documented.
-- **Code Cleanup:** The unused `html2pdf.js` library was removed, resulting in a lighter and cleaner codebase.
+- **Logikus UI Struktúra:** A beviteli mezők át lettek rendezve intuitívabb csoportokba (pl. a helyszín adatok átkerültek az "Utazás" szekcióba), ami egyszerűsíti a felhasználói munkafolyamatot.
+- **Vizuális Konzisztencia:** A felhasználói felület elemei, mint például az árlistakezelő százalékos beviteli mezői, egységesítve lettek a professzionálisabb és koherensebb megjelenés érdekében.
+- **Teljeskörű Dokumentáció:** A `changelog.md` teljes mértékben frissítésre került, tiszta előzményt biztosítva a legutóbbi változásokról.
+- **Stabil Alap:** Ez a verzió robusztus kiindulópontként szolgál bármilyen jövőbeli fejlesztéshez, tiszta kódbázissal és jól definiált logikával.
