@@ -1,4 +1,15 @@
+
 # Változási Napló
+
+## v2.5.0 - Felhasználói Felület Modernizálása és Biztonsági Funkciók
+*Dátum: 2024-05-28*
+
+### Új funkciók és fejlesztések
+- **Professzionális Beléptetés:** Az alkalmazás indításkor egy letisztult, dedikált képernyőn kéri a jelszót, felváltva a korábbi böngésző-alapú `prompt` ablakot.
+- **Védett Árlisták:** Az árlistakezelőben bevezetésre került egy "Védett" kapcsoló. Az aktiválásával az árlista írásvédetté válik, megelőzve a véletlen módosításokat. A védelem feloldásához admin jelszó szükséges, amelyet egy biztonságos dialógusablakban lehet megadni.
+- **Fejlettebb Mentési Folyamat:** Az árlisták mentésekor egy új, biztonságos megerősítő ablak jelenik meg. A felülíráshoz admin jelszó megadása szükséges, illetve lehetőség van a "Mentés másként..." opció választására, ami növeli az adatbiztonságot.
+- **Modern, Interaktív Gombok:** Az egész alkalmazásban a gombok egy új, modernebb dizájnt kaptak. Az egérkurzor föléjük mozgatásakor finoman megemelkednek és egy "glow" (ragyogás) effektet kapnak, ami javítja a felhasználói élményt és az interaktivitást.
+- **Új Árlista Létrehozása Sablonból:** Az "Új" árlista létrehozásakor mostantól lehetőség van egy meglévő árlistát sablonként használni, vagy teljesen üres árlistát indítani.
 
 ## v2.4.1 - Logikai Javítás
 *Dátum: 2024-05-22*

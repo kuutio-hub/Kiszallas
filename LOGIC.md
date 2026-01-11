@@ -1,3 +1,4 @@
+
 # Kalkulációs Logika Dokumentáció
 
 Ez a dokumentum a Kiszállási Kalkulátor motorjának számítási logikáját részletezi, különös tekintettel a személyi költségek, azon belül is a szerelésvezetői díjak meghatározására.
@@ -58,34 +59,34 @@ A rendszer automatikusan kezeli, hogy mikor van szükség külön szerelésvezet
 ### 2.3. Példák
 
 **Példa 1: Csak szerelők**
-- Adatok: 3 szerelő, 7 nap, ebből 2 hétvége, 10 óra/nap. Nincs mérnök.
+- Adatok: 3 szerelő, 5 nap, ebből 0 hétvége, 8 óra/nap. Nincs mérnök.
 - Számítás:
-    - `sWd = 5`, `sW = 2`. `mWd = 0`, `mW = 0`.
+    - `sWd = 5`, `sW = 0`. `mWd = 0`, `mW = 0`.
     - Felügyelet nélküli hétköznapok: `max(0, 5 - 0) = 5`
-    - Felügyelet nélküli hétvégék: `max(0, 2 - 0) = 2`
-    - Szerelésvezetői órák: 50 óra hétköznap, 20 óra hétvége.
-    - Szerelői órák (a másik 2 főre): 100 óra hétköznap, 40 óra hétvége.
+    - Felügyelet nélküli hétvégék: `max(0, 0 - 0) = 0`
+    - Szerelésvezetői órák (1 főre): 40 óra hétköznap.
+    - Szerelői órák (a másik 2 főre): 80 óra hétköznap.
 
 **Példa 2: Több szerelőnap, mint mérnöknap**
-- Adatok: 3 szerelő (7 nap, 2 hétvége), 1 mérnök (3 nap, 0 hétvége), 10 óra/nap.
+- Adatok: 3 szerelő (5 nap, 0 hétvége), 1 mérnök (3 nap, 0 hétvége), 8 óra/nap.
 - Számítás:
-    - `sWd = 5`, `sW = 2`. `mWd = 3`, `mW = 0`.
+    - `sWd = 5`, `sW = 0`. `mWd = 3`, `mW = 0`.
     - Felügyelet nélküli hétköznapok: `max(0, 5 - 3) = 2`
-    - Felügyelet nélküli hétvégék: `max(0, 2 - 0) = 2`
-    - Eredmény: A mérnök 3 hétköznapon felügyel. A maradék 2 hétköznapon és a 2 hétvégén a szerelők közül kell egy főnek vezetnie.
-    - Szerelésvezetői órák: 20 óra hétköznap, 20 óra hétvége.
+    - Felügyelet nélküli hétvégék: `max(0, 0 - 0) = 0`
+    - Eredmény: A mérnök 3 napon felügyel. A maradék 2 napon a szerelők közül kell egy főnek vezetnie.
+    - Szerelésvezetői órák: 16 óra hétköznap.
     - Szerelői órák: A többi óra a normál szerelői díjon kerül elszámolásra.
-    - Mérnöki órák: 30 óra hétköznap.
+    - Mérnöki órák: 24 óra hétköznap.
 
 **Példa 3: A mérnök végig jelen van**
-- Adatok: 3 szerelő (7 nap, 2 hétvége), 1 mérnök (7 nap, 2 hétvége), 10 óra/nap.
+- Adatok: 3 szerelő (5 nap, 0 hétvége), 1 mérnök (5 nap, 0 hétvége), 8 óra/nap.
 - Számítás:
-    - `sWd = 5`, `sW = 2`. `mWd = 5`, `mW = 2`.
+    - `sWd = 5`, `sW = 0`. `mWd = 5`, `mW = 0`.
     - Felügyelet nélküli hétköznapok: `max(0, 5 - 5) = 0`
-    - Felügyelet nélküli hétvégék: `max(0, 2 - 2) = 0`
+    - Felügyelet nélküli hétvégék: `max(0, 0 - 0) = 0`
     - Eredmény: Nincs felügyelet nélküli nap, ezért nincs külön szerelésvezetői díj.
-    - Szerelői órák: Az összes szerelői óra (210 óra) a normál szerelői díjon kerül elszámolásra.
-    - Mérnöki órák: Az összes mérnöki óra (70 óra) a mérnöki díjon kerül elszámolásra.
+    - Szerelői órák: Az összes szerelői óra (120 óra) a normál szerelői díjon kerül elszámolásra.
+    - Mérnöki órák: Az összes mérnöki óra (40 óra) a mérnöki díjon kerül elszámolásra.
 
 ## 3. Egyéb Költségek Számítása
 
