@@ -1,10 +1,9 @@
 
-Checkpoint: v2.13.0
+Checkpoint: v2.11.0 - PDF Export Simplification and Stability
 
-Ez a verzió egy jelentős mérföldkő az alkalmazás modernizációjában és a felhasználói élmény javításában.
+This version represents a major stabilization point and architectural shift for document generation.
 
 Főbb pontok:
-- **Dizájn Egységesítés:** A teljes felület (sötét és világos mód is) egységes, modern vizuális stílust kapott (hover, glow effektek). A világos mód teljesen újra lett tervezve a jobb kontraszt és professzionális megjelenés érdekében.
-- **Professzionális Nyomtatás:** Minden nyomtatott dokumentum egységes láblécet kapott, amely tartalmazza a verziószámot, copyright információt és az oldalszámozást.
-- **Felhasználói Felület Finomhangolása:** Az eredménytáblázat megszünteti a belső görgetést a jobb átláthatóság érdekében, és a kedvezmény mező vizuális visszajelzést kapott.
-- **Verziószám:** A verzióinformáció a belépőképernyőn is megjelenik.
+- **PDF Export Simplification:** The PDF export feature was radically simplified to a single "Print / Save PDF" button. This removes external libraries and relies on the browser's stable, built-in printing functionality, ensuring cross-platform consistency and reliability.
+- **Documentation Restoration:** Critical documentation files (`LOGIC.md`, `checkpoint.txt`) were restored to the project, ensuring that the core business logic and project milestones are properly documented.
+- **Code Cleanup:** The unused `html2pdf.js` library was removed, resulting in a lighter and cleaner codebase.

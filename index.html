@@ -13,16 +13,19 @@
             src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');
         }
         :root {
+            --seahawks-navy: #002244; --seahawks-green: #69BE28; --seahawks-gray: #A5ACAF;
             --bg-primary: #1a202c; --bg-secondary: #2d3748; --bg-tertiary: #4a5568;
-            --text-primary: #edf2f7; --text-secondary: #a0aec0; --text-on-accent: #ffffff;
-            --border-color: #4a5568; --accent-primary: #63b3ed; --accent-secondary: #4299e1;
-            --danger-primary: #fc8181; --success-primary: #68d391;
+            --text-primary: #edf2f7; --text-secondary: #a0aec0; --text-on-accent: #000000;
+            --border-color: #4a5568;
+            --accent-primary: var(--seahawks-green);
+            --accent-secondary: color-mix(in srgb, var(--seahawks-green) 85%, black);
+            --danger-primary: #9B2C2C;
+            --success-primary: var(--seahawks-green);
             --font-family: 'Segoe UI', system-ui, sans-serif;
             --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             --border-radius: 0.5rem;
-            --seahawks-navy: #002244; --seahawks-green: #69BE28; --seahawks-gray: #A5ACAF;
-            --glow-color: color-mix(in srgb, var(--seahawks-green) 40%, transparent);
-            --glow-color-darker: color-mix(in srgb, var(--seahawks-green) 60%, black 30%);
+            --glow-color: color-mix(in srgb, var(--seahawks-green) 75%, transparent);
+            --glow-color-darker: color-mix(in srgb, var(--seahawks-green) 70%, black 40%);
         }
 
         .light-mode {
@@ -46,8 +49,8 @@
         .header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: stretch; margin-bottom: 1rem; }
         .header-item { display: flex; align-items: center; background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius); overflow: hidden; box-shadow: var(--shadow); flex-grow: 1; }
         .header-item-title { padding: 0.5rem 1rem; font-weight: bold; color: var(--text-primary); background-color: var(--bg-tertiary); white-space: nowrap; }
-        .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; transition: box-shadow 0.2s; }
-        .header input:focus, .header select:focus { outline: none; box-shadow: 0 0 0 3px var(--glow-color) inset; }
+        .header input, .header select { padding: 0.5rem; border: none; background-color: transparent; color: var(--text-primary); font-size: 0.9rem; width: 100%; transition: box-shadow 0.2s, border-color 0.2s; }
+        .header input:focus, .header select:focus { outline: none; box-shadow: 0 0 0 4px var(--glow-color) inset; }
         
         .input-with-button { display: flex; align-items: center; flex-grow: 1; }
         .input-with-button.flash-success { animation: flash-success-anim 1s ease-out; }
@@ -70,10 +73,10 @@
         
         .btn { padding: 0.6rem 1.2rem; border: none; border-radius: var(--border-radius); font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: all 0.2s ease-in-out; box-shadow: var(--shadow); background-color: var(--bg-tertiary); color: var(--text-primary); }
         .btn:disabled { background-color: var(--bg-tertiary); cursor: not-allowed; opacity: 0.5; transform: none; box-shadow: var(--shadow); }
-        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 12px -3px rgba(0,0,0,0.2), 0 0 0 4px var(--glow-color); background-color: var(--accent-secondary); color: var(--text-on-accent); }
+        .btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 12px -3px rgba(0,0,0,0.2), 0 0 0 6px var(--glow-color); background-color: var(--accent-secondary); color: var(--text-on-accent); }
         .btn-danger { background-color: var(--danger-primary); color: #ffffff; }
         .btn-danger:hover:not(:disabled) { background-color: color-mix(in srgb, var(--danger-primary) 85%, black); }
-        .btn-success { background-color: var(--success-primary); color: #ffffff; }
+        .btn-success { background-color: var(--success-primary); color: var(--text-on-accent); }
         .btn-success:hover:not(:disabled) { background-color: color-mix(in srgb, var(--success-primary) 85%, black); }
         .header-action-btn:hover { background-color: var(--glow-color-darker); }
 
@@ -106,13 +109,21 @@
         
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.8rem; }
         .form-group label { margin-bottom: 0.3rem; font-size: 0.8rem; color: var(--text-secondary); display: block; }
-        .form-group input, .form-group select { width: 100%; max-width: 400px; padding: 0.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); transition: box-shadow 0.2s; }
-        .form-group input:focus, .form-group select:focus { outline: none; box-shadow: 0 0 0 3px var(--glow-color); }
+        .form-group input, .form-group select { width: 100%; max-width: 400px; padding: 0.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); transition: box-shadow 0.2s, border-color 0.2s; }
+        .form-group input:focus, .form-group select:focus { outline: none; box-shadow: 0 0 0 4px var(--glow-color); }
+        .form-group input:not([type=checkbox]):not(:disabled):hover,
+        .form-group select:not(:disabled):hover {
+            border-color: var(--accent-primary);
+        }
+
         .travel-unit-toggle { cursor: pointer; color: var(--accent-primary); font-weight: bold; }
         .close-details-btn { float: right; margin-top: 0.5rem; cursor: pointer; background: var(--bg-tertiary); color: var(--text-primary); border: none; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; line-height: 1; }
         
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.7); animation: fade-in 0.3s; }
         .modal-content { background-color: var(--bg-secondary); margin: 5% auto; padding: 2rem; width: 90%; max-width: 900px; border-radius: var(--border-radius); position: relative; }
+        .modal-content .form-group select { padding: 0.5rem; border: 1px solid var(--border-color); background-color: var(--bg-primary); color: var(--text-primary); font-size: 0.9rem; width: 100%; transition: box-shadow 0.2s, border-color 0.2s; border-radius: 0.3rem; }
+        .modal-content .form-group select:focus { outline: none; box-shadow: 0 0 0 4px var(--glow-color); }
+
         .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
         .modal-header h2 { font-size: 1.5rem; }
         .modal-close-btn { font-size: 2rem; font-weight: bold; cursor: pointer; background: none; border: none; color: var(--text-primary); line-height: 1; padding: 0 0 0 1rem; }
@@ -124,21 +135,30 @@
         
         #rate-editor-form fieldset { border: 1px solid var(--border-color); border-radius: var(--border-radius); padding: 1rem; margin-top: 1.5rem; }
         #rate-editor-form legend { padding: 0 0.5rem; color: var(--text-secondary); }
+        #rate-editor-form input, #rate-editor-form .percent-input-wrapper { background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: 0.3rem; color: var(--text-primary); transition: box-shadow 0.2s, border-color 0.2s; }
+        #rate-editor-form input { padding: 0.5rem; }
+        #rate-editor-form input:focus, #rate-editor-form .percent-input-wrapper:focus-within { outline: none; box-shadow: 0 0 0 4px var(--glow-color); border-color: var(--accent-primary); }
+        #rate-editor-form input:not([type=checkbox]):not(:disabled):hover,
+        .percent-input-wrapper:hover {
+            border-color: var(--accent-primary);
+        }
+        
         .rate-editor-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 0.5rem 1.5rem; }
         .compact-form-group { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
         .compact-form-group label { flex-shrink: 0; margin-bottom: 0; }
         .compact-form-group input, .compact-form-group .percent-input-wrapper { max-width: 160px; }
-        .percent-input-wrapper { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 0.3rem; background: var(--bg-primary); padding-right: 0.5rem; }
-        .percent-input-wrapper input { border: none; background: transparent; }
+        .percent-input-wrapper { display: flex; align-items: center; padding-right: 0.5rem; }
+        .percent-input-wrapper input { border: none; background: transparent; padding: 0.5rem; }
+        .percent-input-wrapper input:focus { box-shadow: none; }
+        
         .protection-switch { display: flex; align-items: center; gap: 0.5rem; cursor: pointer; user-select: none;}
         .protection-switch input { width: auto; }
 
         #landing-page { display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center; }
         #landing-content { background-color: var(--bg-secondary); padding: 3rem; border-radius: var(--border-radius); box-shadow: var(--shadow); width: 100%; max-width: 400px; }
         #landing-content h1 { margin-bottom: 1.5rem; color: var(--text-primary); }
-        #password-input { width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); text-align: center; font-size: 1rem; }
-        #password-form .btn { background-color: var(--seahawks-green); color: var(--text-on-accent); }
-        .light-mode #password-form .btn { background-color: var(--accent-primary); }
+        #password-input { width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); text-align: center; font-size: 1rem; transition: border-color 0.2s; }
+        #password-input:hover { border-color: var(--accent-primary); }
         #landing-footer { margin-top: 2rem; font-size: 0.8rem; color: var(--text-secondary); }
         
         .confirmation-checkbox { display: flex; align-items: center; gap: 0.5rem; margin: 1rem 0; cursor: pointer; user-select: none;}
@@ -159,7 +179,7 @@
             <h1>Kiszállási Kalkulátor</h1>
             <form id="password-form">
                 <input type="password" id="password-input" placeholder="Jelszó" required>
-                <button type="submit" class="btn">Belépés</button>
+                <button type="submit" class="btn btn-success">Belépés</button>
             </form>
             <footer id="landing-footer"></footer>
         </div>
@@ -241,7 +261,7 @@
                                 <label class="radio-group"><input type="radio" name="print-detail" value="detailed"> Részletes</label>
                                 <label class="radio-group"><input type="radio" name="print-detail" value="internal"> Teljes (belső)</label>
                             </fieldset>
-                            <button id="print-btn" class="btn btn-danger">Nyomtatás</button>
+                            <button id="print-btn" class="btn btn-success">Nyomtatás</button>
                         </div>
                      </div>
                 </div>
@@ -335,7 +355,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.13.0";
+        const APP_VERSION = "v2.16.0";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -505,7 +525,7 @@
             header.innerHTML = `<h2>Árlisták kezelése</h2><button class="modal-close-btn">&times;</button>`;
             body.innerHTML=`
                 <div style="display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:1rem; margin-bottom:1.5rem">
-                    <div class="form-group" style="flex-grow:1; min-width: 200px;"><label>Szerkesztendő árlista</label><select id="rate-editor-select"></select></div>
+                    <div class="form-group" style="flex-grow:1; min-width: 200px;"><label>Szerkesztendő árlista</label><select id="rate-editor-select" class="seahawks-select"></select></div>
                     <div class="protection-switch"><input type="checkbox" id="rate-protection-toggle"><label for="rate-protection-toggle">Védett</label></div>
                     <div style="display:flex; gap: 0.5rem;">
                         <button id="new-rate-btn" class="btn">Új</button>
@@ -638,6 +658,7 @@
             const templateSelect = D('new-rate-template');
             templateSelect.innerHTML = '<option value="empty">-- Üres árlista --</option>';
             state.rates.forEach(p => templateSelect.add(new Option(p.name, p.id)));
+            templateSelect.classList.add('seahawks-select');
             modal.style.display = 'block';
             
             const form = D('new-rate-form');
@@ -935,7 +956,6 @@
         async function initializeApp() {
             const footerText = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | Verzió: ${APP_VERSION}`;
             D('copyright-footer').innerHTML = footerText;
-            D('landing-footer').innerHTML = footerText;
 
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
@@ -1033,6 +1053,9 @@
         }
 
         function init() {
+            const footerText = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | Verzió: ${APP_VERSION}`;
+            D('landing-footer').innerHTML = footerText;
+
             D('password-form').addEventListener('submit', (e) => {
                 e.preventDefault();
                 const password = D('password-input').value;
