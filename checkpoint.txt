@@ -1,10 +1,8 @@
+Checkpoint: v3.0.0 - Robusztus Adatkezelés és Védett Alapértelmezett Sablonok
 
-Checkpoint: v2.22.2 - UI Finomítás és Logikai Egységesítés
-
-Ez a verzió egy új, stabil alapot képez az alkalmazás számára. Jelentős UI/UX finomításokat, a beviteli űrlapok logikusabbá tételét és a dokumentáció naprakésszé tételét foglalja magában. Az alkalmazás jelenlegi formájában funkcionálisan teljesnek és stabilnak tekinthető.
+Ez a verzió egy kritikus fontosságú mérföldkő, amely bevezeti az intelligens adatszinkronizációt és a "gyári" árlisták felülírhatatlan védelmét. Megoldja az adatok elavulásának és a véletlen felülírásának problémáját, miközben megőrzi a felhasználók által létrehozott egyedi árlistákat.
 
 Főbb pontok:
-- **Logikus UI Struktúra:** A beviteli mezők át lettek rendezve intuitívabb csoportokba (pl. a helyszín adatok átkerültek az "Utazás" szekcióba), ami egyszerűsíti a felhasználói munkafolyamatot.
-- **Vizuális Konzisztencia:** A felhasználói felület elemei, mint például az árlistakezelő százalékos beviteli mezői, egységesítve lettek a professzionálisabb és koherensebb megjelenés érdekében.
-- **Teljeskörű Dokumentáció:** A `changelog.md` teljes mértékben frissítésre került, tiszta előzményt biztosítva a legutóbbi változásokról.
-- **Stabil Alap:** Ez a verzió robusztus kiindulópontként szolgál bármilyen jövőbeli fejlesztéshez, tiszta kódbázissal és jól definiált logikával.
+- **Adatintegritás:** Az alapértelmezett árlisták mostantól a `rates.json` fájlból származó "egyetlen igazságforrást" képviselik, és nem módosíthatók a felületen.
+- **Automatikus Frissítések:** Az alkalmazás frissítésekor a felhasználók automatikusan megkapják a legújabb alap-árlistákat anélkül, hogy a saját adataik elvesznének.
+- **Stabil, Jövőbiztos Alap:** Ez a fejlesztés egy sokkal robusztusabb és megbízhatóbb alapot teremt a jövőbeli funkciók számára.

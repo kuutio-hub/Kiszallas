@@ -1,5 +1,13 @@
-
 # Változási Napló
+
+## v3.0.0 - Robusztus Adatkezelés és Alapértelmezett Árlisták Védelme
+*Dátum: 2024-05-29*
+
+### Főbb változások és fejlesztések
+- **Intelligens Adatszinkronizáció:** Az alkalmazás mostantól minden indításkor szinkronizálja az alapértelmezett árlistákat a `rates.json` fájlból. Ez biztosítja, hogy a "gyári" árlisták mindig naprakészek, felülírva a böngészőben tárolt elavult verziókat.
+- **Felhasználói Adatok Megőrzése:** A szinkronizációs folyamat érintetlenül hagyja a felhasználók által létrehozott egyedi árlistákat, így azok nem vesznek el az alkalmazás frissítésekor.
+- **Felülírhatatlan Védelem:** A `rates.json`-ből származó alapértelmezett árlisták (`isDefault: true` jelölővel) mostantól véglegesen védettek. Nem szerkeszthetők és nem törölhetők, megelőzve a véletlen adatrongálást. A felhasználók továbbra is készíthetnek róluk másolatot ("Mentés másként...") a saját használatukra.
+- **Verzióugrás:** A jelentős adatkezelési változások miatt az alkalmazás verziószáma v3.0.0-ra változott.
 
 ## v2.22.2 - UI Konzisztencia és Logikai Átrendezés
 *Dátum: 2024-05-29*

@@ -1,4 +1,4 @@
-# Költségkalkulátor v2.22.2
+# Költségkalkulátor v3.0.0
 
 ## 1. Projekt Bemutatása
 
@@ -14,7 +14,7 @@ Az alkalmazás nulláról épült fel, kizárólag statikus webtechnológiák (H
 - **Árlista Kezelés (CRUD):**
     - **Létrehozás:** Új árlisták hozhatók létre üresen vagy egy meglévő sablon alapján.
     - **Szerkesztés:** Meglévő árlisták összes díjtétele szerkeszthető egy dedikált felugró ablakban.
-    - **Védelem:** Az árlisták "védett" állapotba kapcsolhatók, ami megakadályozza a véletlen módosítást. A védelem feloldása admin jelszóhoz kötött.
+    - **Védelem:** Az alapértelmezett, gyári árlisták nem szerkeszthetők. A felhasználó által létrehozott listák "védett" állapotba kapcsolhatók, ami megakadályozza a véletlen módosítást. A védelem feloldása admin jelszóhoz kötött.
     - **Törlés:** Az árlisták jelszavas megerősítés után törölhetők, megelőzve az adatvesztést.
 - **Pénzügyi Funkciók:**
     - **Több Pénznem:** Támogatja a HUF és EUR alapú számítást.
@@ -37,7 +37,7 @@ Az alkalmazás nulláról épült fel, kizárólag statikus webtechnológiák (H
     - `Chart.js` & `chartjs-adapter-date-fns`: Az árfolyam grafikon megjelenítéséhez.
     - `DejaVuSans.ttf`: Egységes és megbízható betűtípus a generált nyomtatási nézetekben, biztosítva a platformfüggetlen megjelenést.
 - **Adattárolás:**
-    - **Árlisták:** Alapértelmezetten a `rates.json` fájlból töltődnek be, de a felhasználó által végzett módosítások a böngésző `localStorage`-ában perzisztensen tárolódnak.
+    - **Árlisták:** A `rates.json` fájlból származó alapértelmezett árlisták minden indításkor szinkronizálódnak, biztosítva a naprakészséget, míg a felhasználó által létrehozott egyedi listák és a módosítások a böngésző `localStorage`-ában perzisztensen tárolódnak.
     - **Árfolyamadatok:** A `frankfurter.app` API-ról letöltött adatok a `localStorage`-ban kerülnek gyorsítótárazásra a felesleges hálózati kérések elkerülése érdekében.
 
 ## 4. Fájlstruktúra

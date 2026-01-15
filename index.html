@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -139,7 +138,9 @@
         .modal-close-btn { font-size: 2rem; font-weight: bold; cursor: pointer; background: none; border: none; color: var(--text-primary); line-height: 1; padding: 0 0 0 1rem; }
 
         .item-list-controls { margin-top: 1rem; }
-        #other-costs-list .dynamic-item { display: grid; grid-template-columns: 2.5fr 0.8fr 0.8fr 1.5fr auto; gap: 0.8rem; align-items: end; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        #other-costs-list .dynamic-item { display: grid; grid-template-columns: 2fr 0.7fr 0.7fr 1.2fr 1.5fr auto; gap: 0.8rem; align-items: end; margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); }
+        .cost-item-controls { display: flex; flex-direction: column; justify-content: flex-end; }
+        .multiplier-group { width: 100%; margin-top: 0.5rem; }
         #other-costs-list .dynamic-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .item-delete { padding: 0.5rem; width: 100%; line-height: 1; }
         
@@ -410,7 +411,7 @@
     <script type="module">
         // --- KONFIGURÁCIÓ ---
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v2.22.2";
+        const APP_VERSION = "v3.0.0";
         // --- KONFIGURÁCIÓ VÉGE ---
 
         let chartInstance = null;
@@ -439,7 +440,30 @@
         const parseCurrency = (v) => parseFloat(String(v).replace(/[^0-9,.-]/g, '').replace(',', '.')) || 0;
         const convertPrice = (huf,curr) => curr==='EUR'?huf/(parseFloat(D('exchange-rate-manual').value)||1):huf;
         
-        const loadData = async (k,f) => { try {const d=localStorage.getItem(k); if(d)return JSON.parse(d);const r=await fetch(f);const j=await r.json();localStorage.setItem(k,JSON.stringify(j));return j;}catch(e){console.error(`Hiba: ${k} betöltése`,e);return[];}};
+        async function syncAndLoadRates() {
+            try {
+                const response = await fetch('rates.json');
+                const defaultRates = await response.json();
+                const storedRatesRaw = localStorage.getItem('rates');
+                const storedRates = storedRatesRaw ? JSON.parse(storedRatesRaw) : [];
+                const userOnlyRates = storedRates.filter(rate => !rate.isDefault);
+                const mergedRatesMap = new Map();
+                defaultRates.forEach(rate => mergedRatesMap.set(rate.id, rate));
+                userOnlyRates.forEach(rate => {
+                    if (!mergedRatesMap.has(rate.id)) {
+                        mergedRatesMap.set(rate.id, rate);
+                    }
+                });
+                const finalRates = Array.from(mergedRatesMap.values());
+                localStorage.setItem('rates', JSON.stringify(finalRates));
+                return finalRates;
+            } catch (e) {
+                console.error(`Hiba az árlisták szinkronizálásakor:`, e);
+                const storedRatesRaw = localStorage.getItem('rates');
+                return storedRatesRaw ? JSON.parse(storedRatesRaw) : [];
+            }
+        }
+        
         const updateAndFetchExchangeRates = async()=>{let r=JSON.parse(localStorage.getItem('exchangeRates'))||{};const d=Object.keys(r);const l=d.length>0?d.sort().pop():'2000-01-01';const t=new Date().toISOString().split('T')[0];if(l>=t)return r;try{const s=new Date(l);s.setDate(s.getDate()+1);const e=await fetch(`https://api.frankfurter.app/${s.toISOString().split('T')[0]}..${t}?to=HUF`);const n=(await e.json()).rates;r={...r,...n};localStorage.setItem('exchangeRates',JSON.stringify(r));return r;}catch(e){console.error("Hiba árfolyam frissítésekor:",e);}return r;};
         
         function renderInputs() {
@@ -525,7 +549,21 @@
             const szallasCost=r.szallas_dij; const szallasSell=szallasCost*(r.szallas_szorzo||1);a('Szállás költség',i.szerelo_szallas_ejszaka*sF+i.mernok_szallas_ejszaka*mF,'éj',szallasSell,szallasCost,true);
             const emeloNapiCost=r.emelogep_napidij; const emeloNapiSell=emeloNapiCost*(r.emelogep_szorzo||1); a('Emelőgép napidíj',i.emelogep_db*i.emelogep_napok,'nap',emeloNapiSell,emeloNapiCost,true);
             const emeloSzallCost=r.emelogep_szallitas_dij; const emeloSzallSell=emeloSzallCost*(r.emelogep_szorzo||1); a('Emelőgép szállítás',i.emelogep_szallitasok*2,'alk',emeloSzallSell,emeloSzallCost,true);
-            state.otherCosts.forEach(c=>{if(c.amount>0&&c.description)a(c.description,c.quantity, c.unit || 'tétel',c.amount,c.amount,false);});
+            
+            state.otherCosts.forEach(c => {
+                if ((c.amount > 0) && c.description) {
+                    const quantity = c.quantity || 1;
+                    const unit = c.unit || 'tétel';
+                    if (c.isCostItem) {
+                        const costPrice = c.amount;
+                        const sellPrice = costPrice * (1 + ((parseFloat(c.multiplier) || 30) / 100));
+                        a(c.description, quantity, unit, sellPrice, costPrice, true);
+                    } else {
+                        a(c.description, quantity, unit, c.amount, c.amount, false);
+                    }
+                }
+            });
+            
             return{totalHuf:t_sell,totalCostHuf:t_cost,breakdown:b,hasCostItems:hasCost};
         }
 
@@ -618,6 +656,7 @@
                 </div>`;
             modal.querySelector('.modal-close-btn').onclick = () => modal.style.display = 'none';
             const s=D('rate-editor-select');
+            s.innerHTML = '';
             state.rates.forEach(p=>s.add(new Option(p.name,p.id)));
             s.value=state.activeRatePackage.id;
             populateRateForm();
@@ -634,7 +673,10 @@
             const toggle = event.target;
             const selectedId = D('rate-editor-select').value;
             const pkg = state.rates.find(r => r.id === selectedId);
-            if (!pkg) return;
+            if (!pkg || pkg.isDefault) {
+                event.preventDefault();
+                return;
+            };
         
             if (toggle.checked) {
                 pkg.isProtected = true;
@@ -677,11 +719,17 @@
             });
             form.querySelectorAll('.currency-input').forEach(input=>{input.onblur=()=>{const currentVal=parseCurrency(input.value);input.value=formatCustomCurrency(currentVal)};});
             
+            const isDefault = pkg.isDefault || false;
             const isProtected = pkg.isProtected || false;
-            D('rate-protection-toggle').checked = isProtected;
-            form.querySelectorAll('input, select').forEach(i => i.disabled = isProtected);
-            D('save-rate-btn').disabled = isProtected;
-            D('delete-rate-btn').disabled = isProtected;
+            const isDisabled = isDefault || isProtected;
+
+            const protectionToggle = D('rate-protection-toggle');
+            protectionToggle.checked = isProtected;
+            protectionToggle.disabled = isDefault;
+
+            form.querySelectorAll('input, select').forEach(i => i.disabled = isDisabled);
+            D('save-rate-btn').disabled = isDisabled;
+            D('delete-rate-btn').disabled = isDisabled;
         }
         
         function handleSaveRatePackage() {
@@ -716,7 +764,7 @@
 
             if (isSaveAs) {
                 const newId = `csomag-${Date.now()}`;
-                const newPackage = { id: newId, name: newName, rates: formRates, isProtected: false };
+                const newPackage = { id: newId, name: newName, rates: formRates, isProtected: false, isDefault: false };
                 state.rates.push(newPackage);
                 alert(`"${newName}" árlista sikeresen létrehozva!`);
                 updateRatePackagesUI(newId);
@@ -754,7 +802,7 @@
                     } else {
                         Object.keys(RATE_KEY_LABELS).forEach(key => { newRates[key] = key.includes('_szorzo') ? 1 : 0; });
                     }
-                    const newPackage = { id: newId, name: name.trim(), rates: newRates, isProtected: false };
+                    const newPackage = { id: newId, name: name.trim(), rates: newRates, isProtected: false, isDefault: false };
                     state.rates.push(newPackage);
                     localStorage.setItem('rates', JSON.stringify(state.rates));
                     updateRatePackagesUI(newId);
@@ -770,13 +818,13 @@
             const copyright = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva.`;
             const css = `
                 <style>
-                    @page { size: A4; margin: 20mm; }
+                    @page { size: A4; margin: 25mm; }
                     body { counter-reset: page; }
                     .print-footer {
                         position: fixed;
-                        bottom: 10mm;
-                        left: 20mm;
-                        right: 20mm;
+                        bottom: 15mm;
+                        left: 25mm;
+                        right: 25mm;
                         font-size: 8px;
                         color: #6c757d;
                         display: flex;
@@ -853,6 +901,11 @@
             const selectedId = D('rate-editor-select').value;
             const pkg = state.rates.find(r => r.id === selectedId);
             if (!pkg) return;
+
+            if (pkg.isDefault) {
+                alert("Alapértelmezett árlista nem törölhető.");
+                return;
+            }
 
             const modal = D('delete-confirm-modal');
             modal.dataset.packageId = selectedId;
@@ -933,10 +986,10 @@
             const separator = fullDescription && summaryText ? '<br>' : '';
             const combinedBlock = (fullDescription || summaryText) ? `<div class="task-description">${fullDescription}${separator}${summaryText}</div>` : '';
 
-            let tableHeaderHtml = `<th>Költségnem</th><th class="align-right">Mennyiség</th><th class="align-center">Egység</th>`;
-            if (!simplified) tableHeaderHtml += `<th class="align-right">Egységár</th>`;
-            if (showCostColumn) tableHeaderHtml += `<th class="align-right">Önköltség</th>`;
-            if (!simplified) tableHeaderHtml += `<th class="align-right">Összesen</th>`;
+            let tableHeaderHtml = `<th class="col-desc">Költségnem</th><th class="col-qty align-right">Mennyiség</th><th class="col-unit align-center">Egység</th>`;
+            if (!simplified) tableHeaderHtml += `<th class="col-uprice align-right">Egységár</th>`;
+            if (showCostColumn) tableHeaderHtml += `<th class="col-cost align-right">Önköltség</th>`;
+            if (!simplified) tableHeaderHtml += `<th class="col-total align-right">Összesen</th>`;
 
             let tableBodyHtml = '';
             res.breakdown.forEach(item => {
@@ -971,7 +1024,7 @@
                     @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
                     body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; background-color: #ffffff !important; }
                     .page { width: 100%; padding: 0; margin: 0; position: relative; }
-                    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; color: rgba(128, 0, 0, 0.08); font-weight: bold; pointer-events: none; z-index: -1; }
+                    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 70px; color: rgba(128, 0, 0, 0.08); font-weight: bold; pointer-events: none; z-index: 1000; }
                     h1 { font-size: 20px; text-align: center; margin-bottom: 20px; color: #002244; }
                     h1 span.date { font-size: 14px; font-weight: normal; color: #666; }
                     .meta-table { width: 100%; border: none; margin-bottom: 10px; border-bottom: 1px solid #ccc; padding-bottom: 10px;}
@@ -987,8 +1040,17 @@
                     .totals-table { width: 60%; margin-left: auto; page-break-inside: avoid; }
                     .totals-table td { border: none; padding: 4px 8px; }
                     .totals-table .final-total { font-weight: bold; font-size: 12px; border-top: 2px solid #333; }
-                    .signature-section { margin-top: 40px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; page-break-inside: avoid; }
+                    .signature-section { margin-top: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; font-size: 9px; page-break-inside: avoid; }
                     .signature-block { border-top: 1px solid #999; padding-top: 5px; }
+
+                    .main-table th.col-desc { width: ${simplified ? '70%' : (showCostColumn ? '34%' : '40%')}; }
+                    .main-table th.col-qty { width: 8%; }
+                    .main-table th.col-unit { width: 8%; }
+                    .main-table th.col-uprice { width: ${showCostColumn ? '15%' : '22%'}; }
+                    .main-table th.col-cost { width: 15%; }
+                    .main-table th.col-total { width: ${showCostColumn ? '20%' : '22%'}; }
+                    .simplified-view th.col-desc { width: 70%; }
+
                     @media print { body { -webkit-print-color-adjust: exact; } .task-description { background-color: #f8f8f8 !important; } th { background-color: #f2f2f2 !important; } }
                 </style>
                 ${footerCss}
@@ -1001,11 +1063,12 @@
                     </td><td class="meta-item">
                         <p><span>Megrendelő:</span> <strong>${i.customer||'-'}</strong></p>
                         <p><span>Helyszín:</span> <strong>${i.work_location||'-'}</strong></p>
+                        <p><span>Készítő:</span> <strong>${i.creator_name||'-'}</strong></p>
                     </td></tr></table>
                     ${combinedBlock}
-                    <table><thead><tr>${tableHeaderHtml}</tr></thead><tbody>${tableBodyHtml}</tbody></table>
+                    <table class="main-table ${simplified ? 'simplified-view' : ''}"><thead><tr>${tableHeaderHtml}</tr></thead><tbody>${tableBodyHtml}</tbody></table>
                     <table class="totals-table">${totalsTableHtml}</table>
-                    <div class="signature-section"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó ${i.creator_name ? `(${i.creator_name})` : ''}</div></div>
+                    <div class="signature-section"><div class="signature-block">Megrendelő</div><div class="signature-block">Vállalkozó</div></div>
                     ${footerHtml}
                 </div></body></html>`;
         }
@@ -1040,6 +1103,96 @@
             state.otherCosts = []; D('other-costs-list').innerHTML = '';
             calculateAndDisplay();
         }
+
+        function setupOtherCostsList() {
+            const listId = 'other-costs-list';
+            const stateKey = 'otherCosts';
+            const addButtonId = 'add-other-cost-btn';
+            
+            const renderList = () => {
+                const container = D(listId);
+                container.innerHTML = '';
+                state[stateKey].forEach((item, index) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = 'dynamic-item';
+                    const multiplierVisible = item.isCostItem ? '' : 'style="display:none;"';
+                    const fieldsHtml = `
+                        <div class="form-group" style="grid-column: 1 / 1;">
+                            <label>Tétel neve</label>
+                            <input type="text" data-index="${index}" data-field="description" value="${item.description || ''}">
+                        </div>
+                        <div class="form-group" style="grid-column: 2 / 3;">
+                            <label>Mennyiség</label>
+                            <input type="number" data-index="${index}" data-field="quantity" value="${item.quantity || ''}" placeholder="1">
+                        </div>
+                        <div class="form-group" style="grid-column: 3 / 4;">
+                            <label>Egység</label>
+                            <input type="text" data-index="${index}" data-field="unit" value="${item.unit || ''}" placeholder="tétel">
+                        </div>
+                        <div class="form-group" style="grid-column: 4 / 5;">
+                            <label>Egységár (önköltség)</label>
+                            <input type="text" data-index="${index}" class="currency-input" data-field="amount" value="${formatCustomCurrency(item.amount || 0, 'Ft')}">
+                        </div>
+                        <div class="form-group cost-item-controls" style="grid-column: 5 / 6;">
+                            <label class="confirmation-checkbox" style="margin: 0; font-size: 0.8rem;">
+                                <input type="checkbox" data-index="${index}" data-field="isCostItem" ${item.isCostItem ? 'checked' : ''}>
+                                Önköltséges
+                            </label>
+                            <div class="form-group multiplier-group" ${multiplierVisible}>
+                                <label style="margin-top:0.3rem;">Haszonkulcs</label>
+                                <div class="percent-input-wrapper">
+                                    <input type="number" step="0.01" data-index="${index}" data-field="multiplier" value="${item.multiplier || 30}">
+                                    <span>%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group" style="grid-column: 6 / 7;">
+                             <button data-index="${index}" class="btn btn-danger item-delete" title="Tétel törlése">×</button>
+                        </div>
+                    `;
+                    itemEl.innerHTML = fieldsHtml;
+                    container.appendChild(itemEl);
+                });
+            };
+            
+            D(addButtonId).onclick = () => { state[stateKey].push({}); renderList(); };
+            
+            const listContainer = D(listId);
+            listContainer.addEventListener('input', e => { 
+                const i = e.target.dataset.index;
+                if (i === undefined) return;
+                const field = e.target.dataset.field;
+                const value = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value;
+                state[stateKey][i][field] = (e.target.type === 'number') ? parseFloat(value) || 0 : value;
+                if (!e.target.classList.contains('currency-input')) calculateAndDisplay();
+            });
+            listContainer.addEventListener('change', e => {
+                 const i = e.target.dataset.index;
+                 if (i !== undefined && e.target.dataset.field === 'isCostItem') {
+                     const item = state[stateKey][i];
+                     item.isCostItem = e.target.checked;
+                     if (item.isCostItem && item.multiplier === undefined) {
+                         item.multiplier = 30;
+                     }
+                     renderList();
+                     calculateAndDisplay();
+                 }
+            });
+            listContainer.addEventListener('focusout', e => { 
+                if (e.target.classList.contains('currency-input')) { 
+                    e.target.value = formatCustomCurrency(parseCurrency(e.target.value), 'Ft'); 
+                    calculateAndDisplay(); 
+                }
+            });
+            listContainer.addEventListener('click', e => { 
+                if (e.target.classList.contains('item-delete')) { 
+                    state[stateKey].splice(e.target.dataset.index, 1); 
+                    renderList(); 
+                    calculateAndDisplay(); 
+                } 
+            });
+            renderList();
+        }
         
         async function initializeApp() {
             const footerText = `&copy; ${new Date().getFullYear()} Költségkalkulátor. Minden jog fenntartva. | Verzió: ${APP_VERSION}`;
@@ -1047,10 +1200,12 @@
 
             D('calculation_date').value=new Date().toISOString().split('T')[0];
             renderInputs();
-            state.rates=await loadData('rates','rates.json');
+            state.rates = await syncAndLoadRates();
             state.exchangeRates=await updateAndFetchExchangeRates();
-            const defaultRatePackage = state.rates.find(p => p.name === "2024") || state.rates[0];
-            updateRatePackagesUI(defaultRatePackage ? defaultRatePackage.id : null);
+            const lastSelectedRateId = localStorage.getItem('lastSelectedRateId');
+            const rateToSelect = state.rates.find(r => r.id === lastSelectedRateId) || state.rates.find(p => p.name === "2024") || state.rates[0];
+            updateRatePackagesUI(rateToSelect ? rateToSelect.id : null);
+            
             const dates=Object.keys(state.exchangeRates).sort((a,b)=>new Date(b)-new Date(a));
             if(dates.length>0)D('exchange-rate-manual').value=state.exchangeRates[dates[0]].HUF.toFixed(2);
             calculateAndDisplay();
@@ -1147,40 +1302,18 @@
             
             document.querySelectorAll('.modal-close-btn').forEach(b => { if(!b.closest('#print-preview-modal')) b.onclick=(e)=>e.target.closest('.modal').style.display='none' });
             document.querySelector('#app-container').addEventListener('input', calculateAndDisplay);
-            D('rate-package-select').onchange=(e)=>{state.activeRatePackage=state.rates.find(r=>r.id===e.target.value);calculateAndDisplay();};
+            D('rate-package-select').onchange=(e)=>{
+                state.activeRatePackage=state.rates.find(r=>r.id===e.target.value);
+                localStorage.setItem('lastSelectedRateId', e.target.value);
+                calculateAndDisplay();
+            };
             D('currency-select').onchange=(e)=>{state.activeCurrency=e.target.value;calculateAndDisplay();};
 
             document.body.addEventListener('focusin', e => { if (e.target.matches('input[type="number"], .currency-input, input[type="text"]')) { e.target.select(); } });
             document.querySelectorAll('.close-details-btn').forEach(btn => btn.onclick = (e) => e.target.closest('details').open = false);
             document.querySelector('.inputs-container').addEventListener('click', e => { if (e.target.classList.contains('travel-unit-toggle')) { const input = D('utazas_ido_ora'); const currentUnit = input.dataset.unit || 'óra'; const isHour = currentUnit === 'óra'; const val = parseFloat(input.value) || 0; input.dataset.unit = isHour ? 'perc' : 'óra'; input.value = isHour ? (val * 60).toFixed(0) : (val / 60).toFixed(2); e.target.textContent = isHour ? 'perc' : 'óra'; calculateAndDisplay(); } });
-
-            const setupDynamicList = (listId, stateKey, addButtonId, itemFields) => {
-                const renderList = () => {
-                    const container = D(listId);
-                    container.innerHTML = '';
-                    state[stateKey].forEach((item, index) => {
-                        const itemEl = document.createElement('div');
-                        itemEl.className = 'dynamic-item';
-                        let fieldsHtml = '';
-                        itemFields.forEach(field => {
-                            let inputHtml = '';
-                            if (field.type === 'currency') { inputHtml = `<input type="text" data-index="${index}" class="currency-input" data-field="${field.id}" value="${formatCustomCurrency(item[field.id] || 0, 'Ft')}">`;
-                            } else if (field.type === 'number') { inputHtml = `<input type="number" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`;
-                            } else { inputHtml = `<input type="text" data-index="${index}" data-field="${field.id}" value="${item[field.id] || ''}">`; }
-                            fieldsHtml += `<div class="form-group"><label>${field.label}</label>${inputHtml}</div>`;
-                        });
-                        const buttonHtml = `<div class="form-group"><button data-index="${index}" class="btn btn-danger item-delete" title="Tétel törlése">×</button></div>`;
-                        itemEl.innerHTML = fieldsHtml + buttonHtml;
-                        container.appendChild(itemEl);
-                    });
-                };
-                D(addButtonId).onclick = () => { state[stateKey].push({}); renderList(); };
-                D(listId).addEventListener('input', e => { const i = e.target.dataset.index; if(i !== undefined) { const field = e.target.dataset.field; const val = e.target.classList.contains('currency-input') ? parseCurrency(e.target.value) : e.target.value; state[stateKey][i][field] = e.target.type === 'number' ? parseFloat(val) || 0 : val; if(!e.target.classList.contains('currency-input')) calculateAndDisplay(); } });
-                D(listId).addEventListener('focusout', e => { if(e.target.classList.contains('currency-input')) { e.target.value = formatCustomCurrency(parseCurrency(e.target.value), 'Ft'); calculateAndDisplay(); }});
-                D(listId).addEventListener('click', e => { if (e.target.classList.contains('item-delete')) { state[stateKey].splice(e.target.dataset.index, 1); renderList(); calculateAndDisplay(); } });
-                renderList();
-            };
-            setupDynamicList('other-costs-list', 'otherCosts', 'add-other-cost-btn', [ { id: 'description', label: 'Tétel neve' }, { id: 'quantity', label: 'Mennyiség', type: 'number' }, { id: 'unit', label: 'Egység', type: 'text' }, { id: 'amount', label: 'Egységár', type: 'currency' }, ]);
+            
+            setupOtherCostsList();
         }
 
         function init() {
