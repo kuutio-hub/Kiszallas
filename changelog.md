@@ -1,22 +1,17 @@
 # Változási Napló
 
-## v3.2.3 - Alapértelmezett Árlisták Frissítése
+## v3.2.6 - Reszponzív UI és Stabilitási Javítások
+*Dátum: 2024-06-01*
+
+### Javítások és Fejlesztések
+- **Mobil UI Túlcsordulás:** Kijavítva a hiba, amely miatt a beviteli mezők kilógtak a képernyőről kisebb eszközökön.
+- **Kompakt Műveletsáv:** Az alsó vezérlősáv (árlisták, nyomtatás) mobilon kompaktabb lett, az ikonok megmaradtak, a szövegek eltűntek.
+- **Felugró Eredmény Panel:** Mobil nézetben a kalkuláció eredménye egy teljes képernyős, görgethető felugró ablakban jelenik meg a jobb olvashatóság érdekében.
+- **JavaScript Hiba Javítva:** Elhárítva egy `Cannot set properties of null` hiba, ami az eseménykezelők hozzárendelésekor léphetett fel.
+
+## v3.2.5 - Landing Page Finomhangolás
 *Dátum: 2024-05-31*
+- **Jelszó Felirat:** A bejelentkezési oldalon a jelszó mező felirata "Admin jelszó"-ról "Jelszó"-ra módosult.
+- **Landing Page Lábléc:** A copyright és verziószám információk visszaállításra kerültek a bejelentkezési oldal láblécébe.
 
-### Főbb változások
-- **Árlista adatok frissítése:** A `rates.json` fájlban rögzítésre kerültek a hivatalos 2023-as és 2024-es egységárak.
-- **Védett állapot:** Ezek az árlisták gyári alapértelmezettként (`isDefault: true`) nem módosíthatók és nem törölhetők a felületen.
-
-## v3.2.2 - UI/UX Finomítás és Kompakt Vezérlés
-*Dátum: 2024-05-31*
-- Kompakt Action Bar és modern pill választók.
-- Professzionális PDF lábléc és mobil optimalizálás.
-- Terminológia egységesítése ("haszonkulcs").
-
-## v3.2.1 - Mobil UX Finomítás és Nyomtatási Lábléc
-*Dátum: 2024-05-31*
-- Kezdeti mobil és nyomtatási javítások.
-
-## v3.0.0 - Robusztus Adatkezelés
-*Dátum: 2024-05-29*
-- Adatvédelem és árlista szinkron.
+... (korábbi verziók)

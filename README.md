@@ -1,11 +1,11 @@
-# Költségkalkulátor v3.2.3
+# Költségkalkulátor v3.2.6
 
 ## 1. Projekt Bemutatása
 Helyszíni szerelési projektek költségbecslésére szolgáló, modern, reszponzív webalkalmazás.
 
-## 2. Újdonságok a v3.2.3-ban
-- **Frissített Alap Árlisták:** Hivatalos 2023-as és 2024-as adatok beépítése.
-- **Módosíthatatlan Alapértelmezések:** A gyári árlisták integritása biztosított, nem szerkeszthetők.
-- **Hibajavítás:** Kisebb JSON formázási hiba javítása az árlistákban.
+## 2. Újdonságok a v3.2.6-ben
+- **Reszponzív Javítások:** A mobilnézet jelentős javításokon esett át, a beviteli mezők és vezérlőelemek már nem lógnak ki a képernyőről.
+- **Felugró Eredmény Panel:** Mobilon a kalkuláció egy teljes képernyős, felugró panelen jelenik meg a jobb használhatóságért.
+- **Stabilitás:** Kritikus JavaScript hiba javítása.
 
 ... (további részletek a changelog.md-ben)

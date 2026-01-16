@@ -1,8 +1,8 @@
-Checkpoint: v3.2.3 - Hivatalos 2023 és 2024 Alapértelmezett Árlisták
+Checkpoint: v3.2.6 - Mobilnézet Stabilizálása
 
-Ez a verzió rögzíti a rendszer alapját képező hivatalos díjtételeket.
+Ez a verzió kijavítja a kritikus mobilnézeti hibákat, és egy stabil, minden eszközön jól használható felületet biztosít.
 
 Főbb fejlesztések:
-- **Hivatalos Adatok:** A 2023-as és 2024-es árlisták mostantól a rendszer fix részei.
-- **Sérthetetlenség:** Az alapértelmezett árlisták védettek a felhasználói módosításoktól.
-- **Konzisztens Számítás:** Minden új kalkuláció ezeken a hitelesített alapokon indul.
+- **Reszponzív Elrendezés:** A beviteli mezők és a vezérlősáv mobilon is tökéletesen illeszkednek.
+- **Mobil UX:** Az eredmények egy felugró, görgethető panelen jelennek meg a könnyebb áttekinthetőségért.
+- **Hibajavítás:** Az alkalmazás stabilitását növelő JavaScript hiba javítása.
