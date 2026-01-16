@@ -73,8 +73,7 @@
         .btn-icon { font-size: 1.2em; }
         
         .main-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; }
-        @media (min-width: 1024px) { .main-grid { grid-template-columns: 1fr 1.5fr; } }
-
+        
         .card { background-color: var(--bg-secondary); border-radius: var(--border-radius); box-shadow: var(--shadow); border: 1px solid var(--border-color); }
         details.card { padding: 0; overflow: hidden; margin-bottom: 1rem; }
         details.card summary { padding: 1rem; cursor: pointer; font-size: 1.05rem; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; list-style: none; }
@@ -115,6 +114,13 @@
         #print-preview-iframe { width: 100%; height: 60vh; border: 1px solid var(--border-color); }
 
         .mobile-results-btn { display: none; }
+        
+        @media (min-width: 1024px) {
+            .main-grid { grid-template-columns: 1fr 1.5fr; }
+            .action-bar { justify-content: flex-start; }
+            .action-bar .print-group { margin-left: auto; }
+            #print-preview-modal .modal-close-btn { display: none; }
+        }
 
         @media (max-width: 1023px) {
             .container { padding: 0.5rem; }
