@@ -1,5 +1,11 @@
 # Változási Napló
 
+## v3.2.17 - Kalkulációs Logika Javítása
+*Dátum: 2024-06-11*
+
+### Javítások
+- **Önköltség Számítási Hiba:** Kijavítva egy kritikus hiba a "Belső" nézetben és a PDF generálás során, ahol az összesített önköltség helytelenül tartalmazta a nem önköltséges tételeket (pl. óradíjakat) is. A számítás most már helyesen, kizárólag a `isCostItem` jelölővel ellátott tételek önköltségét összegzi.
+
 ## v3.2.16 - Adatformátum és PDF Finomítások
 *Dátum: 2024-06-10*
 

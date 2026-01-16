@@ -337,7 +337,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.16";
+        const APP_VERSION = "v3.2.17";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -538,8 +538,10 @@
                     const totalCostPrice = quantity * costPrice;
                     breakdown.push({ label, quantity, unit, unitPriceHuf: sellPrice, totalHuf: totalSellPrice, costPriceHuf: costPrice, totalCostHuf: totalCostPrice, isCostItem });
                     totalSell += totalSellPrice;
-                    totalCost += totalCostPrice;
-                    if (isCostItem) hasCostItems = true;
+                    if (isCostItem) {
+                        totalCost += totalCostPrice;
+                        hasCostItems = true;
+                    }
                 }
             };
 

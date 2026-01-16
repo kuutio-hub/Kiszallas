@@ -1,11 +1,11 @@
-# Költségkalkulátor v3.2.15
+# Költségkalkulátor v3.2.17
 
 ## 1. Projekt Bemutatása
 Helyszíni szerelési projektek költségbecslésére szolgáló, modern, reszponzív webalkalmas.
 
-## 2. Újdonságok a v3.2.15-ben
-- **Rugalmas Árlista Kezelés:** Az alkalmazás mostantól lehetővé teszi a gyári árlisták módosítható díjtételeinek (pl. km díj, szállás) szerkesztését is. Mentéskor a rendszer egy új, "(módosított)" jelzésű másolatot hoz létre, így az eredeti sablonok sértetlenek maradnak, miközben a felhasználói szabadság nő.
-- **Optimalizált Felület:** A részletes projekt-összefoglaló a képernyőről átkerült a nyomtatási képre, letisztultabbá téve a kalkulációs felületet. A fő projektadatokat tartalmazó fejléc lenyithatóvá vált a jobb helykihasználás érdekében.
-- **Pontosított Költségmegjelenítés:** Az önköltségi adatok most már szigorúan csak a "Belső" nézetben jelennek meg.
+## 2. Legutóbbi Változások (v3.2.17)
+- **Javítás:** Az összesített önköltség számítási logikája javítva lett, hogy a "Belső" nézetben és a generált PDF-en is pontos értéket mutasson, kizárva a nem releváns tételeket.
+- A haszonkulcsok százalékos formátumban jelennek meg a jobb érthetőségért.
+- A PDF exportban a tételek nevei, a fejléc és a tartalmi összefoglaló is finomhangolásra került a professzionálisabb megjelenés érdekében.
 
-... (további részletek a changelog.md-ben)
+Részletesebb információkért lásd a `changelog.md` fájlt.
