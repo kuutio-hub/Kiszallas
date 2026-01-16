@@ -1,9 +1,8 @@
-Checkpoint: v3.1.0 - Moduláris Konfiguráció és Tisztább Architektúra
+Checkpoint: v3.2.3 - Hivatalos 2023 és 2024 Alapértelmezett Árlisták
 
-Ez a verzió egy fontos architekturális előrelépést jelent. A statikus konfigurációs adatok (űrlapok definíciói, címkék) kiszervezésre kerültek külön JSON fájlokba.
+Ez a verzió rögzíti a rendszer alapját képező hivatalos díjtételeket.
 
-Főbb pontok:
-- **Karbantarthatóság:** A kód logikai és adat részeinek szétválasztása nagyban megkönnyíti a jövőbeli módosításokat.
-- **Olvashatóság:** A fő JavaScript fájl mostantól az alkalmazás logikájára fókuszál, a statikus definíciók helyett.
-- **Hatékonyság:** A kezdeti adatbetöltés optimalizálva lett a párhuzamos `fetch` kérésekkel.
-- **Jövőbiztos Alap:** Ez a modularizáció stabilabb alapot biztosít a további bővítésekhez.
+Főbb fejlesztések:
+- **Hivatalos Adatok:** A 2023-as és 2024-es árlisták mostantól a rendszer fix részei.
+- **Sérthetetlenség:** Az alapértelmezett árlisták védettek a felhasználói módosításoktól.
+- **Konzisztens Számítás:** Minden új kalkuláció ezeken a hitelesített alapokon indul.
