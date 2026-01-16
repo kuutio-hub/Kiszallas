@@ -6,17 +6,14 @@ Ez a dokumentum a Kiszállási és Szerelési Költségkalkulátor számítási 
 
 - **Alap Pénznem:** Minden ár és díjtétel az árlistákban (`rates.json`) magyar forintban (HUF) van rögzítve.
 - **EUR Konverzió:** Ha a felhasználó az EUR pénznemet választja, minden HUF érték a felületen megadott EUR/HUF árfolyamon kerül átváltásra a megjelenítéskor.
-- **Díjtételek Kezelése és Szerkesztése:**
+- **Díjtételek Kezelése és Módosítása (Munkamenet-alapú):**
+    - **Betöltés:** Az alkalmazás minden indításkor a `rates.json` fájlból tölti be a rendelkezésre álló árlistákat. Nincs helyi tárolás vagy mentés.
     - **Kétszintű Adatstruktúra:** Minden árlista két csoportra bontva tárolja a díjtételeket:
         1.  `fixed`: Fix, nem módosítható tételek (pl. óradíjak, kiszállási díjak). Ezek az üzleti logika alapkövei.
-        2.  `overridable`: Módosítható tételek (pl. kilométerdíj, szállás költség, emelőgép díjak). Ezek projektenként változhatnak.
-    - **Szerkesztési Logika:**
-        - Az "Árlisták Kezelése" ablakban a `fixed` díjtételek mezői mindig le vannak tiltva.
-        - A `overridable` díjtételek mezői mindig szerkeszthetők.
-        - **Felhasználói Árlisták:** A felhasználó által létrehozott listák neve és módosítható díjai szabadon szerkeszthetők, a változások közvetlenül az adott listába mentődnek.
-        - **Gyári Árlisták Módosítása:** Ha a felhasználó egy gyári (alapértelmezett) árlista módosítható díjtételeit szerkeszti és menti, a rendszer **automatikusan létrehoz egy új, "(módosított)" utótaggal ellátott felhasználói árlistát**, és átvált rá. Ezzel az eredeti sablonok integritása megmarad, de a rugalmasság biztosított.
+        2.  `overridable`: Módosítható tételek (pl. kilométerdíj, szállás költség, emelőgép díjak).
+    - **Ideiglenes Módosítás:** A felhasználó az "Árlisták Kezelése" ablakban felülírhatja a `overridable` kategóriába tartozó díjtételeket. Ezek a változtatások **azonnal** érvénybe lépnek a kalkulációban, de **csak az aktuális munkamenet végéig** (az oldal újratöltéséig vagy bezárásáig) maradnak érvényben.
 - **Önköltség vs. Eladási ár:**
-  - Bizonyos alap tételeknél (pl. szállás, emelőgép) a rendszer megkülönböztet egy alap önköltségi árat és egy **haszonkulcs** szorzót. `Eladási Ár = Önköltségi Ár * Haszonkulcs Szorzó`.
+  - Bizonyos alap tételeknél (pl. szállás, emelőgép) a rendszer megkülönböztet egy alap önköltségi árat és egy százalékos **haszonkulcsot**. `Eladási Ár = Önköltségi Ár * (1 + Haszonkulcs / 100)`.
   - Az "Egyéb költségek" esetében egy jelölőnégyzet (`isCostItem`) dönti el, hogy a tétel önköltséges-e. Ha igen, a rendszer a százalékos `multiplier` értékkel növeli az árat. Ha nem, az `amount` mező a végleges eladási ár.
 
 ## 2. Személyi Költségek Logikája
@@ -40,14 +37,14 @@ A rendszer dinamikusan dönti el, hogy a szerelői órákból mennyi számít sz
 - **Kiszállási díj:** Az utazással töltött idő alapján számolódik, oda-vissza úttal.
 - **Kiküldetési díj:** Csak "Külföld" esetén, napidíj alapon.
 - **Jármű km díj:** A távolság alapján, oda-vissza úttal, a megadott számú járműre.
-- **Szállás:** Személyenként és éjszakánként, a haszonkulcs szorzóval növelt áron.
-  - `Szállás Költség = Létszám * Éjszakák * (Szállás önköltség * Szállás haszonkulcs)`
+- **Szállás:** Személyenként és éjszakánként, a haszonkulccsal növelt áron.
+  - `Szállás Költség = Létszám * Éjszakák * (Szállás önköltség * (1 + Szállás haszonkulcs / 100))`
 
 ## 4. Eszköz Költségek
 
 - Az emelőgép napidíja és szállítási költsége az aktív árlistából származik.
-- **Emelőgép napidíj és szállítás:** A haszonkulcs szorzóval növelt áron kerülnek kiszámlázásra.
-  - `Emelőgép Költség = (Eszközök * Napok * Napidíj + Szállítások * 2 * Szállítási díj) * Eszköz haszonkulcs`
+- **Emelőgép napidíj és szállítás:** A haszonkulccsal növelt áron kerülnek kiszámlázásra.
+  - `Emelőgép Költség = (Eszközök * Napok * Napidíj + Szállítások * 2 * Szállítási díj) * (1 + Eszköz haszonkulcs / 100)`
 
 ## 5. Egyéb Költségek
 

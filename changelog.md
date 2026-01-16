@@ -1,29 +1,18 @@
 # Változási Napló
 
+## v3.2.18 - Munkamenet-alapú Árlista Kezelés
+*Dátum: 2024-06-12*
+
+### Jelentős Változások
+- **Árlista Mentés Eltávolítva:** Az alkalmazásból teljes egészében eltávolításra került az árlisták böngészőben (`localStorage`) való mentésének, létrehozásának és törlésének funkciója. Az alkalmazás mostantól minden indításkor a `rates.json` fájlból tölti be a gyári árlistákat.
+- **Ideiglenes Módosítások:** Az árlisták módosítható díjtételei továbbra is szerkeszthetők az "Árlisták Kezelése" ablakban, de ezek a változtatások csak az aktuális munkamenetre (oldalfrissítésig) érvényesek.
+- **Azonnali Visszajelzés:** Az árlistakezelőben végrehajtott bármely díjtétel-módosítás azonnal frissíti a fő kalkulációs táblázatot, lehetővé téve a változások hatásának élő követését.
+- **Leegyszerűsített UI:** Az árlistakezelő felületéről eltávolításra kerültek a mentéssel, létrehozással és törléssel kapcsolatos gombok és mezők.
+
 ## v3.2.17 - Kalkulációs Logika Javítása
 *Dátum: 2024-06-11*
 
 ### Javítások
-- **Önköltség Számítási Hiba:** Kijavítva egy kritikus hiba a "Belső" nézetben és a PDF generálás során, ahol az összesített önköltség helytelenül tartalmazta a nem önköltséges tételeket (pl. óradíjakat) is. A számítás most már helyesen, kizárólag a `isCostItem` jelölővel ellátott tételek önköltségét összegzi.
-
-## v3.2.16 - Adatformátum és PDF Finomítások
-*Dátum: 2024-06-10*
-
-### Fejlesztések
-- **Százalékos Haszonkulcs:** Az árlistákban és a számítási logikában a haszonkulcsok szorzókról (pl. 1.3) százalékos értékre (pl. 30%) lettek átállítva a jobb érthetőség érdekében.
-- **Részletesebb Árlista Címkék:** Az árlistakezelőben a díjtételek mellett megjelentek a mértékegységek (Ft/óra, Ft/km, %).
-- **PDF Tartalom Finomhangolása:** A generált dokumentumokban az óradíjak nevei egyszerűsítve és egyértelműsítve lettek (pl. "Szerelő (hétvége)"). A PDF fejlécének sorköze csökkent. A napi óraszám információja már csak a "Belső" nézetben látható.
-
-### Javítások
-- **Árlista Törlés:** Javítva egy hiba, ami megakadályozta a felhasználó által létrehozott árlisták törlését.
-- **UI Rétegződés:** A nyomtatási előnézet ablaka most már garantáltan a többi felugró ablak fölött jelenik meg.
-
-## v3.2.15 - Rugalmas Árlista Kezelés és UI Finomítások
-*Dátum: 2024-06-08*
-
-### Fejlesztések
-- **Rugalmas Árlista Szerkesztés:** Lehetővé vált a gyári árlisták módosítható díjtételeinek szerkesztése, ami automatikusan egy új, másolt árlistát hoz létre.
-- **Letisztult Kalkulációs Nézet:** A részletes projekt összesítő a képernyőről a nyomtatási képre került.
-- **Lenyitható Projekt Adatok:** A fő projektadatok panelje a képernyőn lenyithatóvá vált.
+- **Önköltség Számítási Hiba:** Kijavítva egy kritikus hiba, ahol az összesített önköltség helytelenül tartalmazta a nem önköltséges tételeket is.
 
 ... (korábbi verziók)

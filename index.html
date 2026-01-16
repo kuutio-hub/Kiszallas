@@ -298,32 +298,21 @@
     <div id="rate-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Árlisták Kezelése</h2>
+                <h2>Árlisták Kezelése (ideiglenes módosítás)</h2>
                 <button class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="form-grid" style="grid-template-columns: 1fr 1fr; align-items: end; margin-bottom: 1.5rem;">
+                <div class="form-grid" style="grid-template-columns: 1fr; margin-bottom: 1.5rem;">
                     <div class="form-group">
                         <label for="rate-package-selector-modal">Válasszon árlistát</label>
                         <select id="rate-package-selector-modal" class="seahawks-select"></select>
                     </div>
-                     <div class="form-group">
-                        <label for="rate-package-name">Árlista neve</label>
-                        <input type="text" id="rate-package-name">
-                    </div>
                 </div>
                 <div id="rate-editor-fields" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));"></div>
-                <div id="rate-editor-notice" style="margin-top:1rem; font-style:italic; color:var(--text-secondary);"></div>
             </div>
-            <div class="modal-footer">
-                <div style="display: flex; gap: 1rem;">
-                    <button id="rate-delete-btn" class="btn btn-danger">Törlés</button>
-                    <button id="rate-print-btn" class="btn">Nyomtat</button>
-                </div>
-                <div style="display: flex; gap: 1rem; margin-left: auto;">
-                    <button id="rate-new-btn" class="btn">Új létrehozása</button>
-                    <button id="rate-save-btn" class="btn btn-success">Mentés</button>
-                </div>
+            <div class="modal-footer" style="justify-content: space-between;">
+                <button id="rate-print-btn" class="btn">Nyomtat</button>
+                <button class="btn modal-close-btn" style="font-size: 0.9rem;">Bezárás</button>
             </div>
         </div>
     </div>
@@ -337,7 +326,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.17";
+        const APP_VERSION = "v3.2.18";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -420,28 +409,24 @@
                     fetch('rates.json'), fetch('rate_key_labels.json'), fetch('input_config.json')
                 ]);
                 state.config = { RATE_KEY_LABELS: await labelsRes.json(), INPUT_CONFIG: await inputsRes.json() };
-                
-                const defaultRates = await ratesRes.json();
-                const storedRates = JSON.parse(localStorage.getItem('rates') || '[]');
-                const rateMap = new Map();
-                defaultRates.forEach(r => rateMap.set(r.id, r));
-                storedRates.forEach(r => rateMap.set(r.id, r));
-                state.rates = Array.from(rateMap.values());
-                saveRatesToStorage();
+                state.rates = await ratesRes.json();
 
                 renderInputs(); 
-                updateMainRateSelector();
+                updateRateSelectors();
                 const initialPackageId = D('rate-package-select').value;
                 state.activeRatePackage = state.rates.find(r => r.id === initialPackageId) || state.rates[0];
                 
                 setupOtherCostsList();
                 calculateAndDisplay();
+
+                // --- EVENT LISTENERS ---
                 
                 D('app-container').addEventListener('input', (e) => {
                     if (e.target.closest('#other-costs-list')) handleOtherCostInput(e);
                     else if (e.target.name === 'print-detail') calculateAndDisplay();
                     else calculateAndDisplay();
                 });
+
                 D('app-container').addEventListener('click', (e) => {
                     if (e.target.closest('.other-cost-delete-btn')) {
                         const index = parseInt(e.target.closest('.other-cost-delete-btn').dataset.index, 10);
@@ -456,12 +441,9 @@
                     state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: 'db', isCostItem: false, multiplier: 30 });
                     setupOtherCostsList();
                 };
-                D('rate-package-select').onchange = (e) => { 
-                    state.activeRatePackage = state.rates.find(r => r.id === e.target.value); 
-                    calculateAndDisplay(); 
-                };
+
                 D('currency-select').onchange = (e) => { state.activeCurrency = e.target.value; calculateAndDisplay(); };
-                D('reset-btn').onclick = () => { if(confirm("Minden beviteli mezőt töröl?")) location.reload(); };
+                D('reset-btn').onclick = () => { if(confirm("Minden beviteli mezőt töröl? A módosított árak is alaphelyzetbe állnak.")) location.reload(); };
                 D('theme-switcher').onclick = () => document.body.classList.toggle('light-mode');
                 
                 D('manage-rates-btn').onclick = openRateManager;
@@ -475,12 +457,34 @@
 
                 document.querySelectorAll('.modal-close-btn').forEach(btn => btn.onclick = () => btn.closest('.modal').style.display = 'none');
                 D('execute-print-btn').onclick = () => D('print-preview-iframe').contentWindow.print();
-                D('rate-package-selector-modal').onchange = (e) => populateRateForm(e.target.value);
-                D('rate-save-btn').onclick = handleSaveRatePackage;
-                D('rate-new-btn').onclick = handleCreateNewRatePackage;
-                D('rate-delete-btn').onclick = handleDeleteRatePackage;
+                
+                const syncRatePackages = (newPackageId) => {
+                    state.activeRatePackage = state.rates.find(r => r.id === newPackageId);
+                    D('rate-package-select').value = newPackageId;
+                    D('rate-package-selector-modal').value = newPackageId;
+                    populateRateForm(newPackageId);
+                    calculateAndDisplay();
+                };
+
+                D('rate-package-select').onchange = (e) => syncRatePackages(e.target.value);
+                D('rate-package-selector-modal').onchange = (e) => syncRatePackages(e.target.value);
                 D('rate-print-btn').onclick = handlePrintRateList;
                 D('show-chart-btn').onclick = showChart;
+
+                D('rate-editor-fields').addEventListener('input', (e) => {
+                    const input = e.target;
+                    const key = input.dataset.rateKey;
+                    const type = input.dataset.rateType;
+                    const value = parseFloat(input.value) || 0;
+                    const activePackageId = D('rate-package-selector-modal').value;
+                    const packageToEdit = state.rates.find(r => r.id === activePackageId);
+
+                    if (key && type && packageToEdit && packageToEdit.rates[type]) {
+                        packageToEdit.rates[type][key] = value;
+                        calculateAndDisplay();
+                    }
+                });
+
 
             } catch (error) {
                 console.error("Alkalmazás inicializálási hiba:", error);
@@ -642,15 +646,31 @@
             tfoot.innerHTML = footerHtml;
         }
         
-        function openRateManager() { D('rate-modal').style.display = 'block'; updateRateManagerView(); }
-
-        function updateRateManagerView(selectedId) {
+        function openRateManager() { 
+            D('rate-modal').style.display = 'block'; 
+            D('rate-package-selector-modal').value = state.activeRatePackage.id;
+            populateRateForm(state.activeRatePackage.id);
+        }
+        
+        function updateRateSelectors(selectedId) {
+            const mainSelector = D('rate-package-select');
             const modalSelector = D('rate-package-selector-modal');
-            const currentVal = selectedId || modalSelector.value || state.activeRatePackage.id;
-            modalSelector.innerHTML = '';
-            state.rates.forEach(p => modalSelector.add(new Option(p.name, p.id)));
-            modalSelector.value = currentVal;
-            populateRateForm(currentVal);
+            const currentVal = selectedId || mainSelector.value || (state.rates[0] ? state.rates[0].id : '');
+            
+            mainSelector.innerHTML = ''; 
+            modalSelector.innerHTML = ''; 
+            state.rates.forEach(p => {
+                mainSelector.add(new Option(p.name, p.id));
+                modalSelector.add(new Option(p.name, p.id));
+            });
+            
+            if (state.rates.some(r => r.id === currentVal)) {
+                mainSelector.value = currentVal;
+                modalSelector.value = currentVal;
+            } else if (mainSelector.options.length > 0) {
+                mainSelector.value = mainSelector.options[0].value;
+                modalSelector.value = modalSelector.options[0].value;
+            }
         }
 
         function populateRateForm(packageId) {
@@ -670,92 +690,6 @@
                     }
                 });
             });
-
-            D('rate-package-name').value = pkg.name;
-            D('rate-package-name').disabled = pkg.isDefault;
-            D('rate-delete-btn').disabled = pkg.isDefault;
-            D('rate-editor-notice').textContent = pkg.isDefault ? 'Gyári árlista. A fix díjtételek nem, de a módosítható díjak szerkeszthetők (mentéskor új másolat jön létre).' : '';
-        }
-
-        function handleSaveRatePackage() {
-            const packageId = D('rate-package-selector-modal').value;
-            let pkg = state.rates.find(r => r.id === packageId);
-            if (!pkg) return;
-
-            const newRates = {
-                fixed: { ...pkg.rates.fixed },
-                overridable: { ...pkg.rates.overridable }
-            };
-
-            document.querySelectorAll('#rate-editor-fields input:not(:disabled)').forEach(input => {
-                const key = input.dataset.rateKey;
-                const type = input.dataset.rateType;
-                if(type && newRates[type]) {
-                    newRates[type][key] = parseFloat(input.value) || 0;
-                }
-            });
-
-            if (pkg.isDefault) {
-                const newName = `${pkg.name} (módosított)`;
-                const newPkg = {
-                    id: `user-${Date.now()}`,
-                    name: newName,
-                    isDefault: false,
-                    rates: newRates
-                };
-                state.rates.push(newPkg);
-                saveRatesToStorage();
-                updateMainRateSelector(newPkg.id);
-                updateRateManagerView(newPkg.id);
-                state.activeRatePackage = newPkg;
-                alert(`Az alapértelmezett árlista nem módosítható. Létrehoztunk egy új, "${newName}" nevű árlistát a változtatásaiddal.`);
-            } else {
-                const pkgIndex = state.rates.findIndex(r => r.id === packageId);
-                const newName = D('rate-package-name').value.trim();
-                if (!newName) { alert('Az árlista neve nem lehet üres!'); return; }
-                state.rates[pkgIndex].name = newName;
-                state.rates[pkgIndex].rates = newRates;
-                saveRatesToStorage();
-                updateMainRateSelector(packageId);
-                state.activeRatePackage = state.rates[pkgIndex];
-                const saveBtn = D('rate-save-btn'); saveBtn.textContent = 'Mentve!'; setTimeout(() => { saveBtn.textContent = 'Mentés'; }, 2000);
-            }
-            calculateAndDisplay();
-        }
-
-        function handleCreateNewRatePackage() {
-            const templatePkg = state.rates.find(r => r.id === D('rate-package-selector-modal').value);
-            const newName = prompt('Adja meg az új árlista nevét:', `${templatePkg.name} másolat`);
-            if (newName) {
-                const newPkg = { id: `user-${Date.now()}`, name: newName, isDefault: false, rates: JSON.parse(JSON.stringify(templatePkg.rates)) };
-                state.rates.push(newPkg); saveRatesToStorage();
-                updateMainRateSelector(newPkg.id); updateRateManagerView(newPkg.id);
-                state.activeRatePackage = newPkg; calculateAndDisplay();
-            }
-        }
-        
-        function handleDeleteRatePackage() {
-            const packageId = D('rate-package-selector-modal').value;
-            const pkg = state.rates.find(r => r.id === packageId);
-            if (!pkg || pkg.isDefault) {
-                alert('Ez az árlista nem törölhető!');
-                return;
-            }
-            if (confirm(`Biztosan törli a(z) "${pkg.name}" árlistát?`)) {
-                state.rates = state.rates.filter(r => r.id !== packageId);
-                saveRatesToStorage(); updateMainRateSelector();
-                const newActiveId = D('rate-package-select').value;
-                state.activeRatePackage = state.rates.find(r => r.id === newActiveId);
-                updateRateManagerView(newActiveId); calculateAndDisplay();
-            }
-        }
-
-        function saveRatesToStorage() { localStorage.setItem('rates', JSON.stringify(state.rates.filter(r => !r.isDefault))); }
-        function updateMainRateSelector(selectedId) {
-            const mainSelector = D('rate-package-select'); const currentVal = selectedId || mainSelector.value || (state.rates[0] ? state.rates[0].id : '');
-            mainSelector.innerHTML = ''; state.rates.forEach(p => mainSelector.add(new Option(p.name, p.id)));
-            if (state.rates.some(r => r.id === currentVal)) mainSelector.value = currentVal;
-            else if (mainSelector.options.length > 0) mainSelector.value = mainSelector.options[0].value;
         }
 
         function handlePrint(isRateList = false, pkg) {
