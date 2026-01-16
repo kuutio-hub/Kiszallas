@@ -1,32 +1,23 @@
 # Változási Napló
 
-## v3.2.11 - Rugalmas Díjtétel Kezelés
-*Dátum: 2024-06-04*
+## v3.2.16 - Adatformátum és PDF Finomítások
+*Dátum: 2024-06-10*
 
 ### Fejlesztések
-- **Felülírható Díjtételek:** A szállás, kilométerdíj és emelőgép költségei mostantól a fő felületen, dedikált beviteli mezőkben felülírhatók.
-- **Dinamikus Alapértékek:** Árlista váltásakor ezek a mezők automatikusan feltöltődnek az adott árlista alapértelmezett értékeivel.
-- **Logikai Szétválasztás:** A mentett árlisták mostantól csak a fix óradíjakat és kiküldetési díjakat tartalmazzák, míg a projektenként változó költségek a fő felületen kezelhetők, növelve a kalkuláció rugalmasságát.
+- **Százalékos Haszonkulcs:** Az árlistákban és a számítási logikában a haszonkulcsok szorzókról (pl. 1.3) százalékos értékre (pl. 30%) lettek átállítva a jobb érthetőség érdekében.
+- **Részletesebb Árlista Címkék:** Az árlistakezelőben a díjtételek mellett megjelentek a mértékegységek (Ft/óra, Ft/km, %).
+- **PDF Tartalom Finomhangolása:** A generált dokumentumokban az óradíjak nevei egyszerűsítve és egyértelműsítve lettek (pl. "Szerelő (hétvége)"). A PDF fejlécének sorköze csökkent. A napi óraszám információja már csak a "Belső" nézetben látható.
 
-## v3.2.10 - Árlista Kezelő UI Fejlesztés
-*Dátum: 2024-06-03*
+### Javítások
+- **Árlista Törlés:** Javítva egy hiba, ami megakadályozta a felhasználó által létrehozott árlisták törlését.
+- **UI Rétegződés:** A nyomtatási előnézet ablaka most már garantáltan a többi felugró ablak fölött jelenik meg.
+
+## v3.2.15 - Rugalmas Árlista Kezelés és UI Finomítások
+*Dátum: 2024-06-08*
 
 ### Fejlesztések
-- **Csoportosított Árlista Mezők:** Az "Árlisták Kezelése" felületen a díjtételek mostantól logikai csoportokba (Szerelők, Mérnökök, Utazás, Szállás, Eszközök) vannak rendezve a jobb átláthatóság és kezelhetőség érdekében.
-
-## v3.2.9 - Árlistakezelő Helyreállítása és Mobil UI Javítások
-*Dátum: 2024-06-02*
-
-### Javítások és Fejlesztések
-- **Árlistakezelő (CRUD):** A korábban hiányzó árlistakezelő funkció teljes mértékben helyreállításra került. Egy új, dedikált modális ablakban lehetséges új árlistákat létrehozni, a meglévőket szerkeszteni és törölni.
-- **Perzisztencia:** A felhasználó által létrehozott árlisták a böngésző `localStorage`-ában kerülnek mentésre.
-- **Mobil Ikonok:** Javítva a hiba, ami miatt az alsó akciósáv gombjain nem jelentek meg az ikonok mobilnézetben. A gombok HTML szerkezete is finomítva lett a robusztusabb megjelenés érdekében.
-- **Stabilitás:** Az "Árlisták kezelése" gomb eseménykezelője a helyes funkcióra lett cserélve, megszüntetve a szükségtelen `alert` üzenetet.
-
-## v3.2.8 - Kritikus UI és Funkcionalitási Javítások
-*Dátum: 2024-06-01*
-- Működő "Nyomtatás" gomb teljes előnézeti funkcióval.
-- Mobil UI gombok vizuális javítása.
-- Mobil eredmények panel gombjának javítása.
+- **Rugalmas Árlista Szerkesztés:** Lehetővé vált a gyári árlisták módosítható díjtételeinek szerkesztése, ami automatikusan egy új, másolt árlistát hoz létre.
+- **Letisztult Kalkulációs Nézet:** A részletes projekt összesítő a képernyőről a nyomtatási képre került.
+- **Lenyitható Projekt Adatok:** A fő projektadatok panelje a képernyőn lenyithatóvá vált.
 
 ... (korábbi verziók)

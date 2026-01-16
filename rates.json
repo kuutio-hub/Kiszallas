@@ -1,50 +1,57 @@
+
 [
   {
     "id": "egysegarak-2023",
     "name": "2023",
     "isDefault": true,
-    "isProtected": true,
     "rates": {
-      "szerelo_hetkoznap_oradij": 8600,
-      "szerelo_hetvege_oradij": 10000,
-      "szerelesvezeto_hetkoznap_oradij": 14000,
-      "szerelesvezeto_hetvege_oradij": 17000,
-      "mernok_hetkoznap_oradij": 17500,
-      "mernok_hetvege_oradij": 21500,
-      "kiszallasi_dij_szerelo": 7500,
-      "kiszallasi_dij_mernok": 9200,
-      "kikuldeles_dij_szerelo": 12000,
-      "kikuldeles_dij_mernok": 18000,
-      "km_dij": 200,
-      "szallas_dij": 22000,
-      "szallas_szorzo": 1.3,
-      "emelogep_napidij": 14000,
-      "emelogep_szallitas_dij": 120000,
-      "emelogep_szorzo": 1.3
+      "fixed": {
+        "szerelo_hetkoznap_oradij": 8600,
+        "szerelo_hetvege_oradij": 10000,
+        "szerelesvezeto_hetkoznap_oradij": 14000,
+        "szerelesvezeto_hetvege_oradij": 17000,
+        "mernok_hetkoznap_oradij": 17500,
+        "mernok_hetvege_oradij": 21500,
+        "kiszallasi_dij_szerelo": 7500,
+        "kiszallasi_dij_mernok": 9200,
+        "kikuldeles_dij_szerelo": 12000,
+        "kikuldeles_dij_mernok": 18000
+      },
+      "overridable": {
+        "km_dij": 200,
+        "szallas_dij": 22000,
+        "szallas_szorzo": 30,
+        "emelogep_napidij": 14000,
+        "emelogep_szallitas_dij": 120000,
+        "emelogep_szorzo": 30
+      }
     }
   },
   {
     "id": "egysegarak-2024",
     "name": "2024",
     "isDefault": true,
-    "isProtected": true,
     "rates": {
-      "szerelo_hetkoznap_oradij": 9500,
-      "szerelo_hetvege_oradij": 11000,
-      "szerelesvezeto_hetkoznap_oradij": 15400,
-      "szerelesvezeto_hetvege_oradij": 18700,
-      "mernok_hetkoznap_oradij": 19500,
-      "mernok_hetvege_oradij": 22000,
-      "kiszallasi_dij_szerelo": 8300,
-      "kiszallasi_dij_mernok": 10200,
-      "kikuldeles_dij_szerelo": 12000,
-      "kikuldeles_dij_mernok": 18000,
-      "km_dij": 250,
-      "szallas_dij": 22000,
-      "szallas_szorzo": 1.3,
-      "emelogep_napidij": 14000,
-      "emelogep_szallitas_dij": 140000,
-      "emelogep_szorzo": 1.3
+      "fixed": {
+        "szerelo_hetkoznap_oradij": 9500,
+        "szerelo_hetvege_oradij": 11000,
+        "szerelesvezeto_hetkoznap_oradij": 15400,
+        "szerelesvezeto_hetvege_oradij": 18700,
+        "mernok_hetkoznap_oradij": 19500,
+        "mernok_hetvege_oradij": 22000,
+        "kiszallasi_dij_szerelo": 8300,
+        "kiszallasi_dij_mernok": 10200,
+        "kikuldeles_dij_szerelo": 12000,
+        "kikuldeles_dij_mernok": 18000
+      },
+      "overridable": {
+        "km_dij": 250,
+        "szallas_dij": 22000,
+        "szallas_szorzo": 30,
+        "emelogep_napidij": 14000,
+        "emelogep_szallitas_dij": 140000,
+        "emelogep_szorzo": 30
+      }
     }
   }
 ]

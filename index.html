@@ -77,6 +77,7 @@
         .card { background-color: var(--bg-secondary); border-radius: var(--border-radius); box-shadow: var(--shadow); border: 1px solid var(--border-color); }
         details.card { padding: 0; overflow: hidden; margin-bottom: 1rem; }
         details.card summary { padding: 1rem; cursor: pointer; font-size: 1.05rem; font-weight: 600; position: relative; display: flex; justify-content: space-between; align-items: center; list-style: none; }
+        details.card summary::-webkit-details-marker { display: none; }
         details.card summary::after { content: ''; display: inline-block; width: 20px; height: 20px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3E%3Cpath d='M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z'/%3E%3C/svg%3E"); transition: transform 0.2s; }
         details[open].card > summary::after { transform: rotate(180deg); }
         details.card .card-content { padding: 1rem; }
@@ -89,13 +90,9 @@
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
         .form-group label { margin-bottom: 0.4rem; font-size: 0.8rem; color: var(--text-secondary); display: block; }
         .form-group input, .form-group select { width: 100%; padding: 0.5rem; border-radius: 0.3rem; border: 1px solid var(--border-color); background: var(--bg-primary); color: var(--text-primary); }
-
-        @media (min-width: 768px) {
-            .form-group input, .form-group select { max-width: 250px; }
-        }
-
+        .travel-unit-toggle { cursor: pointer; text-decoration: underline; color: var(--accent-primary); }
+        
         .card-controls { display: flex; justify-content: flex-end; align-items: center; gap: 1rem; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
-        .close-details-btn { cursor: pointer; background: var(--bg-tertiary); color: var(--text-primary); border: none; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 1rem; }
         
         .action-bar { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem; background-color: var(--bg-secondary); border-radius: var(--border-radius); border: 1px solid var(--border-color); }
         .print-group { display: flex; align-items: center; gap: 0.5rem; }
@@ -105,10 +102,11 @@
         .radio-pill input:checked + span { background-color: var(--accent-primary); color: var(--text-on-accent); font-weight: bold; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
+        #print-preview-modal { z-index: 2001; }
         .modal-content { background-color: var(--bg-secondary); margin: 5vh auto; padding: 1.5rem; width: 90%; max-width: 900px; border-radius: var(--border-radius); border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .modal-body { overflow-y: auto; flex-grow: 1; }
-        .modal-footer { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
+        .modal-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
         .modal-close-btn { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
         
         #print-preview-iframe { width: 100%; height: 60vh; border: 1px solid var(--border-color); }
@@ -116,51 +114,47 @@
         .mobile-results-btn { display: none; }
 
         #rate-editor-fields .rate-group-title {
-            grid-column: 1 / -1;
-            margin-top: 1.5rem;
-            margin-bottom: 0.5rem;
-            font-size: 1rem;
-            color: var(--accent-primary);
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.5rem;
+            grid-column: 1 / -1; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem;
+            color: var(--accent-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
         }
-        #rate-editor-fields .rate-group-title:first-of-type {
-            margin-top: 0;
-        }
+        #rate-editor-fields .rate-group-title:first-of-type { margin-top: 0; }
+        
+        .other-cost-item { display: flex; flex-wrap: wrap; gap: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; align-items: flex-end; }
+        .other-cost-item .form-group { margin-bottom: 0; }
+        .other-cost-item .description { flex: 1 1 250px; }
+        .other-cost-item .is-cost-item-group { display: flex; align-items: center; gap: 0.5rem; flex: 0 1 auto; white-space: nowrap; padding-bottom: 0.5rem; }
+        .other-cost-item .multiplier { flex: 0 1 120px; }
+        .other-cost-item .quantity { flex: 1 1 80px; }
+        .other-cost-item .unit { flex: 1 1 80px; }
+        .other-cost-item .amount { flex: 1 1 120px; }
+        .other-cost-item .delete-btn { flex-shrink: 0; }
+
+        #calculation-summary-header-content { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; padding: 1rem; }
+        #calculation-summary-header-content .summary-title { flex-basis: 100%; text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--accent-primary); }
+        #calculation-summary-header-content .summary-col { flex: 1; min-width: 200px; padding: 0 1rem; }
+        #calculation-summary-header-content .summary-col p { margin-bottom: 0.3rem; }
+        #calculation-summary-header-content .summary-col strong { color: var(--text-secondary); margin-right: 0.5em; }
         
         @media (min-width: 1024px) {
             .main-grid { grid-template-columns: 1fr 1.5fr; }
             .action-bar { justify-content: flex-start; }
             .action-bar .print-group { margin-left: auto; }
-            #print-preview-modal .modal-close-btn { display: none; }
         }
 
         @media (max-width: 1023px) {
             .container { padding: 0.5rem; }
             .header-item { min-width: calc(50% - 0.4rem); }
-
             .action-bar { flex-direction: row; justify-content: space-around; align-items: center; }
             .action-bar .btn { flex-grow: 0; width: 50px; height: 50px; padding: 0; }
             .action-bar .btn .btn-text { display: none; }
             .action-bar .print-group { flex-grow: 1; justify-content: center; }
             .action-bar .print-group .selector-label { display: none; }
-
-            .calculation-table { 
-                display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-                z-index: 3000; background: var(--bg-primary); overflow-y: auto; 
-                padding: 1rem; flex-direction: column;
-            }
+            .calculation-table { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 3000; background: var(--bg-primary); overflow-y: auto; padding: 1rem; flex-direction: column; }
             .calculation-table.mobile-visible { display: flex; }
             .calculation-table .table-wrapper { flex-grow: 1; }
             .close-mobile-results { display: block; margin-top: 1rem; }
-
-            .mobile-results-btn {
-                display: flex; position: fixed; bottom: 1rem; right: 1rem;
-                z-index: 2500; width: 56px; height: 56px; border-radius: 50%;
-                align-items: center; justify-content: center; font-size: 1.5rem;
-                background-color: var(--accent-primary); color: var(--text-on-accent);
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: none; cursor: pointer;
-            }
+            .mobile-results-btn { display: flex; position: fixed; bottom: 1rem; right: 1rem; z-index: 2500; width: 56px; height: 56px; border-radius: 50%; align-items: center; justify-content: center; font-size: 1.5rem; background-color: var(--accent-primary); color: var(--text-on-accent); box-shadow: 0 4px 12px rgba(0,0,0,0.3); border: none; cursor: pointer; }
+            .copyright-version::before { content: '\\A'; white-space: pre; }
         }
         
         footer { text-align: center; padding: 2rem 1rem; color: var(--text-secondary); font-size: 0.8rem; margin-top: 2rem; border-top: 1px solid var(--border-color); }
@@ -230,39 +224,23 @@
                                 <div class="form-group"><label for="creator_name">Készítő</label><input type="text" id="creator_name" placeholder="Opcionális"></div>
                                 <div class="form-group" style="grid-column: 1 / -1;"><label for="feladat">Feladat leírása</label><input type="text" id="feladat" style="max-width: none;"></div>
                             </div>
-                            <div class="card-controls">
-                                <button class="btn card-save-btn btn-success">Mentés</button>
-                                <button class="close-details-btn" title="Becsuk">↑</button>
-                            </div>
+                            <div class="card-controls"><button class="btn card-save-btn btn-success">Mentés és bezárás</button></div>
                         </div>
                     </details>
                     
-                    <details class="card"><summary>Utazás</summary><div class="card-content"><div class="form-grid" id="utazas-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés</button><button class="close-details-btn" title="Becsuk">↑</button></div></div></details>
-                    <details class="card"><summary>Szerelők</summary><div class="card-content"><div class="form-grid" id="szerelo-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés</button><button class="close-details-btn" title="Becsuk">↑</button></div></div></details>
-                    <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés</button><button class="close-details-btn" title="Becsuk">↑</button></div></div></details>
-                    <details class="card"><summary>Eszközök</summary><div class="card-content"><div class="form-grid" id="emelogep-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés</button><button class="close-details-btn" title="Becsuk">↑</button></div></div></details>
-                    
-                    <details class="card" open>
-                        <summary>Díjtételek</summary>
-                        <div class="card-content">
-                            <div class="form-grid" id="overridable-rates-inputs">
-                                <div class="form-group"><label for="override_km_dij">Kilométerdíj (Ft/km)</label><input type="number" id="override_km_dij"></div>
-                                <div class="form-group"><label for="override_szallas_dij">Szállás önköltség (Ft/éj)</label><input type="number" id="override_szallas_dij"></div>
-                                <div class="form-group"><label for="override_szallas_szorzo">Szállás haszonkulcs</label><input type="number" id="override_szallas_szorzo" step="0.1"></div>
-                                <div class="form-group"><label for="override_emelogep_napidij">Emelőgép napidíj (Ft)</label><input type="number" id="override_emelogep_napidij"></div>
-                                <div class="form-group"><label for="override_emelogep_szallitas_dij">Emelőgép szállítás (Ft)</label><input type="number" id="override_emelogep_szallitas_dij"></div>
-                                <div class="form-group"><label for="override_emelogep_szorzo">Eszköz haszonkulcs</label><input type="number" id="override_emelogep_szorzo" step="0.1"></div>
-                            </div>
-                        </div>
-                    </details>
+                    <details class="card"><summary>Utazás</summary><div class="card-content"><div class="form-grid" id="utazas-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés és bezárás</button></div></div></details>
+                    <details class="card"><summary>Szerelők</summary><div class="card-content"><div class="form-grid" id="szerelo-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés és bezárás</button></div></div></details>
+                    <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés és bezárás</button></div></div></details>
+                    <details class="card"><summary>Eszközök</summary><div class="card-content"><div class="form-grid" id="emelogep-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés és bezárás</button></div></div></details>
 
                     <details class="card">
                         <summary>Egyéb költségek</summary>
                         <div class="card-content">
                             <div id="other-costs-list"></div>
-                            <div class="item-list-controls" style="margin-top: 1rem;">
+                            <div class="item-list-controls" style="margin-top: 1rem; padding-bottom: 1rem;">
                                 <button id="add-other-cost-btn" class="btn">+ Új tétel</button>
                             </div>
+                            <div class="card-controls"><button class="btn card-save-btn btn-success">Mentés és bezárás</button></div>
                         </div>
                     </details>
                      
@@ -284,7 +262,10 @@
                 
                 <div class="card calculation-table" id="results-panel">
                     <button class="btn close-mobile-results btn-danger">Bezárás</button>
-                    <div id="calculation-summary-header"></div>
+                    <details class="card" id="calculation-summary-header" open>
+                        <summary>Projekt Adatok</summary>
+                        <div id="calculation-summary-header-content"></div>
+                    </details>
                     <div class="table-wrapper">
                         <table>
                             <thead id="breakdown-head"></thead>
@@ -335,10 +316,11 @@
                 <div id="rate-editor-notice" style="margin-top:1rem; font-style:italic; color:var(--text-secondary);"></div>
             </div>
             <div class="modal-footer">
-                <div>
-                    <button id="rate-delete-btn" class="btn btn-danger">Törlés</button>
-                </div>
                 <div style="display: flex; gap: 1rem;">
+                    <button id="rate-delete-btn" class="btn btn-danger">Törlés</button>
+                    <button id="rate-print-btn" class="btn">Nyomtat</button>
+                </div>
+                <div style="display: flex; gap: 1rem; margin-left: auto;">
                     <button id="rate-new-btn" class="btn">Új létrehozása</button>
                     <button id="rate-save-btn" class="btn btn-success">Mentés</button>
                 </div>
@@ -346,31 +328,38 @@
         </div>
     </div>
 
+    <div id="chart-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header"><h2>EUR/HUF Árfolyam Előzmények</h2><button class="modal-close-btn">&times;</button></div>
+            <div class="modal-body"><canvas id="exchange-rate-chart"></canvas></div>
+        </div>
+    </div>
+
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.11";
+        const APP_VERSION = "v3.2.16";
 
         const RATE_EDITOR_GROUPS = [
             {
-                title: 'Szerelők és Szerelésvezetők',
-                keys: ['szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij', 'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij', 'kiszallasi_dij_szerelo', 'kikuldeles_dij_szerelo']
+                title: 'Fix Díjtételek (nem módosítható)',
+                type: 'fixed',
+                keys: ['szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij', 'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij', 'mernok_hetkoznap_oradij', 'mernok_hetvege_oradij', 'kiszallasi_dij_szerelo', 'kiszallasi_dij_mernok', 'kikuldeles_dij_szerelo', 'kikuldeles_dij_mernok']
             },
             {
-                title: 'Mérnökök',
-                keys: ['mernok_hetkoznap_oradij', 'mernok_hetvege_oradij', 'kiszallasi_dij_mernok', 'kikuldeles_dij_mernok']
+                title: 'Módosítható Díjtételek',
+                type: 'overridable',
+                keys: ['km_dij', 'szallas_dij', 'szallas_szorzo', 'emelogep_napidij', 'emelogep_szallitas_dij', 'emelogep_szorzo']
             }
         ];
-
-        document.getElementById('landing-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor | Verzió: ${APP_VERSION}`;
+        
+        const footerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor <span class="copyright-version">| Verzió: ${APP_VERSION}</span>`;
+        document.getElementById('landing-footer').innerHTML = footerHTML;
+        document.getElementById('copyright-footer').innerHTML = footerHTML;
 
         let state = {
-            rates: [],
-            otherCosts: [],
-            exchangeRates: {},
-            activeRatePackage: null,
-            calculationResults: null,
-            activeCurrency: 'HUF',
-            config: {},
+            rates: [], otherCosts: [], exchangeRates: {}, activeRatePackage: null,
+            calculationResults: null, activeCurrency: 'HUF', config: {}, chart: null,
+            travelTimeUnit: 'óra'
         };
 
         const D = (id) => document.getElementById(id);
@@ -388,10 +377,44 @@
         
         const convertPrice = (huf, curr) => curr === 'EUR' ? huf / (parseFloat(D('exchange-rate-manual').value) || 1) : huf;
         
+        async function fetchExchangeRates() {
+            const cached = localStorage.getItem('exchangeRates');
+            const now = new Date();
+            if (cached) {
+                const { timestamp, data } = JSON.parse(cached);
+                if (now.getTime() - timestamp < 4 * 60 * 60 * 1000) {
+                    state.exchangeRates = data; return;
+                }
+            }
+            try {
+                const end = now.toISOString().split('T')[0];
+                const start = new Date(new Date().setDate(now.getDate() - 90)).toISOString().split('T')[0];
+                const response = await fetch(`https://api.frankfurter.app/${start}..${end}?from=EUR&to=HUF`);
+                if (!response.ok) throw new Error('API hiba');
+                const data = await response.json();
+                state.exchangeRates = data;
+                localStorage.setItem('exchangeRates', JSON.stringify({ timestamp: new Date().getTime(), data }));
+            } catch (error) {
+                console.error("Árfolyam lekérdezés sikertelen:", error);
+                alert("Az árfolyamadatok lekérdezése nem sikerült. Kézi beállítás szükséges.");
+            }
+        }
+
+        function setLatestExchangeRate() {
+            if (state.exchangeRates && state.exchangeRates.rates) {
+                const dates = Object.keys(state.exchangeRates.rates).sort();
+                const latestDate = dates[dates.length - 1];
+                if (latestDate && state.exchangeRates.rates[latestDate].HUF) {
+                    D('exchange-rate-manual').value = state.exchangeRates.rates[latestDate].HUF.toFixed(2);
+                }
+            }
+        }
+        
         async function initApp() {
             try {
                 D('calculation_date').value = new Date().toISOString().split('T')[0];
-                D('copyright-footer').innerHTML = `&copy; ${new Date().getFullYear()} Kiszállítás Kalkulátor | Verzió: ${APP_VERSION}`;
+                await fetchExchangeRates();
+                setLatestExchangeRate();
 
                 const [ratesRes, labelsRes, inputsRes] = await Promise.all([
                     fetch('rates.json'), fetch('rate_key_labels.json'), fetch('input_config.json')
@@ -402,7 +425,7 @@
                 const storedRates = JSON.parse(localStorage.getItem('rates') || '[]');
                 const rateMap = new Map();
                 defaultRates.forEach(r => rateMap.set(r.id, r));
-                storedRates.forEach(r => rateMap.set(r.id, r)); // User rates can override defaults if IDs match, though unlikely
+                storedRates.forEach(r => rateMap.set(r.id, r));
                 state.rates = Array.from(rateMap.values());
                 saveRatesToStorage();
 
@@ -410,67 +433,54 @@
                 updateMainRateSelector();
                 const initialPackageId = D('rate-package-select').value;
                 state.activeRatePackage = state.rates.find(r => r.id === initialPackageId) || state.rates[0];
-                populateOverridableInputs(state.activeRatePackage);
-
+                
                 setupOtherCostsList();
                 calculateAndDisplay();
                 
-                // Event Listeners
                 D('app-container').addEventListener('input', (e) => {
-                    if (e.target.closest('#other-costs-list')) {
-                        handleOtherCostInput(e);
-                    } else {
-                        calculateAndDisplay();
-                    }
+                    if (e.target.closest('#other-costs-list')) handleOtherCostInput(e);
+                    else if (e.target.name === 'print-detail') calculateAndDisplay();
+                    else calculateAndDisplay();
                 });
                 D('app-container').addEventListener('click', (e) => {
                     if (e.target.closest('.other-cost-delete-btn')) {
                         const index = parseInt(e.target.closest('.other-cost-delete-btn').dataset.index, 10);
                         state.otherCosts.splice(index, 1);
-                        setupOtherCostsList();
-                        calculateAndDisplay();
+                        setupOtherCostsList(); calculateAndDisplay();
                     }
+                    if (e.target.closest('.card-save-btn')) { e.target.closest('details').open = false; }
+                    if (e.target.closest('.travel-unit-toggle')) { handleTravelUnitToggle(); }
                 });
 
                 D('add-other-cost-btn').onclick = () => {
-                    state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: 'db', isCostItem: true, multiplier: 30 });
+                    state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: 'db', isCostItem: false, multiplier: 30 });
                     setupOtherCostsList();
                 };
                 D('rate-package-select').onchange = (e) => { 
                     state.activeRatePackage = state.rates.find(r => r.id === e.target.value); 
-                    populateOverridableInputs(state.activeRatePackage);
                     calculateAndDisplay(); 
                 };
-                D('currency-select').onchange = (e) => { 
-                    state.activeCurrency = e.target.value; 
-                    calculateAndDisplay(); 
-                };
+                D('currency-select').onchange = (e) => { state.activeCurrency = e.target.value; calculateAndDisplay(); };
                 D('reset-btn').onclick = () => { if(confirm("Minden beviteli mezőt töröl?")) location.reload(); };
                 D('theme-switcher').onclick = () => document.body.classList.toggle('light-mode');
                 
                 D('manage-rates-btn').onclick = openRateManager;
-                D('print-btn').onclick = handlePrint;
+                D('print-btn').onclick = () => handlePrint();
 
                 const mobileResultsBtn = D('mobile-results-btn');
                 const resultsPanel = D('results-panel');
                 const closeMobileResultsBtn = resultsPanel.querySelector('.close-mobile-results');
-
                 if (mobileResultsBtn) mobileResultsBtn.onclick = () => resultsPanel.classList.add('mobile-visible');
                 if (closeMobileResultsBtn) closeMobileResultsBtn.onclick = () => resultsPanel.classList.remove('mobile-visible');
 
-                document.querySelectorAll('.close-details-btn').forEach(b => {
-                    b.onclick = () => b.closest('details').open = false;
-                });
-
-                // Modal listeners
-                document.querySelectorAll('.modal-close-btn').forEach(btn => {
-                    btn.onclick = () => btn.closest('.modal').style.display = 'none';
-                });
+                document.querySelectorAll('.modal-close-btn').forEach(btn => btn.onclick = () => btn.closest('.modal').style.display = 'none');
                 D('execute-print-btn').onclick = () => D('print-preview-iframe').contentWindow.print();
                 D('rate-package-selector-modal').onchange = (e) => populateRateForm(e.target.value);
                 D('rate-save-btn').onclick = handleSaveRatePackage;
                 D('rate-new-btn').onclick = handleCreateNewRatePackage;
                 D('rate-delete-btn').onclick = handleDeleteRatePackage;
+                D('rate-print-btn').onclick = handlePrintRateList;
+                D('show-chart-btn').onclick = showChart;
 
             } catch (error) {
                 console.error("Alkalmazás inicializálási hiba:", error);
@@ -496,7 +506,6 @@
                             inputEl.type = config.type === 'text' ? 'text' : 'number';
                         }
                         inputEl.id = config.id;
-                        if (config.unit) inputEl.dataset.unit = config.unit;
                         groupEl.appendChild(inputEl);
                         container.appendChild(groupEl);
                     });
@@ -508,7 +517,7 @@
             const inputs = {};
             document.querySelectorAll('#app-container input, #app-container select').forEach(el => {
                 if (el.id) {
-                    if (el.type === 'number') inputs[el.id] = parseFloat(el.value) || 0;
+                    if (el.type === 'number' || el.type === 'checkbox') inputs[el.id] = (el.type === 'checkbox') ? el.checked : (parseFloat(el.value) || 0);
                     else inputs[el.id] = el.value;
                 }
             });
@@ -517,17 +526,9 @@
 
         function calculateCosts() {
             const inputs = getInputs(); 
-            const rates = state.activeRatePackage?.rates;
-            if (!rates) return { totalHuf: 0, totalCostHuf: 0, breakdown: [], hasCostItems: false };
-
-            const overrideRates = {
-                km_dij: parseFloat(D('override_km_dij').value) || 0,
-                szallas_dij: parseFloat(D('override_szallas_dij').value) || 0,
-                szallas_szorzo: parseFloat(D('override_szallas_szorzo').value) || 1,
-                emelogep_napidij: parseFloat(D('override_emelogep_napidij').value) || 0,
-                emelogep_szallitas_dij: parseFloat(D('override_emelogep_szallitas_dij').value) || 0,
-                emelogep_szorzo: parseFloat(D('override_emelogep_szorzo').value) || 1
-            };
+            const pkg = state.activeRatePackage;
+            if (!pkg || !pkg.rates) return { totalHuf: 0, totalCostHuf: 0, breakdown: [], hasCostItems: false };
+            const rates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
 
             let breakdown = [], totalSell = 0, totalCost = 0, hasCostItems = false;
             
@@ -547,35 +548,33 @@
             const sWd = sN - sW; const mWd = mN - mW;
 
             if (mF > 0 && mN > 0) {
-                addItem('Mérnök óradíj', mF * mWd * mH, 'óra', rates.mernok_hetkoznap_oradij, rates.mernok_hetkoznap_oradij, false);
-                addItem('Mérnök óradíj (hétvége)', mF * mW * mH, 'óra', rates.mernok_hetvege_oradij, rates.mernok_hetvege_oradij, false);
+                addItem('Mérnök (hétköznap)', mF * mWd * mH, 'óra', rates.mernok_hetkoznap_oradij, rates.mernok_hetkoznap_oradij, false);
+                addItem('Mérnök (hétvége)', mF * mW * mH, 'óra', rates.mernok_hetvege_oradij, rates.mernok_hetvege_oradij, false);
             }
             if (sF > 0 && sN > 0) {
                 const foreman_needed_wd = Math.max(0, sWd - mWd);
                 const foreman_needed_we = Math.max(0, sW - mW);
-                addItem('Szerelésvezető óradíj', foreman_needed_wd * sH, 'óra', rates.szerelesvezeto_hetkoznap_oradij, rates.szerelesvezeto_hetkoznap_oradij, false);
-                addItem('Szerelésvezető óradíj (hétvége)', foreman_needed_we * sH, 'óra', rates.szerelesvezeto_hetvege_oradij, rates.szerelesvezeto_hetvege_oradij, false);
-                addItem('Szerelő óradíj', (sF * sWd * sH) - (foreman_needed_wd * sH), 'óra', rates.szerelo_hetkoznap_oradij, rates.szerelo_hetkoznap_oradij, false);
-                addItem('Szerelő óradíj (hétvége)', (sF * sW * sH) - (foreman_needed_we * sH), 'óra', rates.szerelo_hetvege_oradij, rates.szerelo_hetvege_oradij, false);
+                addItem('Szerelésvezető (hétköznap)', foreman_needed_wd * sH, 'óra', rates.szerelesvezeto_hetkoznap_oradij, rates.szerelesvezeto_hetkoznap_oradij, false);
+                addItem('Szerelésvezető (hétvége)', foreman_needed_we * sH, 'óra', rates.szerelesvezeto_hetvege_oradij, rates.szerelesvezeto_hetvege_oradij, false);
+                addItem('Szerelő (hétköznap)', (sF * sWd * sH) - (foreman_needed_wd * sH), 'óra', rates.szerelo_hetkoznap_oradij, rates.szerelo_hetkoznap_oradij, false);
+                addItem('Szerelő (hétvége)', (sF * sW * sH) - (foreman_needed_we * sH), 'óra', rates.szerelo_hetvege_oradij, rates.szerelo_hetvege_oradij, false);
             }
             if(inputs.location_type === 'kulfold'){
                 addItem('Kiküldetés - Szerelő', sF * sN, 'nap', rates.kikuldeles_dij_szerelo, rates.kikuldeles_dij_szerelo, true);
                 addItem('Kiküldetés - Mérnök', mF * mN, 'nap', rates.kikuldeles_dij_mernok, rates.kikuldeles_dij_mernok, true);
             }
-            const travelTime = inputs.utazas_ido_ora || 0;
+            
+            let travelTime = inputs.utazas_ido_ora || 0;
+            if (state.travelTimeUnit === 'perc') travelTime /= 60;
+            
             addItem('Kiszállási díj - Szerelő', travelTime * 2 * (inputs.utazas_odautak_szama_szerelo || 0) * sF, 'óra', rates.kiszallasi_dij_szerelo, rates.kiszallasi_dij_szerelo, false);
             addItem('Kiszállási díj - Mérnök', travelTime * 2 * (inputs.utazas_odautak_szama_mernok || 0) * mF, 'óra', rates.kiszallasi_dij_mernok, rates.kiszallasi_dij_mernok, false);
-            addItem('Jármű km díj', (inputs.utazas_tavolsag_km || 0) * 2 * ((inputs.utazas_odautak_szama_szerelo || 0) * (inputs.utazas_jarmuvek_szama_szerelo || 0) + (inputs.utazas_odautak_szama_mernok || 0) * (inputs.utazas_jarmuvek_szama_mernok || 0)), 'km', overrideRates.km_dij, overrideRates.km_dij, false);
+            addItem('Jármű km díj', (inputs.utazas_tavolsag_km || 0) * 2 * ((inputs.utazas_odautak_szama_szerelo || 0) * (inputs.utazas_jarmuvek_szama_szerelo || 0) + (inputs.utazas_odautak_szama_mernok || 0) * (inputs.utazas_jarmuvek_szama_mernok || 0)), 'km', rates.km_dij, rates.km_dij, true);
+            
+            addItem('Szállás költség', (inputs.szerelo_szallas_ejszaka || 0) * sF + (inputs.mernok_szallas_ejszaka || 0) * mF, 'éj', rates.szallas_dij * (1 + rates.szallas_szorzo / 100), rates.szallas_dij, true);
 
-            const szallasCost = overrideRates.szallas_dij;
-            const szallasSell = szallasCost * overrideRates.szallas_szorzo;
-            addItem('Szállás költség', (inputs.szerelo_szallas_ejszaka || 0) * sF + (inputs.mernok_szallas_ejszaka || 0) * mF, 'éj', szallasSell, szallasCost, true);
-
-            const emeloNapidijCost = overrideRates.emelogep_napidij;
-            const emeloSzallitasCost = overrideRates.emelogep_szallitas_dij;
-            const emeloSzorzo = overrideRates.emelogep_szorzo;
-            addItem('Emelőgép napidíj', (inputs.emelogep_db || 0) * (inputs.emelogep_napok || 0), 'nap', emeloNapidijCost * emeloSzorzo, emeloNapidijCost, true);
-            addItem('Emelőgép szállítás', (inputs.emelogep_szallitasok || 0) * 2, 'alk', emeloSzallitasCost * emeloSzorzo, emeloSzallitasCost, true);
+            addItem('Emelőgép napidíj', (inputs.emelogep_db || 0) * (inputs.emelogep_napok || 0), 'nap', rates.emelogep_napidij * (1 + rates.emelogep_szorzo / 100), rates.emelogep_napidij, true);
+            addItem('Emelőgép szállítás', (inputs.emelogep_szallitasok || 0) * 2, 'alk', rates.emelogep_szallitas_dij * (1 + rates.emelogep_szorzo / 100), rates.emelogep_szallitas_dij, true);
             
             state.otherCosts.forEach(c => {
                 if (c.amount > 0 && c.description) {
@@ -590,23 +589,35 @@
 
         function calculateAndDisplay(){
             state.calculationResults = calculateCosts();
+            const inputs = getInputs();
             const { breakdown, totalHuf, totalCostHuf, hasCostItems } = state.calculationResults;
             const tbody = D('breakdown-body'), thead = D('breakdown-head'), tfoot = D('breakdown-foot');
-            const currency = state.activeCurrency; 
-            const symbol = currency === 'EUR' ? '€' : 'Ft';
-            const discount = parseFloat(D('discount-input')?.value) || 0;
+            const currency = state.activeCurrency, symbol = currency === 'EUR' ? '€' : 'Ft';
+            const discount = inputs['discount-input'] || 0;
+            const detailLevel = document.querySelector('input[name="print-detail"]:checked').value;
             
-            tbody.innerHTML = thead.innerHTML = tfoot.innerHTML = '';
-            
-            thead.innerHTML = `<tr><th>Költségnem</th><th style="text-align:right;">Menny.</th><th>Egys.</th><th style="text-align:right;">Egységár</th>${hasCostItems ? '<th style="text-align:right;">Önköltség</th>' : ''}<th style="text-align:right;">Összesen</th></tr>`;
+            D('calculation-summary-header-content').innerHTML = `
+                <div class="summary-title">Kiszállás kalkuláció</div>
+                <div class="summary-col">
+                    <p><strong>Ajánlatszám:</strong> ${inputs.offer_number || '-'}</p>
+                    <p><strong>Projektszám:</strong> ${inputs.project_number || '-'}</p>
+                    <p><strong>Dátum:</strong> ${new Date(inputs.calculation_date).toLocaleDateString('hu-HU')}</p>
+                </div>
+                <div class="summary-col">
+                    <p><strong>Megrendelő:</strong> ${inputs.customer || '-'}</p>
+                    <p><strong>Projekt neve:</strong> ${inputs.project_name || '-'}</p>
+                    <p><strong>Készítő:</strong> ${inputs.creator_name || '-'}</p>
+                </div>`;
 
+            tbody.innerHTML = thead.innerHTML = tfoot.innerHTML = '';
+            const showCost = hasCostItems && detailLevel === 'internal';
+            const colspan = showCost ? 5 : 4;
+            thead.innerHTML = `<tr><th>Költségnem</th><th style="text-align:right;">Menny.</th><th>Egys.</th><th style="text-align:right;">Egységár</th>${showCost ? '<th style="text-align:right;">Önköltség</th>' : ''}<th style="text-align:right;">Összesen</th></tr>`;
+            
             breakdown.forEach(item => {
                 const row = tbody.insertRow();
-                let cells = `<td>${item.label}</td>`;
-                cells += `<td style="text-align:right;">${item.quantity.toLocaleString('hu-HU')}</td>`;
-                cells += `<td style="text-align:center;">${item.unit}</td>`;
-                cells += `<td style="text-align:right;">${formatCustomCurrency(convertPrice(item.unitPriceHuf, currency), symbol)}</td>`;
-                if(hasCostItems) {
+                let cells = `<td>${item.label}</td><td style="text-align:right;">${item.quantity.toLocaleString('hu-HU')}</td><td style="text-align:center;">${item.unit}</td><td style="text-align:right;">${formatCustomCurrency(convertPrice(item.unitPriceHuf, currency), symbol)}</td>`;
+                if(showCost) {
                     cells += `<td style="text-align:right;">${item.isCostItem ? formatCustomCurrency(convertPrice(item.totalCostHuf, currency), symbol) : '-'}</td>`;
                 }
                 cells += `<td style="text-align:right;">${formatCustomCurrency(convertPrice(item.totalHuf, currency), symbol)}</td>`;
@@ -615,36 +626,21 @@
 
             const totalSellFinal = convertPrice(totalHuf, currency);
             let footerHtml = ``;
-            if (hasCostItems) {
+            if (showCost) {
                 const totalCostFinal = convertPrice(totalCostHuf, currency);
-                footerHtml += `<tr><td colspan="${hasCostItems ? 5 : 4}" style="text-align:right; font-weight:bold;">Önköltség összesen</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal, symbol)}</td></tr>`;
+                footerHtml += `<tr><td colspan="${colspan-1}" style="text-align:right; font-weight:bold;">Önköltség összesen</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal, symbol)}</td></tr>`;
             }
-            footerHtml += `<tr style="border-top: 2px solid var(--accent-primary);"><td colspan="${hasCostItems ? 5 : 4}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalSellFinal, symbol)}</td></tr>`;
+            footerHtml += `<tr style="border-top: 2px solid var(--accent-primary);"><td colspan="${colspan-1}" style="text-align:right; font-weight:bold;">Végösszeg (${currency})</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalSellFinal, symbol)}</td></tr>`;
             
             if (discount > 0) {
                 const discountedTotal = totalSellFinal * (1 - discount/100);
-                footerHtml += `<tr style="color: var(--danger-primary);"><td colspan="${hasCostItems ? 5 : 4}" style="text-align:right;">Engedmény (${discount}%)</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal - discountedTotal, symbol)}</td></tr>`;
-                footerHtml += `<tr style="color: var(--success-primary); font-weight:bold;"><td colspan="${hasCostItems ? 5 : 4}" style="text-align:right;">Kedvezményes végösszeg</td><td style="text-align:right;">${formatCustomCurrency(discountedTotal, symbol)}</td></tr>`;
+                footerHtml += `<tr style="color: var(--danger-primary);"><td colspan="${colspan-1}" style="text-align:right;">Engedmény (${discount}%)</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal - discountedTotal, symbol)}</td></tr>`;
+                footerHtml += `<tr style="color: var(--success-primary); font-weight:bold;"><td colspan="${colspan-1}" style="text-align:right;">Kedvezményes végösszeg</td><td style="text-align:right;">${formatCustomCurrency(discountedTotal, symbol)}</td></tr>`;
             }
             tfoot.innerHTML = footerHtml;
         }
-
-        function populateOverridableInputs(pkg) {
-            if (!pkg || !pkg.rates) return;
-            const rates = pkg.rates;
-            D('override_km_dij').value = rates.km_dij || 0;
-            D('override_szallas_dij').value = rates.szallas_dij || 0;
-            D('override_szallas_szorzo').value = rates.szallas_szorzo || 1;
-            D('override_emelogep_napidij').value = rates.emelogep_napidij || 0;
-            D('override_emelogep_szallitas_dij').value = rates.emelogep_szallitas_dij || 0;
-            D('override_emelogep_szorzo').value = rates.emelogep_szorzo || 1;
-        }
         
-        // Rate Manager Functions
-        function openRateManager() {
-            D('rate-modal').style.display = 'block';
-            updateRateManagerView();
-        }
+        function openRateManager() { D('rate-modal').style.display = 'block'; updateRateManagerView(); }
 
         function updateRateManagerView(selectedId) {
             const modalSelector = D('rate-package-selector-modal');
@@ -656,218 +652,210 @@
         }
 
         function populateRateForm(packageId) {
-            const pkg = state.rates.find(r => r.id === packageId);
-            if (!pkg) return;
-
+            const pkg = state.rates.find(r => r.id === packageId); if (!pkg) return;
             const fieldsContainer = D('rate-editor-fields');
-            const notice = D('rate-editor-notice');
             fieldsContainer.innerHTML = '';
             
             RATE_EDITOR_GROUPS.forEach(group => {
-                let groupHtml = `<h3 class="rate-group-title">${group.title}</h3>`;
+                fieldsContainer.innerHTML += `<h3 class="rate-group-title">${group.title}</h3>`;
+                const ratesSource = pkg.rates[group.type];
                 group.keys.forEach(key => {
-                    if (state.config.RATE_KEY_LABELS[key]) {
+                    if (state.config.RATE_KEY_LABELS[key] && ratesSource.hasOwnProperty(key)) {
                         const label = state.config.RATE_KEY_LABELS[key];
-                        const value = pkg.rates[key] || 0;
-                        groupHtml += `
-                            <div class="form-group">
-                                <label for="rate-edit-${key}">${label}</label>
-                                <input type="number" id="rate-edit-${key}" data-rate-key="${key}" value="${value}" ${pkg.isDefault ? 'disabled' : ''}>
-                            </div>`;
+                        const value = ratesSource[key] || 0;
+                        const isDisabled = group.type === 'fixed';
+                        fieldsContainer.innerHTML += `<div class="form-group"><label for="rate-edit-${key}">${label}</label><input type="number" id="rate-edit-${key}" data-rate-key="${key}" data-rate-type="${group.type}" value="${value}" ${isDisabled ? 'disabled' : ''}></div>`;
                     }
                 });
-                fieldsContainer.innerHTML += groupHtml;
             });
 
             D('rate-package-name').value = pkg.name;
             D('rate-package-name').disabled = pkg.isDefault;
-            D('rate-save-btn').disabled = pkg.isDefault;
             D('rate-delete-btn').disabled = pkg.isDefault;
-            notice.textContent = pkg.isDefault ? 'Alapértelmezett, "gyári" árlista. Nem szerkeszthető és nem törölhető.' : '';
+            D('rate-editor-notice').textContent = pkg.isDefault ? 'Gyári árlista. A fix díjtételek nem, de a módosítható díjak szerkeszthetők (mentéskor új másolat jön létre).' : '';
         }
 
         function handleSaveRatePackage() {
             const packageId = D('rate-package-selector-modal').value;
-            const pkgIndex = state.rates.findIndex(r => r.id === packageId);
-            if (pkgIndex === -1 || state.rates[pkgIndex].isDefault) {
-                alert('Ez az árlista nem módosítható!');
-                return;
-            }
+            let pkg = state.rates.find(r => r.id === packageId);
+            if (!pkg) return;
 
-            const newName = D('rate-package-name').value.trim();
-            if (!newName) {
-                alert('Az árlista neve nem lehet üres!');
-                return;
-            }
-            state.rates[pkgIndex].name = newName;
+            const newRates = {
+                fixed: { ...pkg.rates.fixed },
+                overridable: { ...pkg.rates.overridable }
+            };
 
-            document.querySelectorAll('#rate-editor-fields input').forEach(input => {
+            document.querySelectorAll('#rate-editor-fields input:not(:disabled)').forEach(input => {
                 const key = input.dataset.rateKey;
-                const value = parseFloat(input.value) || 0;
-                state.rates[pkgIndex].rates[key] = value;
+                const type = input.dataset.rateType;
+                if(type && newRates[type]) {
+                    newRates[type][key] = parseFloat(input.value) || 0;
+                }
             });
 
-            saveRatesToStorage();
-            updateMainRateSelector(packageId);
-            state.activeRatePackage = state.rates[pkgIndex];
-            calculateAndDisplay();
-            
-            const saveBtn = D('rate-save-btn');
-            saveBtn.textContent = 'Mentve!';
-            setTimeout(() => { saveBtn.textContent = 'Mentés'; }, 2000);
-        }
-
-        function handleCreateNewRatePackage() {
-            const templateId = D('rate-package-selector-modal').value;
-            const templatePkg = state.rates.find(r => r.id === templateId);
-            const newName = prompt('Adja meg az új árlista nevét:', `${templatePkg.name} másolat`);
-            
-            if (newName) {
+            if (pkg.isDefault) {
+                const newName = `${pkg.name} (módosított)`;
                 const newPkg = {
                     id: `user-${Date.now()}`,
                     name: newName,
                     isDefault: false,
-                    isProtected: false,
-                    rates: JSON.parse(JSON.stringify(templatePkg.rates))
+                    rates: newRates
                 };
                 state.rates.push(newPkg);
                 saveRatesToStorage();
                 updateMainRateSelector(newPkg.id);
                 updateRateManagerView(newPkg.id);
                 state.activeRatePackage = newPkg;
-                calculateAndDisplay();
+                alert(`Az alapértelmezett árlista nem módosítható. Létrehoztunk egy új, "${newName}" nevű árlistát a változtatásaiddal.`);
+            } else {
+                const pkgIndex = state.rates.findIndex(r => r.id === packageId);
+                const newName = D('rate-package-name').value.trim();
+                if (!newName) { alert('Az árlista neve nem lehet üres!'); return; }
+                state.rates[pkgIndex].name = newName;
+                state.rates[pkgIndex].rates = newRates;
+                saveRatesToStorage();
+                updateMainRateSelector(packageId);
+                state.activeRatePackage = state.rates[pkgIndex];
+                const saveBtn = D('rate-save-btn'); saveBtn.textContent = 'Mentve!'; setTimeout(() => { saveBtn.textContent = 'Mentés'; }, 2000);
+            }
+            calculateAndDisplay();
+        }
+
+        function handleCreateNewRatePackage() {
+            const templatePkg = state.rates.find(r => r.id === D('rate-package-selector-modal').value);
+            const newName = prompt('Adja meg az új árlista nevét:', `${templatePkg.name} másolat`);
+            if (newName) {
+                const newPkg = { id: `user-${Date.now()}`, name: newName, isDefault: false, rates: JSON.parse(JSON.stringify(templatePkg.rates)) };
+                state.rates.push(newPkg); saveRatesToStorage();
+                updateMainRateSelector(newPkg.id); updateRateManagerView(newPkg.id);
+                state.activeRatePackage = newPkg; calculateAndDisplay();
             }
         }
         
         function handleDeleteRatePackage() {
             const packageId = D('rate-package-selector-modal').value;
             const pkg = state.rates.find(r => r.id === packageId);
-            
             if (!pkg || pkg.isDefault) {
                 alert('Ez az árlista nem törölhető!');
                 return;
             }
-            if (state.rates.filter(r => !r.isDefault).length <= 1 && state.rates.length > 1) {
-                 if (state.rates.length === 1){
-                    alert('Az utolsó árlista nem törölhető!');
-                    return;
-                }
-            }
-        
             if (confirm(`Biztosan törli a(z) "${pkg.name}" árlistát?`)) {
                 state.rates = state.rates.filter(r => r.id !== packageId);
-                saveRatesToStorage();
-                updateMainRateSelector();
+                saveRatesToStorage(); updateMainRateSelector();
                 const newActiveId = D('rate-package-select').value;
                 state.activeRatePackage = state.rates.find(r => r.id === newActiveId);
-                updateRateManagerView(newActiveId);
-                calculateAndDisplay();
+                updateRateManagerView(newActiveId); calculateAndDisplay();
             }
         }
 
-        function saveRatesToStorage() {
-            localStorage.setItem('rates', JSON.stringify(state.rates.filter(r => !r.isDefault)));
-        }
-
+        function saveRatesToStorage() { localStorage.setItem('rates', JSON.stringify(state.rates.filter(r => !r.isDefault))); }
         function updateMainRateSelector(selectedId) {
-            const mainSelector = D('rate-package-select');
-            const currentVal = selectedId || mainSelector.value;
-            mainSelector.innerHTML = '';
-            state.rates.forEach(p => mainSelector.add(new Option(p.name, p.id)));
-            if (state.rates.some(r => r.id === currentVal)) {
-                mainSelector.value = currentVal;
-            }
+            const mainSelector = D('rate-package-select'); const currentVal = selectedId || mainSelector.value || (state.rates[0] ? state.rates[0].id : '');
+            mainSelector.innerHTML = ''; state.rates.forEach(p => mainSelector.add(new Option(p.name, p.id)));
+            if (state.rates.some(r => r.id === currentVal)) mainSelector.value = currentVal;
+            else if (mainSelector.options.length > 0) mainSelector.value = mainSelector.options[0].value;
         }
 
-
-        // Print functions
-        function handlePrint() {
-            const detailLevel = document.querySelector('input[name="print-detail"]:checked').value;
-            const printableHtml = getPrintableHtml(detailLevel);
+        function handlePrint(isRateList = false, pkg) {
             const iframe = D('print-preview-iframe');
+            let printableHtml;
+            if (isRateList && pkg) {
+                printableHtml = getRateListPrintableHtml(pkg);
+            } else {
+                const detailLevel = document.querySelector('input[name="print-detail"]:checked').value;
+                printableHtml = getPrintableHtml(detailLevel, getInputs(), state.calculationResults);
+            }
             iframe.srcdoc = printableHtml;
+            iframe.onload = () => { iframe.contentWindow.scrollTo(0, 0); };
             D('print-preview-modal').style.display = 'block';
         }
+        
+        function handlePrintRateList() {
+            const pkgId = D('rate-package-selector-modal').value;
+            const pkg = state.rates.find(r => r.id === pkgId);
+            if (pkg) handlePrint(true, pkg);
+        }
 
-        function getPrintableHtml(detailLevel) {
-            const { breakdown, totalHuf, totalCostHuf, hasCostItems } = state.calculationResults;
-            const inputs = getInputs();
-            const currency = state.activeCurrency;
-            const symbol = currency === 'EUR' ? '€' : 'Ft';
-            const discount = parseFloat(D('discount-input').value) || 0;
-
+        function getPrintableHtml(detailLevel, inputs, calcResults) {
+            const { breakdown, totalHuf, totalCostHuf, hasCostItems } = calcResults;
+            const currency = state.activeCurrency, symbol = currency === 'EUR' ? '€' : 'Ft';
+            const discount = inputs['discount-input'] || 0;
             const totalSellFinal = convertPrice(totalHuf, currency);
             const discountedTotal = totalSellFinal * (1 - discount / 100);
 
+            const showCost = hasCostItems && detailLevel === 'internal';
+            const colspan = showCost ? 5 : 4;
+
             let tableRows = '';
-            if (detailLevel === 'simple') {
-                breakdown.forEach(item => {
+            const headerCols = detailLevel === 'simple' ? '<th style="text-align:right;">Összesen</th>' : `<th style="text-align:right;">Mennyiség</th><th style="text-align:right;">Egységár</th>${showCost ? '<th style="text-align:right;">Önköltség</th>' : ''}<th style="text-align:right;">Összesen</th>`;
+            breakdown.forEach(item => {
+                if (detailLevel === 'simple') {
                     tableRows += `<tr><td>${item.label}</td><td style="text-align:right;">${formatCustomCurrency(convertPrice(item.totalHuf, currency), symbol)}</td></tr>`;
-                });
-            } else { // detailed or internal
-                breakdown.forEach(item => {
-                    tableRows += `<tr>
-                        <td>${item.label}</td>
-                        <td style="text-align:right;">${item.quantity.toLocaleString('hu-HU')} ${item.unit}</td>
-                        <td style="text-align:right;">${formatCustomCurrency(convertPrice(item.unitPriceHuf, currency), symbol)}</td>
-                        ${detailLevel === 'internal' && hasCostItems ? `<td style="text-align:right;">${item.isCostItem ? formatCustomCurrency(convertPrice(item.totalCostHuf, currency), symbol) : '-'}</td>` : ''}
-                        <td style="text-align:right;">${formatCustomCurrency(convertPrice(item.totalHuf, currency), symbol)}</td>
-                    </tr>`;
-                });
+                } else {
+                    let cells = `<td>${item.label}</td><td style="text-align:right;">${item.quantity.toLocaleString('hu-HU')} ${item.unit}</td><td style="text-align:right;">${formatCustomCurrency(convertPrice(item.unitPriceHuf, currency), symbol)}</td>`;
+                    if(showCost) {
+                        cells += `<td style="text-align:right;">${item.isCostItem ? formatCustomCurrency(convertPrice(item.totalCostHuf, currency), symbol) : '-'}</td>`;
+                    }
+                    cells += `<td style="text-align:right;">${formatCustomCurrency(convertPrice(item.totalHuf, currency), symbol)}</td>`;
+                    tableRows += `<tr>${cells}</tr>`;
+                }
+            });
+            
+            let footerHtml = '';
+            if (showCost) {
+                const totalCostFinal = convertPrice(totalCostHuf, currency);
+                footerHtml += `<tr><td colspan="${colspan-1}" style="text-align:right; font-weight:bold;">Önköltség összesen:</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal, symbol)}</td></tr>`;
             }
 
-            return `
-                <!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Ajánlat</title>
-                <style>
-                    @font-face { font-family: 'DejaVuSans'; src: url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype'); }
-                    @page { size: A4; margin: 25mm; }
-                    body { font-family: 'DejaVuSans', sans-serif; font-size: 10px; color: #333; }
-                    .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-45deg); font-size: 100px; color: rgba(128, 0, 0, 0.08); z-index: -1; font-weight: bold; pointer-events: none; }
-                    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
-                    th { background-color: #f2f2f2; }
-                    .summary-table { margin-top: 20px; width: 50%; margin-left: auto; }
-                    .summary-table td { border: none; }
-                </style>
-                </head><body>
-                    ${detailLevel === 'internal' ? '<div class="watermark">BELSŐ HASZNÁLATRA</div>' : ''}
-                    <h1>Költségkalkuláció</h1>
-                    <p><strong>Ajánlatszám:</strong> ${inputs.offer_number || '-'}</p>
-                    <p><strong>Projekt:</strong> ${inputs.project_name || '-'}</p>
-                    <p><strong>Megrendelő:</strong> ${inputs.customer || '-'}</p>
-                    <p><strong>Dátum:</strong> ${new Date(inputs.calculation_date).toLocaleDateString('hu-HU')}</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Leírás</th>
-                                ${detailLevel === 'simple' ? '<th style="text-align:right;">Összesen</th>' : ''}
-                                ${detailLevel !== 'simple' ? '<th style="text-align:right;">Mennyiség</th><th style="text-align:right;">Egységár</th>' : ''}
-                                ${detailLevel === 'internal' && hasCostItems ? '<th style="text-align:right;">Önköltség</th>' : ''}
-                                ${detailLevel !== 'simple' ? '<th style="text-align:right;">Összesen</th>' : ''}
-                            </tr>
-                        </thead>
-                        <tbody>${tableRows}</tbody>
-                    </table>
-                    <table class="summary-table">
-                        <tr><td>Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal, symbol)}</td></tr>
-                        ${discount > 0 ? `<tr><td>Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal - discountedTotal, symbol)}</td></tr>
-                                          <tr><td><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal, symbol)}</strong></td></tr>` : ''}
-                    </table>
-                </body></html>`;
+            const printHeader = `<div style="display:flex; justify-content:space-between; width:100%; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
+                <div style="flex:1;">
+                    <p><strong>Ajánlatszám:</strong> ${inputs.offer_number||'-'}</p><p><strong>Projektszám:</strong> ${inputs.project_number||'-'}</p><p><strong>Dátum:</strong> ${new Date(inputs.calculation_date).toLocaleDateString('hu-HU')}</p>
+                </div><div style="flex:1; text-align:right;">
+                    <p><strong>Megrendelő:</strong> ${inputs.customer||'-'}</p><p><strong>Projekt neve:</strong> ${inputs.project_name||'-'}</p><p><strong>Készítő:</strong> ${inputs.creator_name||'-'}</p>
+                </div></div>`;
+            
+            let summaryHtml = `<div style="padding: 10px; margin-bottom: 20px; background-color: #f9f9f9; border: 1px solid #eee; border-radius: 4px;">`;
+            summaryHtml += `<p><strong>Feladat:</strong> ${inputs.feladat || 'Nincs megadva'}</p>`;
+            if (inputs.szerelo_fo > 0) { 
+                const hoursText = detailLevel === 'internal' ? `, napi ${inputs.szerelo_munkaora} órában` : '';
+                summaryHtml += `<p>${inputs.szerelo_fo} szerelő, ${inputs.szerelo_munkanap} munkanap (ebből ${inputs.szerelo_hetvegi_nap} hétvége)${hoursText}.</p>`; 
+            }
+            if (inputs.mernok_fo > 0) { 
+                const hoursText = detailLevel === 'internal' ? `, napi ${inputs.mernok_munkaora} órában` : '';
+                summaryHtml += `<p>${inputs.mernok_fo} mérnök, ${inputs.mernok_munkanap} munkanap (ebből ${inputs.mernok_hetvegi_nap} hétvége)${hoursText}.</p>`; 
+            }
+            summaryHtml += `</div>`;
+
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Kalkuláció</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333;} h1{text-align:center;} p{margin: 2px 0;} .watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);font-size:100px;color:rgba(128,0,0,0.08);z-index:-1;font-weight:bold;pointer-events:none;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{background-color:#f2f2f2;} .summary-table{margin-top:20px;width:60%;margin-left:auto;border:none;} .summary-table td{border:none;}</style></head><body>${detailLevel === 'internal' ? '<div class="watermark">BELSŐ HASZNÁLATRA</div>' : ''}<h1>Kiszállás kalkuláció</h1>${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr><td colspan="${colspan-1}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr><td colspan="${colspan-1}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr><td colspan="${colspan-1}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></body></html>`;
+        }
+
+        function getRateListPrintableHtml(pkg) {
+            const allRates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
+            let tableRows = '';
+            Object.entries(allRates).forEach(([key, value]) => {
+                if (!key.endsWith('_szorzo')) {
+                     tableRows += `<tr><td>${state.config.RATE_KEY_LABELS[key] || key}</td><td style="text-align:right;">${formatCustomCurrency(value, 'Ft')}</td></tr>`;
+                }
+            });
+            const title = `Árlista: ${pkg.name}`;
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${title}</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm 50mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style></head><body><h1>${title}</h1><p><strong>Dátum:</strong> ${new Date().toLocaleDateString('hu-HU')}</p><table><thead><tr><th>Megnevezés</th><th style="text-align:right;">Egységár (Ft)</th></tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
         }
 
         function setupOtherCostsList() {
             const container = D('other-costs-list');
-            container.innerHTML = state.otherCosts.map((item, index) => `
-                <div class="form-grid dynamic-item" style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; align-items: flex-end;">
-                    <div class="form-group" style="grid-column: 1 / -1;"><label>Leírás</label><input type="text" data-index="${index}" data-field="description" value="${item.description}"></div>
-                    <div class="form-group"><label>Menny.</label><input type="number" data-index="${index}" data-field="quantity" value="${item.quantity}"></div>
-                    <div class="form-group"><label>Egység</label><input type="text" data-index="${index}" data-field="unit" value="${item.unit}"></div>
-                    <div class="form-group"><label>Önköltség (HUF/db)</label><input type="number" data-index="${index}" data-field="amount" value="${item.amount}"></div>
-                    <div class="form-group"><label>Haszonkulcs (%)</label><input type="number" data-index="${index}" data-field="multiplier" value="${item.multiplier}"></div>
-                    <button class="btn btn-danger other-cost-delete-btn" data-index="${index}" style="height: fit-content;">×</button>
-                </div>
-            `).join('');
+            container.innerHTML = state.otherCosts.map((item, index) => {
+                const multiplierField = item.isCostItem ? `<div class="form-group multiplier"><label>Haszonkulcs (%)</label><input type="number" data-index="${index}" data-field="multiplier" value="${item.multiplier}"></div>` : '<div class="form-group multiplier"></div>';
+                return `
+                <div class="other-cost-item">
+                    <div class="form-group description"><label>Leírás</label><input type="text" data-index="${index}" data-field="description" value="${item.description}"></div>
+                    <div class="form-group is-cost-item-group"><input type="checkbox" id="is-cost-item-${index}" data-index="${index}" data-field="isCostItem" ${item.isCostItem ? 'checked' : ''}><label for="is-cost-item-${index}">Önköltséges tétel?</label></div>
+                    ${multiplierField}
+                    <div class="form-group quantity"><label>Menny.</label><input type="number" data-index="${index}" data-field="quantity" value="${item.quantity}"></div>
+                    <div class="form-group unit"><label>Egység</label><input type="text" data-index="${index}" data-field="unit" value="${item.unit}"></div>
+                    <div class="form-group amount"><label>Önköltség/Ár (HUF)</label><input type="number" data-index="${index}" data-field="amount" value="${item.amount}"></div>
+                    <button class="btn btn-danger other-cost-delete-btn delete-btn" data-index="${index}">×</button>
+                </div>`;
+            }).join('');
         }
 
         function handleOtherCostInput(e) {
@@ -875,10 +863,41 @@
             const index = parseInt(target.dataset.index, 10);
             const field = target.dataset.field;
             if (!isNaN(index) && field && state.otherCosts[index]) {
-                const value = target.type === 'number' ? parseFloat(target.value) || 0 : target.value;
+                const value = target.type === 'checkbox' ? target.checked : (target.type === 'number' ? parseFloat(target.value) || 0 : target.value);
                 state.otherCosts[index][field] = value;
+                if (field === 'isCostItem') setupOtherCostsList();
                 calculateAndDisplay();
             }
+        }
+        
+        function handleTravelUnitToggle() {
+            const input = D('utazas_ido_ora');
+            const label = document.querySelector('label[for="utazas_ido_ora"]');
+            let currentValue = parseFloat(input.value) || 0;
+
+            if (state.travelTimeUnit === 'óra') {
+                state.travelTimeUnit = 'perc';
+                input.value = (currentValue * 60).toFixed(0);
+                label.innerHTML = `Utazási idő (<span class="travel-unit-toggle">perc</span>, oda)`;
+            } else {
+                state.travelTimeUnit = 'óra';
+                input.value = (currentValue / 60).toFixed(2);
+                label.innerHTML = `Utazási idő (<span class="travel-unit-toggle">óra</span>, oda)`;
+            }
+            calculateAndDisplay();
+        }
+
+        function showChart() {
+            D('chart-modal').style.display = 'block';
+            const ctx = D('exchange-rate-chart').getContext('2d');
+            const labels = Object.keys(state.exchangeRates.rates).sort();
+            const data = labels.map(date => state.exchangeRates.rates[date].HUF);
+            if (state.chart) state.chart.destroy();
+            state.chart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: [{ label: 'EUR/HUF Árfolyam', data: data, borderColor: 'var(--accent-primary)', tension: 0.1 }] },
+                options: { scales: { x: { type: 'time', time: { unit: 'day' } } }, maintainAspectRatio: false }
+            });
         }
 
         D('password-form').onsubmit = (e) => {
@@ -887,9 +906,7 @@
                 D('landing-page').style.display = 'none'; 
                 D('app-container').style.display = 'block'; 
                 initApp();
-            } else {
-                alert("Hibás jelszó!");
-            }
+            } else { alert("Hibás jelszó!"); }
         };
     </script>
 </body>
