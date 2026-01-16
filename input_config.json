@@ -1,0 +1,32 @@
+
+{
+    "szerelo": [
+        { "id": "szerelo_fo", "label": "Szerelők (fő)" },
+        { "id": "szerelo_munkaora", "label": "Napi munkaóra" },
+        { "id": "szerelo_munkanap", "label": "Munkanapok" },
+        { "id": "szerelo_hetvegi_nap", "label": "Ebből hétvégi nap" },
+        { "id": "szerelo_szallas_ejszaka", "label": "Szállás (éj)" },
+        { "id": "utazas_odautak_szama_szerelo", "label": "Kiszállások (db)" },
+        { "id": "utazas_jarmuvek_szama_szerelo", "label": "Járművek (db)" }
+    ],
+    "mernok": [
+        { "id": "mernok_fo", "label": "Mérnökök (fő)" },
+        { "id": "mernok_munkaora", "label": "Napi munkaóra" },
+        { "id": "mernok_munkanap", "label": "Munkanapok" },
+        { "id": "mernok_hetvegi_nap", "label": "Ebből hétvégi nap" },
+        { "id": "mernok_szallas_ejszaka", "label": "Szállás (éj)" },
+        { "id": "utazas_odautak_szama_mernok", "label": "Kiszállások (db)" },
+        { "id": "utazas_jarmuvek_szama_mernok", "label": "Járművek (db)" }
+    ],
+    "utazas": [
+        { "id": "work_location", "label": "Munkavégzés helyszíne", "type": "text" },
+        { "id": "location_type", "label": "Hely típusa", "type": "select", "options": [{ "text": "Belföld", "value": "belfold" }, { "text": "Külföld", "value": "kulfold" }] },
+        { "id": "utazas_tavolsag_km", "label": "Távolság (km, oda)" },
+        { "id": "utazas_ido_ora", "label": "Utazási idő (<span class=\"travel-unit-toggle\">óra</span>, oda)", "unit": "óra" }
+    ],
+    "emelogep": [
+        { "id": "emelogep_db", "label": "Emelőgépek (db)" },
+        { "id": "emelogep_napok", "label": "Napok száma" },
+        { "id": "emelogep_szallitasok", "label": "Szállítások (oda-vissza)" }
+    ]
+}

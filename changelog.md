@@ -1,5 +1,15 @@
 # Változási Napló
 
+## v3.1.0 - Architektúra Refaktorálás: Konfiguráció Kiszervezése
+*Dátum: 2024-05-30*
+
+### Főbb változások és fejlesztések
+- **Modularizáció:** A statikus konfigurációs adatok (a beviteli mezők struktúrája és a díjtételek címkéi) kiszervezésre kerültek a JavaScript kódból különálló `input_config.json` és `rate_key_labels.json` fájlokba.
+- **Tisztább Kód:** A `index.html` JavaScript szekciója jelentősen "tisztább" és könnyebben olvasható lett a több száz sornyi statikus adat eltávolításával.
+- **Könnyebb Karbantarthatóság:** A címkék és a dinamikus űrlapok szerkesztése mostantól a dedikált JSON fájlokban végezhető el, anélkül, hogy az alkalmazás logikájába bele kellene nyúlni.
+- **Hatékonyabb Betöltés:** Az alkalmazás indításakor az összes szükséges adatfájl (`rates.json`, konfigurációs JSON-ok) párhuzamosan, `Promise.all` segítségével töltődik be a jobb teljesítmény érdekében.
+- **Verzióugrás:** Az architekturális változások miatt az alkalmazás verziószáma v3.1.0-ra változott.
+
 ## v3.0.0 - Robusztus Adatkezelés és Alapértelmezett Árlisták Védelme
 *Dátum: 2024-05-29*
 

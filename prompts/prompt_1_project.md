@@ -12,7 +12,7 @@
 - **Jelszó:** A jelszó egy JavaScript konstansban (`ADMIN_PASSWORD`) van rögzítve.
 
 ### 2.2. Adatbevitel és Kalkuláció
-- **Dinamikus Űrlapok:** A beviteli mezők (pl. létszám, napok száma, távolság) egy `INPUT_CONFIG` JavaScript objektum alapján dinamikusan generálódnak.
+- **Dinamikus Űrlapok:** A beviteli mezők (pl. létszám, napok száma, távolság) egy külső `input_config.json` fájl alapján dinamikusan generálódnak.
 - **Valós Idejű Számítás:** Bármely beviteli mező értékének megváltozása azonnal kiváltja az újraszámítási és megjelenítési folyamatot (`calculateAndDisplay()`).
 - **Összesítő Panel:** Egy információs panel (`#calculation-summary-header`) valós időben összefoglalja a legfontosabb bemeneti adatokat (pl. feladat leírása, résztvevők, helyszín).
 
@@ -57,5 +57,8 @@ A számítási motor logikájának szigorúan meg kell felelnie a `LOGIC.md` dok
 - **Adatbevitel Gyorsítása:** Fókusz esetén a numerikus és szöveges beviteli mezők tartalma automatikusan kijelölődik.
 
 ## 3. Adatstruktúrák
-- **`state` Objektum:** Egy központi JavaScript objektum, amely tárolja az alkalmazás teljes állapotát: `rates` (árlisták), `otherCosts` (egyéb költségek), `exchangeRates` (árfolyamok), `activeRatePackage` (aktív árlista), `calculationResults` (az utolsó számítás eredménye), `activeCurrency` (aktív pénznem).
-- **`rates.json` / `state.rates` Struktúra:** Egy tömb, amely objektumokat tartalmaz. Minden objektum egy árlistát reprezentál a következő kulcsokkal: `id`, `name`, `isProtected`, `isDefault`, `rates` (egy objektum, ami a konkrét díjtételeket tartalmazza).
+- **`state` Objektum:** Egy központi JavaScript objektum, amely tárolja az alkalmazás teljes állapotát: `rates` (árlisták), `otherCosts` (egyéb költségek), `exchangeRates` (árfolyamok), `activeRatePackage` (aktív árlista), `calculationResults` (az utolsó számítás eredménye), `activeCurrency` (aktív pénznem), `config` (a betöltött konfigurációs fájlok, pl. `INPUT_CONFIG`, `RATE_KEY_LABELS`).
+- **Konfigurációs Fájlok:**
+    - `rates.json`: Az alapértelmezett árlistákat tartalmazza.
+    - `input_config.json`: Az űrlapok felépítését definiálja.
+    - `rate_key_labels.json`: Az árlista díjtételeinek megjelenítendő neveit tartalmazza.

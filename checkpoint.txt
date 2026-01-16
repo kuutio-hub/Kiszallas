@@ -1,8 +1,9 @@
-Checkpoint: v3.0.0 - Robusztus Adatkezelés és Védett Alapértelmezett Sablonok
+Checkpoint: v3.1.0 - Moduláris Konfiguráció és Tisztább Architektúra
 
-Ez a verzió egy kritikus fontosságú mérföldkő, amely bevezeti az intelligens adatszinkronizációt és a "gyári" árlisták felülírhatatlan védelmét. Megoldja az adatok elavulásának és a véletlen felülírásának problémáját, miközben megőrzi a felhasználók által létrehozott egyedi árlistákat.
+Ez a verzió egy fontos architekturális előrelépést jelent. A statikus konfigurációs adatok (űrlapok definíciói, címkék) kiszervezésre kerültek külön JSON fájlokba.
 
 Főbb pontok:
-- **Adatintegritás:** Az alapértelmezett árlisták mostantól a `rates.json` fájlból származó "egyetlen igazságforrást" képviselik, és nem módosíthatók a felületen.
-- **Automatikus Frissítések:** Az alkalmazás frissítésekor a felhasználók automatikusan megkapják a legújabb alap-árlistákat anélkül, hogy a saját adataik elvesznének.
-- **Stabil, Jövőbiztos Alap:** Ez a fejlesztés egy sokkal robusztusabb és megbízhatóbb alapot teremt a jövőbeli funkciók számára.
+- **Karbantarthatóság:** A kód logikai és adat részeinek szétválasztása nagyban megkönnyíti a jövőbeli módosításokat.
+- **Olvashatóság:** A fő JavaScript fájl mostantól az alkalmazás logikájára fókuszál, a statikus definíciók helyett.
+- **Hatékonyság:** A kezdeti adatbetöltés optimalizálva lett a párhuzamos `fetch` kérésekkel.
+- **Jövőbiztos Alap:** Ez a modularizáció stabilabb alapot biztosít a további bővítésekhez.

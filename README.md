@@ -1,4 +1,4 @@
-# Költségkalkulátor v3.0.0
+# Költségkalkulátor v3.1.0
 
 ## 1. Projekt Bemutatása
 
@@ -46,6 +46,8 @@ Az alkalmazás a következő fájlokból áll:
 
 - `index.html`: A fő alkalmazásfájl, amely tartalmazza a teljes HTML struktúrát, a CSS stíluslapokat (`<style>`) és a JavaScript logikát (`<script type="module">`).
 - `rates.json`: Az alapértelmezett, induló árlistákat tartalmazó JSON adatfájl.
+- `input_config.json`: A dinamikusan generált adatbeviteli űrlapok struktúráját és beállításait tartalmazó konfigurációs fájl.
+- `rate_key_labels.json`: A díjtételek belső kulcsait és a felhasználói felületen megjelenő címkéit összerendelő adatfájl.
 - `changelog.md`: Részletes verziótörténet, amely dokumentálja az összes fejlesztést és módosítást.
 - `LOGIC.md`: A számítási motor komplex üzleti logikájának részletes leírása, példákkal illusztrálva.
 - `checkpoint.txt`: A fejlesztési mérföldköveket jelölő szöveges fájl, amely egy-egy stabil verziót rögzít.
