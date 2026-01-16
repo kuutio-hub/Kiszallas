@@ -1,8 +1,8 @@
-Checkpoint: v3.2.7 - Teljes Funkcionális Helyreállítás
+Checkpoint: v3.2.9 - Árlistakezelő (CRUD) Helyreállítva
 
-Ez a verzió egy kritikus regressziós hiba után teljes mértékben helyreállítja az alkalmazás működőképességét és stabilitását.
+Ez a verzió egy kritikus funkcionális regressziót javít, teljes mértékben visszaállítva az árlistakezelő (CRUD) működőképességét, és javítja a mobilnézet UI-ját.
 
 Főbb fejlesztések:
-- **Funkcionális Visszaállítás:** Az összes alapvető funkció (kalkuláció, adatbevitel, interakciók) ismét a tervezett módon működik.
-- **Logikai Integritás:** A számítási motor ismét összhangban van a `LOGIC.md` dokumentációval.
-- **Stabilitás:** A hiányzó HTML és JavaScript kód pótlásával a program ismét robusztus és megbízható.
+- **Teljes Árlistakezelő:** Az árlisták létrehozása, szerkesztése és törlése ismét lehetséges egy dedikált modális ablakban.
+- **Mobil UI Javítások:** Az akciósáv ikonjai mobilnézetben helyesen jelennek meg.
+- **Funkcionális Stabilitás:** Az alkalmazás visszanyerte egyik kulcsfontosságú funkcióját, növelve a használati értékét.
