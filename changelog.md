@@ -1,5 +1,19 @@
 # Változási Napló
 
+## v3.2.11 - Rugalmas Díjtétel Kezelés
+*Dátum: 2024-06-04*
+
+### Fejlesztések
+- **Felülírható Díjtételek:** A szállás, kilométerdíj és emelőgép költségei mostantól a fő felületen, dedikált beviteli mezőkben felülírhatók.
+- **Dinamikus Alapértékek:** Árlista váltásakor ezek a mezők automatikusan feltöltődnek az adott árlista alapértelmezett értékeivel.
+- **Logikai Szétválasztás:** A mentett árlisták mostantól csak a fix óradíjakat és kiküldetési díjakat tartalmazzák, míg a projektenként változó költségek a fő felületen kezelhetők, növelve a kalkuláció rugalmasságát.
+
+## v3.2.10 - Árlista Kezelő UI Fejlesztés
+*Dátum: 2024-06-03*
+
+### Fejlesztések
+- **Csoportosított Árlista Mezők:** Az "Árlisták Kezelése" felületen a díjtételek mostantól logikai csoportokba (Szerelők, Mérnökök, Utazás, Szállás, Eszközök) vannak rendezve a jobb átláthatóság és kezelhetőség érdekében.
+
 ## v3.2.9 - Árlistakezelő Helyreállítása és Mobil UI Javítások
 *Dátum: 2024-06-02*
 

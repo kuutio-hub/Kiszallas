@@ -6,7 +6,10 @@ Ez a dokumentum a Kiszállási és Szerelési Költségkalkulátor számítási 
 
 - **Alap Pénznem:** Minden ár és díjtétel az árlistákban (`rates.json`) magyar forintban (HUF) van rögzítve.
 - **EUR Konverzió:** Ha a felhasználó az EUR pénznemet választja, minden HUF érték a felületen megadott EUR/HUF árfolyamon kerül átváltásra a megjelenítéskor.
-- **Önköltség vs. Eladási ár:** Bizonyos tételeknél (pl. szállás, emelőgép) az árlista megkülönböztet egy alap önköltségi árat és egy **haszonkulcs** szorzót.
+- **Rögzített vs. Felülírható Díjtételek:**
+    - **Rögzített díjak (Árlistából):** Az óradíjak, kiszállási díjak (utazási időre) és kiküldetési díjak közvetlenül a kiválasztott árlistából származnak és a kalkuláció során nem módosíthatók.
+    - **Felülírható díjak (UI-ról):** A kilométerdíj, szállás és eszközök (emelőgép) díjai a fő felületen lévő beviteli mezőkből származnak. Ezeket a mezőket az aktív árlista alapértelmezett értékekkel tölti fel, de a felhasználó a kalkuláció idejére szabadon módosíthatja őket.
+- **Önköltség vs. Eladási ár:** Bizonyos tételeknél (pl. szállás, emelőgép) a rendszer megkülönböztet egy alap önköltségi árat és egy **haszonkulcs** szorzót.
   - `Eladási Ár = Önköltségi Ár * Haszonkulcs Szorzó`
 
 ## 2. Személyi Költségek Logikája
@@ -32,15 +35,15 @@ A rendszer dinamikusan dönti el, hogy a szerelői órákból mennyi számít sz
 
 ## 3. Utazási és Ellátási Költségek
 
-- **Kiszállási díj:** Az utazással töltött idő alapján számolódik, oda-vissza úttal.
-- **Kiküldetési díj:** Csak "Külföld" esetén, napidíj alapon.
-- **Jármű km díj:** A távolság alapján, oda-vissza úttal, a megadott számú járműre.
-- **Szállás:** Személyenként és éjszakánként, a **haszonkulcs** szorzóval növelt áron.
+- **Kiszállási díj:** Az utazással töltött idő alapján számolódik, oda-vissza úttal. (Árlistából származó fix díj).
+- **Kiküldetési díj:** Csak "Külföld" esetén, napidíj alapon. (Árlistából származó fix díj).
+- **Jármű km díj:** A távolság alapján, oda-vissza úttal, a megadott számú járműre. (A fő felületen **felülírható** díj).
+- **Szállás:** Személyenként és éjszakánként, a **haszonkulcs** szorzóval növelt áron. (A fő felületen **felülírható** díj).
   - `Szállás Költség = Létszám * Éjszakák * (Szállás önköltség * Szállás haszonkulcs)`
 
 ## 4. Eszköz Költségek
 
-- **Emelőgép napidíj és szállítás:** A **haszonkulcs** szorzóval növelt áron kerülnek kiszámlázásra.
+- **Emelőgép napidíj és szállítás:** A **haszonkulcs** szorzóval növelt áron kerülnek kiszámlázásra. (A fő felületen **felülírható** díj).
   - `Emelőgép Költség = (Eszközök * Napok * Napidíj + Szállítások * 2 * Szállítási díj) * Eszköz haszonkulcs`
 
 ## 5. Egyéb Költségek

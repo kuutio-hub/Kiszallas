@@ -114,6 +114,19 @@
         #print-preview-iframe { width: 100%; height: 60vh; border: 1px solid var(--border-color); }
 
         .mobile-results-btn { display: none; }
+
+        #rate-editor-fields .rate-group-title {
+            grid-column: 1 / -1;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+            color: var(--accent-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+        #rate-editor-fields .rate-group-title:first-of-type {
+            margin-top: 0;
+        }
         
         @media (min-width: 1024px) {
             .main-grid { grid-template-columns: 1fr 1.5fr; }
@@ -229,6 +242,20 @@
                     <details class="card"><summary>Mérnökök</summary><div class="card-content"><div class="form-grid" id="mernok-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés</button><button class="close-details-btn" title="Becsuk">↑</button></div></div></details>
                     <details class="card"><summary>Eszközök</summary><div class="card-content"><div class="form-grid" id="emelogep-inputs"></div><div class="card-controls"><button class="btn card-save-btn btn-success">Mentés</button><button class="close-details-btn" title="Becsuk">↑</button></div></div></details>
                     
+                    <details class="card" open>
+                        <summary>Díjtételek</summary>
+                        <div class="card-content">
+                            <div class="form-grid" id="overridable-rates-inputs">
+                                <div class="form-group"><label for="override_km_dij">Kilométerdíj (Ft/km)</label><input type="number" id="override_km_dij"></div>
+                                <div class="form-group"><label for="override_szallas_dij">Szállás önköltség (Ft/éj)</label><input type="number" id="override_szallas_dij"></div>
+                                <div class="form-group"><label for="override_szallas_szorzo">Szállás haszonkulcs</label><input type="number" id="override_szallas_szorzo" step="0.1"></div>
+                                <div class="form-group"><label for="override_emelogep_napidij">Emelőgép napidíj (Ft)</label><input type="number" id="override_emelogep_napidij"></div>
+                                <div class="form-group"><label for="override_emelogep_szallitas_dij">Emelőgép szállítás (Ft)</label><input type="number" id="override_emelogep_szallitas_dij"></div>
+                                <div class="form-group"><label for="override_emelogep_szorzo">Eszköz haszonkulcs</label><input type="number" id="override_emelogep_szorzo" step="0.1"></div>
+                            </div>
+                        </div>
+                    </details>
+
                     <details class="card">
                         <summary>Egyéb költségek</summary>
                         <div class="card-content">
@@ -321,7 +348,18 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.9";
+        const APP_VERSION = "v3.2.11";
+
+        const RATE_EDITOR_GROUPS = [
+            {
+                title: 'Szerelők és Szerelésvezetők',
+                keys: ['szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij', 'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij', 'kiszallasi_dij_szerelo', 'kikuldeles_dij_szerelo']
+            },
+            {
+                title: 'Mérnökök',
+                keys: ['mernok_hetkoznap_oradij', 'mernok_hetvege_oradij', 'kiszallasi_dij_mernok', 'kikuldeles_dij_mernok']
+            }
+        ];
 
         document.getElementById('landing-footer').innerHTML = `&copy; ${new Date().getFullYear()} Költségkalkulátor | Verzió: ${APP_VERSION}`;
 
@@ -372,7 +410,8 @@
                 updateMainRateSelector();
                 const initialPackageId = D('rate-package-select').value;
                 state.activeRatePackage = state.rates.find(r => r.id === initialPackageId) || state.rates[0];
-                
+                populateOverridableInputs(state.activeRatePackage);
+
                 setupOtherCostsList();
                 calculateAndDisplay();
                 
@@ -399,6 +438,7 @@
                 };
                 D('rate-package-select').onchange = (e) => { 
                     state.activeRatePackage = state.rates.find(r => r.id === e.target.value); 
+                    populateOverridableInputs(state.activeRatePackage);
                     calculateAndDisplay(); 
                 };
                 D('currency-select').onchange = (e) => { 
@@ -480,6 +520,15 @@
             const rates = state.activeRatePackage?.rates;
             if (!rates) return { totalHuf: 0, totalCostHuf: 0, breakdown: [], hasCostItems: false };
 
+            const overrideRates = {
+                km_dij: parseFloat(D('override_km_dij').value) || 0,
+                szallas_dij: parseFloat(D('override_szallas_dij').value) || 0,
+                szallas_szorzo: parseFloat(D('override_szallas_szorzo').value) || 1,
+                emelogep_napidij: parseFloat(D('override_emelogep_napidij').value) || 0,
+                emelogep_szallitas_dij: parseFloat(D('override_emelogep_szallitas_dij').value) || 0,
+                emelogep_szorzo: parseFloat(D('override_emelogep_szorzo').value) || 1
+            };
+
             let breakdown = [], totalSell = 0, totalCost = 0, hasCostItems = false;
             
             const addItem = (label, quantity, unit, sellPrice, costPrice, isCostItem) => {
@@ -516,15 +565,15 @@
             const travelTime = inputs.utazas_ido_ora || 0;
             addItem('Kiszállási díj - Szerelő', travelTime * 2 * (inputs.utazas_odautak_szama_szerelo || 0) * sF, 'óra', rates.kiszallasi_dij_szerelo, rates.kiszallasi_dij_szerelo, false);
             addItem('Kiszállási díj - Mérnök', travelTime * 2 * (inputs.utazas_odautak_szama_mernok || 0) * mF, 'óra', rates.kiszallasi_dij_mernok, rates.kiszallasi_dij_mernok, false);
-            addItem('Jármű km díj', (inputs.utazas_tavolsag_km || 0) * 2 * ((inputs.utazas_odautak_szama_szerelo || 0) * (inputs.utazas_jarmuvek_szama_szerelo || 0) + (inputs.utazas_odautak_szama_mernok || 0) * (inputs.utazas_jarmuvek_szama_mernok || 0)), 'km', rates.km_dij, rates.km_dij, false);
+            addItem('Jármű km díj', (inputs.utazas_tavolsag_km || 0) * 2 * ((inputs.utazas_odautak_szama_szerelo || 0) * (inputs.utazas_jarmuvek_szama_szerelo || 0) + (inputs.utazas_odautak_szama_mernok || 0) * (inputs.utazas_jarmuvek_szama_mernok || 0)), 'km', overrideRates.km_dij, overrideRates.km_dij, false);
 
-            const szallasCost = rates.szallas_dij || 0;
-            const szallasSell = szallasCost * (rates.szallas_szorzo || 1);
+            const szallasCost = overrideRates.szallas_dij;
+            const szallasSell = szallasCost * overrideRates.szallas_szorzo;
             addItem('Szállás költség', (inputs.szerelo_szallas_ejszaka || 0) * sF + (inputs.mernok_szallas_ejszaka || 0) * mF, 'éj', szallasSell, szallasCost, true);
 
-            const emeloNapidijCost = rates.emelogep_napidij || 0;
-            const emeloSzallitasCost = rates.emelogep_szallitas_dij || 0;
-            const emeloSzorzo = rates.emelogep_szorzo || 1;
+            const emeloNapidijCost = overrideRates.emelogep_napidij;
+            const emeloSzallitasCost = overrideRates.emelogep_szallitas_dij;
+            const emeloSzorzo = overrideRates.emelogep_szorzo;
             addItem('Emelőgép napidíj', (inputs.emelogep_db || 0) * (inputs.emelogep_napok || 0), 'nap', emeloNapidijCost * emeloSzorzo, emeloNapidijCost, true);
             addItem('Emelőgép szállítás', (inputs.emelogep_szallitasok || 0) * 2, 'alk', emeloSzallitasCost * emeloSzorzo, emeloSzallitasCost, true);
             
@@ -579,6 +628,17 @@
             }
             tfoot.innerHTML = footerHtml;
         }
+
+        function populateOverridableInputs(pkg) {
+            if (!pkg || !pkg.rates) return;
+            const rates = pkg.rates;
+            D('override_km_dij').value = rates.km_dij || 0;
+            D('override_szallas_dij').value = rates.szallas_dij || 0;
+            D('override_szallas_szorzo').value = rates.szallas_szorzo || 1;
+            D('override_emelogep_napidij').value = rates.emelogep_napidij || 0;
+            D('override_emelogep_szallitas_dij').value = rates.emelogep_szallitas_dij || 0;
+            D('override_emelogep_szorzo').value = rates.emelogep_szorzo || 1;
+        }
         
         // Rate Manager Functions
         function openRateManager() {
@@ -602,13 +662,21 @@
             const fieldsContainer = D('rate-editor-fields');
             const notice = D('rate-editor-notice');
             fieldsContainer.innerHTML = '';
-            Object.entries(state.config.RATE_KEY_LABELS).forEach(([key, label]) => {
-                const value = pkg.rates[key] || 0;
-                fieldsContainer.innerHTML += `
-                    <div class="form-group">
-                        <label for="rate-edit-${key}">${label}</label>
-                        <input type="number" id="rate-edit-${key}" data-rate-key="${key}" value="${value}" ${pkg.isDefault ? 'disabled' : ''}>
-                    </div>`;
+            
+            RATE_EDITOR_GROUPS.forEach(group => {
+                let groupHtml = `<h3 class="rate-group-title">${group.title}</h3>`;
+                group.keys.forEach(key => {
+                    if (state.config.RATE_KEY_LABELS[key]) {
+                        const label = state.config.RATE_KEY_LABELS[key];
+                        const value = pkg.rates[key] || 0;
+                        groupHtml += `
+                            <div class="form-group">
+                                <label for="rate-edit-${key}">${label}</label>
+                                <input type="number" id="rate-edit-${key}" data-rate-key="${key}" value="${value}" ${pkg.isDefault ? 'disabled' : ''}>
+                            </div>`;
+                    }
+                });
+                fieldsContainer.innerHTML += groupHtml;
             });
 
             D('rate-package-name').value = pkg.name;
