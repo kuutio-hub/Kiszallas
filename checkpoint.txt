@@ -1,8 +1,8 @@
-Checkpoint: v3.2.6 - Mobilnézet Stabilizálása
+Checkpoint: v3.2.7 - Teljes Funkcionális Helyreállítás
 
-Ez a verzió kijavítja a kritikus mobilnézeti hibákat, és egy stabil, minden eszközön jól használható felületet biztosít.
+Ez a verzió egy kritikus regressziós hiba után teljes mértékben helyreállítja az alkalmazás működőképességét és stabilitását.
 
 Főbb fejlesztések:
-- **Reszponzív Elrendezés:** A beviteli mezők és a vezérlősáv mobilon is tökéletesen illeszkednek.
-- **Mobil UX:** Az eredmények egy felugró, görgethető panelen jelennek meg a könnyebb áttekinthetőségért.
-- **Hibajavítás:** Az alkalmazás stabilitását növelő JavaScript hiba javítása.
+- **Funkcionális Visszaállítás:** Az összes alapvető funkció (kalkuláció, adatbevitel, interakciók) ismét a tervezett módon működik.
+- **Logikai Integritás:** A számítási motor ismét összhangban van a `LOGIC.md` dokumentációval.
+- **Stabilitás:** A hiányzó HTML és JavaScript kód pótlásával a program ismét robusztus és megbízható.

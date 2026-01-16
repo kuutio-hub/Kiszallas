@@ -1,17 +1,19 @@
 # Változási Napló
 
-## v3.2.6 - Reszponzív UI és Stabilitási Javítások
+## v3.2.7 - Teljes Körű Funkcionális Helyreállítás
 *Dátum: 2024-06-01*
 
 ### Javítások és Fejlesztések
-- **Mobil UI Túlcsordulás:** Kijavítva a hiba, amely miatt a beviteli mezők kilógtak a képernyőről kisebb eszközökön.
-- **Kompakt Műveletsáv:** Az alsó vezérlősáv (árlisták, nyomtatás) mobilon kompaktabb lett, az ikonok megmaradtak, a szövegek eltűntek.
-- **Felugró Eredmény Panel:** Mobil nézetben a kalkuláció eredménye egy teljes képernyős, görgethető felugró ablakban jelenik meg a jobb olvashatóság érdekében.
-- **JavaScript Hiba Javítva:** Elhárítva egy `Cannot set properties of null` hiba, ami az eseménykezelők hozzárendelésekor léphetett fel.
+- **Kritikus Hiba Javítva:** Egy súlyos regresszió javítása, amely az alkalmazás szinte teljes működésképtelenségét okozta.
+- **HTML Visszaállítás:** A hiányzó `<header>` szekció teljeskörűen visszaállításra került.
+- **Logika Helyreállítása:** A `calculateCosts` függvény logikája visszaállt a `LOGIC.md` dokumentációban leírt, önköltséget és eladási árat is kezelő, helyes állapotba.
+- **Funkciók Visszaállítása:** Az "Egyéb költségek" modul és a hiányzó eseménykezelők (pl. kedvezmény, árlista választás) újra működőképesek.
+- **Stabilitás Növelése:** Az inicializációs folyamat hibakezelése javult a stabilabb indulás érdekében.
 
-## v3.2.5 - Landing Page Finomhangolás
-*Dátum: 2024-05-31*
-- **Jelszó Felirat:** A bejelentkezési oldalon a jelszó mező felirata "Admin jelszó"-ról "Jelszó"-ra módosult.
-- **Landing Page Lábléc:** A copyright és verziószám információk visszaállításra kerültek a bejelentkezési oldal láblécébe.
+## v3.2.6 - Reszponzív UI és Stabilitási Javítások
+*Dátum: 2024-06-01*
+- Mobil UI túlcsordulási hiba javítva.
+- Kompakt műveletsáv és felugró eredmény panel mobil nézetben.
+- JavaScript `null` hiba javítva.
 
 ... (korábbi verziók)
