@@ -1,5 +1,12 @@
 # Változási Napló
 
+## v3.2.39 - Professzionális Nyomtatási Lábléc
+*Dátum: 2024-06-19*
+
+### Fejlesztések
+- **Dinamikus Lábléc:** Minden nyomtatott oldal aljára egy új, professzionális lábléc került, amely tartalmazza az aktuális évet, a copyright jelzést, az alkalmazás nevét és a verziószámot.
+- **Nyomtatás-specifikus Megjelenés:** A lábléc és a "Belső használatra" vízjel mostantól intelligensen, csak a tényleges nyomtatáskor jelenik meg, az előnézeti `iframe`-ben nem, ezzel tisztább előnézeti képet biztosítva.
+
 ## v3.2.38 - Felhasználói Felület Finomhangolása
 *Dátum: 2024-06-19*
 
