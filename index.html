@@ -418,7 +418,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.39";
+        const APP_VERSION = "v3.2.40";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1058,11 +1058,10 @@
             RATE_EDITOR_GROUPS.forEach(group => {
                 tableRows += `<tr><td colspan="2" style="background-color: #f2f2f2; font-weight: bold; text-align: left; padding-left: 10px;">${group.title}</td></tr>`;
                 group.keys.forEach(key => {
-                     if (allRates.hasOwnProperty(key)) {
+                     if (allRates.hasOwnProperty(key) && !key.endsWith('_szorzo')) {
                         const label = state.config.RATE_KEY_LABELS[key] || key;
                         const value = allRates[key];
-                        const isPercentage = key.endsWith('_szorzo');
-                        const formattedValue = isPercentage ? `${value} %` : formatCustomCurrency(value, 'Ft');
+                        const formattedValue = formatCustomCurrency(value, 'Ft');
                         tableRows += `<tr><td style="padding-left: 20px;">${label}</td><td style="text-align:right;">${formattedValue}</td></tr>`;
                      }
                 });

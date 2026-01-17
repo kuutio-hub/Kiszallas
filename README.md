@@ -1,10 +1,9 @@
-# Költségkalkulátor v3.2.39
+# Költségkalkulátor v3.2.40
 
 ## 1. Projekt Bemutatása
 Helyszíni szerelési projektek költségbecslésére szolgáló, modern, reszponzív webalkalmas.
 
-## 2. Legutóbbi Változások (v3.2.39)
-- **Professzionális Nyomtatási Lábléc:** Minden kinyomtatott dokumentum aljára egy új, dinamikus lábléc került, amely tartalmazza az évszámot, a copyrightot és a verziószámot.
-- **Intelligens Nyomtatási Nézet:** A lábléc és a "Belső használatra" vízjel most már csak a tényleges nyomtatáskor jelenik meg, az előnézeti ablakban rejtve marad a tisztább felhasználói élmény érdekében.
+## 2. Legutóbbi Változások (v3.2.40)
+- **Letisztult Árlista Nyomtatás:** A nyomtatott árlisták mostantól nem tartalmazzák a belső használatú haszonkulcsokat, így egy tisztább, ügyfélbarát dokumentum jön létre. A professzionális, nyomtatás-specifikus lábléc itt is konzisztensen működik.
 
 Részletesebb információkért lásd a `changelog.md` fájlt.

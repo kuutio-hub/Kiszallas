@@ -1,5 +1,12 @@
 # Változási Napló
 
+## v3.2.40 - Letisztult Árlista Nyomtatás
+*Dátum: 2024-06-19*
+
+### Fejlesztések
+- **Haszonkulcsok Elrejtése:** A nyomtatható árlistából eltávolításra kerültek a belső használatú haszonkulcsokat (`_szorzo`) tartalmazó sorok. Ez egy tisztább, kizárólag a végfelhasználói árakat tartalmazó dokumentumot eredményez.
+- **Konzisztens Lábléc:** A professzionális, nyomtatás-specifikus lábléc az árlista nyomtatásakor is konzisztensen működik.
+
 ## v3.2.39 - Professzionális Nyomtatási Lábléc
 *Dátum: 2024-06-19*
 
