@@ -315,7 +315,7 @@
     <div id="rate-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Árlisták Kezelése (ideiglenes módosítás)</h2>
+                <h2>Díjtételek Módosítása (ideiglenes)</h2>
                 <button class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
@@ -341,32 +341,44 @@
                 <button class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <h3>Alapvető Használat</h3>
-                <p>Az alkalmazás a helyszíni kiszállások költségeinek gyors és pontos becslésére szolgál. A bal oldali, lenyitható panelekben adhatja meg a projekt részleteit.</p>
+                <h3>Bevezetés</h3>
+                <p>Ez az alkalmazás a helyszíni kiszállások költségeinek gyors és pontos becslésére szolgál. A bal oldalon található, lenyitható panelekben adhatja meg a projekt részleteit, a jobb oldalon pedig valós időben követheti a kalkuláció eredményét.</p>
+                
+                <h3>Fejléc Műveletek</h3>
+                <p>A felső sávban található vezérlőkkel globális beállításokat végezhet:</p>
                 <ul>
-                    <li><strong>Fejléc:</strong> Itt válthat árlistát, pénznemet (HUF/EUR), adhat meg egyedi árfolyamot és globális kedvezményt.</li>
-                    <li><strong>Adatpanelek:</strong> Töltse ki a releváns mezőket az utazásra, személyzetre és eszközökre vonatkozóan. A számítás valós időben frissül a jobb oldali táblázatban.</li>
-                    <li><strong>Egyéb költségek:</strong> Lehetősége van egyedi tételek hozzáadására.
-                        <ul>
-                            <li>**Tétel Mentése:** Minden egyedi tétel csak a sorvégi zöld pipa (mentés) gombra kattintás után kerül be a végleges kalkulációba.</li>
-                            <li><strong>Normál tétel:</strong> Adja meg a tétel nevét, mennyiségét és a nettó eladási árat, majd mentse.</li>
-                            <li><strong>Önköltséges tétel:</strong> Pipálja be az "Önköltséges?" jelölőnégyzetet. Ekkor megjelenik a "Haszonkulcs" mező. Adja meg a beszerzési árat, a haszonkulcsot, majd mentse a tételt.</li>
-                            <li>**Módosítás:** Egy mentett tétel bármely adatának módosítása után a tétel "nem mentett" állapotba kerül, és kikerül a kalkulációból, amíg újra el nem menti.</li>
-                        </ul>
-                    </li>
+                    <li><strong>Árlista:</strong> Válasszon a betöltött árlisták közül. A díjtételek ideiglenesen felülírhatók az "Árlisták" gombbal.</li>
+                    <li><strong>Pénznem:</strong> Váltson HUF és EUR között. Az átváltás az aktuális árfolyamon történik.</li>
+                    <li><strong>Árfolyam:</strong> Az alkalmazás induláskor automatikusan lekéri a legfrissebb EUR/HUF árfolyamot (a dátum a címkében látható). Ezt az értéket bármikor manuálisan felülírhatja.</li>
+                    <li><strong>Kedvezmény:</strong> Adjon meg egy globális, százalékos kedvezményt, amelyet a rendszer a végösszegből von le.</li>
+                    <li><strong>Visszaállítás:</strong> A gomb az összes beviteli mezőt törli, és újratölti az oldalt, visszaállítva az eredeti díjtételeket.</li>
                 </ul>
-                <h3>Számítási Logika</h3>
+
+                <h3>Adatbevitel</h3>
+                <p>A kalkuláció alapját a lenyitható panelekben megadott adatok képezik. A "Mentés és bezárás" gomb csupán a panel bezárására szolgál, a bevitt adatok automatikusan érvénybe lépnek.</p>
+
+                <h3>Egyéb Költségek Kezelése</h3>
+                <p>Lehetősége van egyedi, a standard díjtételeken kívüli költségek hozzáadására.</p>
                 <ul>
-                    <li><strong>Személyi díjak:</strong> A rendszer a Mérnök > Szerelésvezető > Szerelő prioritás alapján számol. Szerelésvezetői díj csak azokon a napokon merül fel, amikor szerelők mérnök felügyelete nélkül dolgoznak.</li>
-                    <li><strong>Önköltség és haszonkulcs:</strong> A szállás, emelőgép és az egyedileg "önköltségesnek" jelölt tételek eladási ára a megadott beszerzési árból és a hozzáadott haszonkulcsból tevődik össze.</li>
+                    <li><strong>Fontos:</strong> Egy új tétel csak a sorvégi <strong>zöld pipa (mentés)</strong> gombra kattintás után kerül be a végleges kalkulációba. A nem mentett tételek sárga oldalsávval vannak megjelölve.</li>
+                    <li><strong>Normál tétel:</strong> Adja meg a tétel nevét, mennyiségét, egységét és a nettó eladási árat.</li>
+                    <li><strong>Önköltséges tétel:</strong> Pipálja be az "Önköltséges?" jelölőnégyzetet. Ekkor a megadott ár beszerzési árnak minősül, amelyre a rendszer ráteszi a megadott "Haszonkulcsot" az eladási ár képzéséhez.</li>
+                    <li><strong>Módosítás:</strong> Egy már mentett tétel bármely adatának módosítása után a tétel újra "nem mentett" állapotba kerül, és kikerül a kalkulációból, amíg újra el nem menti.</li>
                 </ul>
-                 <h3>Nyomtatás és Nézetek</h3>
+
+                <h3>Díjtételek Módosítása</h3>
+                <p>Az "Árlisták" gombra kattintva felugró ablakban a kiválasztott árlista **bármely díjtételét ideiglenesen felülírhatja** az aktuális kalkulációhoz. Ezek a változtatások nem mentődnek el, az oldal újratöltésével visszaállnak az eredeti értékekre.</p>
+                
+                <h3>Nyomtatás és Nézetek</h3>
                  <p>Az alsó sávban három nézet közül választhat, amelyek a jobb oldali táblázat és a nyomtatási kép részletességét is befolyásolják:</p>
                  <ul>
                     <li><strong>Egyszerű:</strong> Csak a főbb kategóriák és a végösszegek látszanak. Ideális ügyfélajánlatokhoz.</li>
                     <li><strong>Részletes:</strong> Minden tételt megjelenít mennyiséggel, egységárral és összesített árral.</li>
                     <li><strong>Teljes:</strong> A részletes nézet kiegészítve az önköltségi oszloppal. Ez a nézet belső használatra készült, a nyomtatási képen vízjellel ellátva.</li>
                 </ul>
+
+                <h3>Mobilnézet</h3>
+                <p>Kisebb képernyőkön (pl. tableten vagy telefonon) az eredménytáblázat el van rejtve. A jobb alsó sarokban megjelenő <strong>lebegő grafikon (📊) gombbal</strong> tudja megjeleníteni vagy elrejteni.</p>
             </div>
              <div class="modal-footer" style="justify-content: flex-end;">
                 <button class="btn modal-close-btn" style="font-size: 0.9rem;">Bezárás</button>
@@ -377,18 +389,20 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.28";
+        const APP_VERSION = "v3.2.30";
 
         const RATE_EDITOR_GROUPS = [
             {
-                title: 'Fix Díjtételek (nem módosítható)',
-                type: 'fixed',
-                keys: ['szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij', 'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij', 'mernok_hetkoznap_oradij', 'mernok_hetvege_oradij', 'kiszallasi_dij_szerelo', 'kiszallasi_dij_mernok', 'kikuldeles_dij_szerelo', 'kikuldeles_dij_mernok']
+                title: 'Személyi Óradíjak',
+                keys: ['mernok_hetkoznap_oradij', 'mernok_hetvege_oradij', 'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij', 'szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij']
             },
             {
-                title: 'Módosítható Díjtételek',
-                type: 'overridable',
-                keys: ['km_dij', 'szallas_dij', 'szallas_szorzo', 'emelogep_napidij', 'emelogep_szallitas_dij', 'emelogep_szorzo']
+                title: 'Utazási Díjak',
+                keys: ['kiszallasi_dij_mernok', 'kiszallasi_dij_szerelo', 'kikuldeles_dij_mernok', 'kikuldeles_dij_szerelo', 'km_dij']
+            },
+            {
+                title: 'Ellátás és Eszközök',
+                keys: ['szallas_dij', 'szallas_szorzo', 'emelogep_napidij', 'emelogep_szallitas_dij', 'emelogep_szorzo']
             }
         ];
         
@@ -621,12 +635,15 @@
                     if (!key) return;
                     
                     const value = parseFloat(unformatCurrencyValue(input.value)) || 0;
-                    const type = input.dataset.rateType;
                     const activePackageId = D('rate-package-selector-modal').value;
                     const packageToEdit = state.rates.find(r => r.id === activePackageId);
 
-                    if (type && packageToEdit && packageToEdit.rates[type]) {
-                        packageToEdit.rates[type][key] = value;
+                    if (packageToEdit) {
+                        if (packageToEdit.rates.fixed.hasOwnProperty(key)) {
+                            packageToEdit.rates.fixed[key] = value;
+                        } else if (packageToEdit.rates.overridable.hasOwnProperty(key)) {
+                            packageToEdit.rates.overridable[key] = value;
+                        }
                         calculateAndDisplay();
                     }
                 });
@@ -848,15 +865,14 @@
             const pkg = state.rates.find(r => r.id === packageId); if (!pkg) return;
             const fieldsContainer = D('rate-editor-fields');
             fieldsContainer.innerHTML = '';
+            const allRates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
             
             RATE_EDITOR_GROUPS.forEach(group => {
                 fieldsContainer.innerHTML += `<h3 class="rate-group-title">${group.title}</h3>`;
-                const ratesSource = pkg.rates[group.type];
                 group.keys.forEach(key => {
-                    if (state.config.RATE_KEY_LABELS[key] && ratesSource.hasOwnProperty(key)) {
+                    if (state.config.RATE_KEY_LABELS[key] && allRates.hasOwnProperty(key)) {
                         const label = state.config.RATE_KEY_LABELS[key];
-                        const value = ratesSource[key] || 0;
-                        const isDisabled = group.type === 'fixed';
+                        const value = allRates[key] || 0;
                         const isPercentage = key.includes('_szorzo');
                         const fieldType = isPercentage ? 'percentage' : 'currency';
                         
@@ -869,10 +885,8 @@
                         input.id = `rate-edit-${key}`;
                         input.className = 'formatted-input';
                         input.dataset.rateKey = key;
-                        input.dataset.rateType = group.type;
                         input.dataset.fieldType = fieldType;
                         input.value = value;
-                        if (isDisabled) input.disabled = true;
 
                         formGroup.appendChild(input);
                         fieldsContainer.appendChild(formGroup);

@@ -1,5 +1,22 @@
 # Változási Napló
 
+## v3.2.30 - UI és Súgó Bővítés
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **Díjtételek Logikai Csoportosítása:** A "Díjtételek Módosítása" ablakban a tételek mostantól logikus csoportokba (Személyi, Utazási, Eszköz) vannak rendezve a könnyebb átláthatóság érdekében.
+- **Részletes Súgó (Wiki):** A Súgó tartalma jelentősen kibővült. Részletesebb leírások és gyakorlati tippek segítik a felhasználókat az összes funkció megértésében és hatékony használatában.
+
+## v3.2.29 - Egyszerűsített Díjtétel-kezelés
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **Egységesített Díjtétel Kezelés:** Megszűnt a "fix" és "módosítható" díjtételek közti megkülönböztetés a felhasználói felületen. Mostantól az "Árlisták" gomb alatt **minden díjtétel szabadon módosítható** az aktuális munkamenet erejéig.
+- **Nincs Mentés:** A díjtételek módosításai nem mentődnek el, az oldal újratöltésével visszaállnak az eredeti értékekre. Ez egy egyszerűbb, hibamentesebb működést biztosít.
+
+### Javítások
+- **Láthatósági Hiba Javítva:** Az új, egységesített nézetnek köszönhetően a korábbi hiba, ami miatt a fix díjtételek nem jelentek meg a szerkesztőben, véglegesen megoldódott.
+
 ## v3.2.28 - Kritikus Adatmegjelenítési Javítások
 *Dátum: 2024-06-18*
 
@@ -12,25 +29,5 @@
 
 ### Javítások
 - **Oldal Elrendezésének Helyreállítása:** Eltávolításra került egy hibásan a HTML fájl végére került, extra szöveges tartalom, amely az oldal szétesését okozta.
-
-## v3.2.26 - Mentési Logika és Nyomtatási Finomítás
-*Dátum: 2024-06-17*
-
-### Fejlesztések
-- **"Egyéb költségek" Mentési Logika:** Minden egyedi tétel egy "Mentés" (zöld pipa) és "Törlés" (piros X) gombot kapott. A tételek **csak mentés után** kerülnek be a kalkulációba és a nyomtatásba. A nem mentett tételek vizuális jelzést kaptak.
-- **Reszponzív Elrendezés Javítása:** Az "Egyéb költségek" szekció elrendezése optimalizálva lett a mentés/törlés gombok elhelyezésével.
-
-### Javítások
-- **Nyomtatási Vízjel Igazítása:** A "Teljes" nézet nyomtatási képén a vízjel pozíciója javítva lett, hogy ne lógjon ki a nyomtatási margóról.
-
-## v3.2.25 - Nyomtatás Hibajavítás és UI Finomítás
-*Dátum: 2024-06-17*
-
-### Javítások
-- **Kritikus Nyomtatási Hiba Javítva:** Elhárítva egy hiba, amely miatt az "Egyéb költségek" nem jelentek meg a nyomtatási előnézetben és a generált PDF-ben.
-- **Azonnali Nézetfrissítés:** Az "Egyéb költségek" panelen az "Önköltséges?" jelölőnégyzet átváltása most már azonnal és helyesen frissíti a jobb oldali összesítő táblázat nézetét.
-
-### Fejlesztések
-- **Árfolyam Dátum Kijelzése:** Az "Árfolyam" mező címe mellett mostantól megjelenik az API-ból lekért legfrissebb árfolyam dátuma.
 
 ... (korábbi verziók)

@@ -7,11 +7,8 @@ Ez a dokumentum a Kiszállási és Szerelési Költségkalkulátor számítási 
 - **Alap Pénznem:** Minden ár és díjtétel az árlistákban (`rates.json`) magyar forintban (HUF) van rögzítve.
 - **EUR Konverzió:** Ha a felhasználó az EUR pénznemet választja, minden HUF érték a felületen megadott EUR/HUF árfolyamon kerül átváltásra a megjelenítéskor.
 - **Díjtételek Kezelése és Módosítása (Munkamenet-alapú):**
-    - **Betöltés:** Az alkalmazás minden indításkor a `rates.json` fájlból tölti be a rendelkezésre álló árlistákat. Nincs helyi tárolás vagy mentés.
-    - **Kétszintű Adatstruktúra:** Minden árlista két csoportra bontva tárolja a díjtételeket:
-        1.  `fixed`: Fix, nem módosítható tételek (pl. óradíjak, kiszállási díjak). Ezek az üzleti logika alapkövei.
-        2.  `overridable`: Módosítható tételek (pl. kilométerdíj, szállás költség, emelőgép díjak).
-    - **Ideiglenes Módosítás:** A felhasználó az "Árlisták Kezelése" ablakban felülírhatja a `overridable` kategóriába tartozó díjtételeket. Ezek a változtatások **azonnal** érvénybe lépnek a kalkulációban, de **csak az aktuális munkamenet végéig** (az oldal újratöltéséig vagy bezárásáig) maradnak érvényben.
+    - **Betöltés:** Az alkalmazás minden indításkor a `rates.json` fájlból tölti be a rendelkezésre álló árlistákat.
+    - **Ideiglenes Módosítás:** A felhasználó a "Díjtételek Módosítása" ablakban **bármelyik díjtételt** felülírhatja. Ezek a változtatások **azonnal** érvénybe lépnek a kalkulációban, de **csak az aktuális munkamenet végéig** (az oldal újratöltéséig vagy bezárásáig) maradnak érvényben. Nincs mentési funkció, ami egy egyszerűbb és stabilabb működést garantál.
 - **Önköltség vs. Eladási ár:**
   - Bizonyos alap tételeknél (pl. szállás, emelőgép) a rendszer megkülönböztet egy alap önköltségi árat és egy százalékos **haszonkulcsot**. `Eladási Ár = Önköltségi Ár * (1 + Haszonkulcs / 100)`.
   - Az "Egyéb költségek" esetében egy jelölőnégyzet (`isCostItem`) dönti el, hogy a tétel önköltséges-e. Ha igen, a rendszer a százalékos `multiplier` értékkel növeli az árat. Ha nem, az `amount` mező a végleges eladási ár.
