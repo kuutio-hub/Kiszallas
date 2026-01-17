@@ -636,7 +636,7 @@
                 });
 
                 D('add-other-cost-btn').onclick = () => {
-                    state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: 'db', isCostItem: false, multiplier: 30, isSaved: false });
+                    state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: '', isCostItem: false, multiplier: 30, isSaved: false });
                     setupOtherCostsList();
                 };
 
@@ -1028,8 +1028,9 @@
             const isInternal = detailLevel === 'internal';
             const watermarkHtml = isInternal ? `<div class="watermark">BELSŐ HASZNÁLATRA</div>` : "";
             const thStyle = isInternal ? 'background-color: rgba(242, 242, 242, 0.7);' : 'background-color: #f2f2f2;';
+            const footerPrintHTML = `<div class="print-footer">&copy; ${new Date().getFullYear()} Költségkalkulátor | Verzió: ${APP_VERSION}</div>`;
 
-            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Kalkuláció</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm;} body{position:relative;font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color:#ffffff!important;} h1{text-align:center;} p{margin:2px 0;} .watermark{position:absolute;top:40vh;left:0;right:0;text-align:center;width:100%;transform:rotate(-45deg);font-size:8vw;color:rgba(128,0,0,0.08);z-index:0;font-weight:bold;pointer-events:none;} .print-wrapper{position:relative;z-index:1;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{${thStyle}} .summary-table{margin-top:20px;width:60%;margin-left:auto;border:none;} .summary-table td{border:none;}</style></head><body>${watermarkHtml}<div class="print-wrapper">${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr><td colspan="${colspanForLabel}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr><td colspan="${colspanForLabel}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr><td colspan="${colspanForLabel}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></div></body></html>`;
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Kalkuláció</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm;} body{position:relative;font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color:#ffffff!important;} h1{text-align:center;} p{margin:2px 0;} .watermark{position:absolute;top:40vh;left:0;right:0;text-align:center;width:100%;transform:rotate(-45deg);font-size:8vw;color:rgba(128,0,0,0.08);z-index:0;font-weight:bold;pointer-events:none;} .print-wrapper{position:relative;z-index:1;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{${thStyle}} .summary-table{margin-top:20px;width:60%;margin-left:auto;border:none;} .summary-table td{border:none;} .print-footer{position:fixed;bottom:15mm;left:25mm;right:25mm;text-align:center;font-size:9px;color:#666;}</style></head><body>${watermarkHtml}<div class="print-wrapper">${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr><td colspan="${colspanForLabel}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr><td colspan="${colspanForLabel}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr><td colspan="${colspanForLabel}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></div>${footerPrintHTML}</body></html>`;
         }
 
         function getRateListPrintableHtml(pkg) {
@@ -1050,7 +1051,8 @@
             });
 
             const title = `Árlista: ${pkg.name}`;
-            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${title}</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm 50mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style></head><body><h1>${title}</h1><p><strong>Dátum:</strong> ${new Date().toLocaleDateString('hu-HU')}</p><table><thead><tr><th>Megnevezés</th><th style="text-align:right;">Érték</th></tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
+            const footerPrintHTML = `<div class="print-footer">&copy; ${new Date().getFullYear()} Költségkalkulátor | Verzió: ${APP_VERSION}</div>`;
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${title}</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm 50mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background-color:#f2f2f2;} .print-footer{position:fixed;bottom:15mm;left:50mm;right:50mm;text-align:center;font-size:9px;color:#666;}</style></head><body><h1>${title}</h1><p><strong>Dátum:</strong> ${new Date().toLocaleDateString('hu-HU')}</p><table><thead><tr><th>Megnevezés</th><th style="text-align:right;">Érték</th></tr></thead><tbody>${tableRows}</tbody></table>${footerPrintHTML}</body></html>`;
         }
 
         function setupOtherCostsList() {
@@ -1080,7 +1082,7 @@
                     </div>
                     <div class="other-cost-row-2">
                         <div class="form-group quantity"><label>Menny.</label><input type="number" data-index="${index}" data-field="quantity" value="${item.quantity}"></div>
-                        <div class="form-group unit"><label>Egység</label><input type="text" data-index="${index}" data-field="unit" value="${item.unit}"></div>
+                        <div class="form-group unit"><label>Egység</label><input type="text" data-index="${index}" data-field="unit" value="${item.unit}" placeholder="db"></div>
                         <div class="form-group amount"><label>${amountLabel}</label><input type="text" data-index="${index}" data-field="amount" value="${item.amount}" class="formatted-input" data-field-type="currency"></div>
                         <div class="cost-toggle-container">${costToggleHtml}</div>
                          <div class="other-cost-actions">
