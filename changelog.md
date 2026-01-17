@@ -1,5 +1,19 @@
 # Változási Napló
 
+## v3.2.32 - Kritikus HTML Struktúra Javítás
+*Dátum: 2024-06-18*
+
+### Javítások
+- **Oldal Elrendezésének Végleges Helyreállítása:** Kijavítva egy kritikus hiba, amely miatt a HTML fájl végére hibásan extra tartalom került, ami az oldal elrendezésének szétesését okozta. A hiba forrása azonosítva és a javítási folyamat megerősítve a jövőbeli előfordulás megelőzése érdekében.
+
+## v3.2.31 - Díjtételek Átláthatóságának Javítása
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **Díjtételek Új Csoportosítása:** A díjtételek szerkesztő felülete a felhasználói visszajelzések alapján új, logikusabb csoportokba (Személyi díjak, Kiszállási díjak, Eszközök és ellátás) lett rendezve, javítva ezzel az áttekinthetőséget.
+- **Láthatósági Hiba Javítva:** Az átszervezés során véglegesen javításra került a hiba, ami miatt nem minden díjtétel jelent meg a listában.
+- **Felület Tisztítása:** A díjtételek szerkesztőjének címe letisztultabb lett a jobb felhasználói élmény érdekében.
+
 ## v3.2.30 - UI és Súgó Bővítés
 *Dátum: 2024-06-18*
 
