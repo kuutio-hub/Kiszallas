@@ -127,15 +127,25 @@
         }
         #rate-editor-fields .rate-group-title:first-of-type { margin-top: 0; }
         
-        .other-cost-item { display: flex; flex-direction: column; gap: 0.8rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1rem; }
+        .other-cost-item {
+            display: flex; flex-direction: column; gap: 0.8rem; border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem; margin-bottom: 1rem; position: relative;
+            padding-left: 0.5rem; border-left: 3px solid transparent; transition: border-color 0.3s;
+        }
+        .other-cost-item.unsaved { border-left-color: var(--accent-primary); }
         .other-cost-row-1, .other-cost-row-2 { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; }
         .other-cost-row-1 .description { flex: 1 1 auto; }
-        .other-cost-row-1 .delete-btn { flex-shrink: 0; }
-        .other-cost-row-2 .quantity { flex: 1 1 60px; }
-        .other-cost-row-2 .unit { flex: 1 1 70px; }
-        .other-cost-row-2 .amount { flex: 1 1 90px; }
-        .other-cost-row-2 .cost-toggle-container { flex: 1 1 220px; display: flex; gap: 0.8rem; align-items: flex-end; }
+        .other-cost-row-2 .quantity { flex: 0 1 70px; }
+        .other-cost-row-2 .unit { flex: 0 1 80px; }
+        .other-cost-row-2 .amount { flex: 0 1 120px; }
+        .other-cost-row-2 .cost-toggle-container { flex: 1 1 150px; display: flex; gap: 0.8rem; align-items: flex-end; }
         .other-cost-row-2 .is-cost-item-group { padding-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
+        .other-cost-actions { display: flex; gap: 0.5rem; }
+        .other-cost-action-btn { background: none; border: none; cursor: pointer; padding: 0.5rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: background-color 0.2s; }
+        .other-cost-action-btn svg { width: 20px; height: 20px; }
+        .other-cost-action-btn.save:hover { background-color: var(--success-primary); }
+        .other-cost-action-btn.delete:hover { background-color: var(--danger-primary); }
+
 
         #calculation-summary-header-content { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; padding: 1rem; }
         #calculation-summary-header-content .summary-title { flex-basis: 100%; text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--accent-primary); }
@@ -338,8 +348,10 @@
                     <li><strong>Adatpanelek:</strong> Töltse ki a releváns mezőket az utazásra, személyzetre és eszközökre vonatkozóan. A számítás valós időben frissül a jobb oldali táblázatban.</li>
                     <li><strong>Egyéb költségek:</strong> Lehetősége van egyedi tételek hozzáadására.
                         <ul>
-                            <li><strong>Normál tétel:</strong> Adja meg a tétel nevét, mennyiségét és a nettó eladási árat.</li>
-                            <li><strong>Önköltséges tétel:</strong> Pipálja be az "Önköltséges?" jelölőnégyzetet. Ekkor a jelölő helyén megjelenik a "Haszonkulcs" mező. Az "Ár" mezőbe a tétel beszerzési árát (önköltséget) írja, a rendszer erre számolja rá a megadott haszonkulcsot.</li>
+                            <li>**Tétel Mentése:** Minden egyedi tétel csak a sorvégi zöld pipa (mentés) gombra kattintás után kerül be a végleges kalkulációba.</li>
+                            <li><strong>Normál tétel:</strong> Adja meg a tétel nevét, mennyiségét és a nettó eladási árat, majd mentse.</li>
+                            <li><strong>Önköltséges tétel:</strong> Pipálja be az "Önköltséges?" jelölőnégyzetet. Ekkor megjelenik a "Haszonkulcs" mező. Adja meg a beszerzési árat, a haszonkulcsot, majd mentse a tételt.</li>
+                            <li>**Módosítás:** Egy mentett tétel bármely adatának módosítása után a tétel "nem mentett" állapotba kerül, és kikerül a kalkulációból, amíg újra el nem menti.</li>
                         </ul>
                     </li>
                 </ul>
@@ -365,7 +377,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.25";
+        const APP_VERSION = "v3.2.26";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -511,22 +523,31 @@
                 // --- EVENT LISTENERS ---
                 
                 D('app-container').addEventListener('input', (e) => {
-                    if (e.target.closest('#other-costs-list')) handleOtherCostInput(e);
-                    else if (e.target.name === 'print-detail') calculateAndDisplay();
-                    else if (!formattedInputs.has(e.target.id)) calculateAndDisplay();
+                    const target = e.target;
+                    if (target.closest('#other-costs-list')) {
+                        handleOtherCostInput(target);
+                    } else if (target.name === 'print-detail') {
+                        calculateAndDisplay();
+                    } else if (!formattedInputs.has(target.id)) {
+                        calculateAndDisplay();
+                    }
                 });
                 
                 D('app-container').addEventListener('change', (e) => {
                     const target = e.target;
                     let needsRecalculation = false;
-
-                    if (target.closest('#other-costs-list') && target.classList.contains('formatted-input')) {
+                    
+                    if (target.closest('#other-costs-list')) {
                         const index = parseInt(target.dataset.index, 10);
                         const field = target.dataset.field;
-                        if (!isNaN(index) && field && state.otherCosts[index]) {
-                            const value = parseFloat(unformatCurrencyValue(target.value)) || 0;
-                            state.otherCosts[index][field] = value;
-                            needsRecalculation = true;
+                        const item = state.otherCosts[index];
+                        if (item) {
+                           if (target.classList.contains('formatted-input')) {
+                                item[field] = parseFloat(unformatCurrencyValue(target.value)) || 0;
+                            }
+                            item.isSaved = false;
+                            setupOtherCostsList();
+                            calculateAndDisplay(); // Recalculate to remove from total
                         }
                     } else if (formattedInputs.has(target.id)) {
                         needsRecalculation = true;
@@ -538,17 +559,30 @@
                 });
 
                 D('app-container').addEventListener('click', (e) => {
-                    if (e.target.closest('.other-cost-delete-btn')) {
-                        const index = parseInt(e.target.closest('.other-cost-delete-btn').dataset.index, 10);
+                    const target = e.target.closest('button');
+                    if (!target) return;
+                    
+                    if (target.classList.contains('other-cost-delete-btn')) {
+                        const index = parseInt(target.dataset.index, 10);
                         state.otherCosts.splice(index, 1);
-                        setupOtherCostsList(); calculateAndDisplay();
+                        setupOtherCostsList();
+                        calculateAndDisplay();
+                    } else if (target.classList.contains('other-cost-save-btn')) {
+                        const index = parseInt(target.dataset.index, 10);
+                        if (state.otherCosts[index]) {
+                            state.otherCosts[index].isSaved = true;
+                            setupOtherCostsList();
+                            calculateAndDisplay();
+                        }
+                    } else if (target.closest('.card-save-btn')) {
+                        target.closest('details').open = false;
+                    } else if (target.closest('.travel-unit-toggle')) {
+                        handleTravelUnitToggle();
                     }
-                    if (e.target.closest('.card-save-btn')) { e.target.closest('details').open = false; }
-                    if (e.target.closest('.travel-unit-toggle')) { handleTravelUnitToggle(); }
                 });
 
                 D('add-other-cost-btn').onclick = () => {
-                    state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: 'db', isCostItem: false, multiplier: 30 });
+                    state.otherCosts.push({ description: '', amount: 0, quantity: 1, unit: 'db', isCostItem: false, multiplier: 30, isSaved: false });
                     setupOtherCostsList();
                 };
 
@@ -697,7 +731,7 @@
             addItem('Emelőgép napidíj', (inputs.emelogep_db || 0) * (inputs.emelogep_napok || 0), 'nap', rates.emelogep_napidij * (1 + rates.emelogep_szorzo / 100), rates.emelogep_napidij, true);
             addItem('Emelőgép szállítás', (inputs.emelogep_szallitasok || 0) * 2, 'alk', rates.emelogep_szallitas_dij * (1 + rates.emelogep_szorzo / 100), rates.emelogep_szallitas_dij, true);
             
-            state.otherCosts.forEach(c => {
+            state.otherCosts.filter(c => c.isSaved).forEach(c => {
                 if (c.amount > 0 && c.description) {
                     const cost = c.amount;
                     const sell = c.isCostItem ? cost * (1 + (c.multiplier / 100)) : cost;
@@ -921,7 +955,7 @@
             const watermarkHtml = isInternal ? `<div class="watermark">BELSŐ HASZNÁLATRA</div>` : "";
             const thStyle = isInternal ? 'background-color: rgba(242, 242, 242, 0.7);' : 'background-color: #f2f2f2;';
 
-            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Kalkuláció</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important;} h1{text-align:center;} p{margin: 2px 0;} .watermark{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-45deg);font-size:100px;color:rgba(128,0,0,0.08);z-index:0;font-weight:bold;pointer-events:none;} .print-wrapper{position:relative;z-index:1;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{${thStyle}} .summary-table{margin-top:20px;width:60%;margin-left:auto;border:none;} .summary-table td{border:none;}</style></head><body>${watermarkHtml}<div class="print-wrapper">${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr><td colspan="${colspanForLabel}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr><td colspan="${colspanForLabel}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr><td colspan="${colspanForLabel}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></div></body></html>`;
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Kalkuláció</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm;} body{position:relative;font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color:#ffffff!important;} h1{text-align:center;} p{margin:2px 0;} .watermark{position:absolute;top:40vh;left:0;right:0;text-align:center;width:100%;transform:rotate(-45deg);font-size:8vw;color:rgba(128,0,0,0.08);z-index:0;font-weight:bold;pointer-events:none;} .print-wrapper{position:relative;z-index:1;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:6px;text-align:left;} th{${thStyle}} .summary-table{margin-top:20px;width:60%;margin-left:auto;border:none;} .summary-table td{border:none;}</style></head><body>${watermarkHtml}<div class="print-wrapper">${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr><td colspan="${colspanForLabel}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr><td colspan="${colspanForLabel}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr><td colspan="${colspanForLabel}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></div></body></html>`;
         }
 
         function getRateListPrintableHtml(pkg) {
@@ -954,48 +988,56 @@
                 `;
 
                 const itemHtml = `
-                <div class="other-cost-item">
+                <div class="other-cost-item ${!item.isSaved ? 'unsaved' : ''}">
                     <div class="other-cost-row-1">
                         <div class="form-group description">
                             <label>Leírás</label>
                             <input type="text" data-index="${index}" data-field="description" value="${item.description}">
                         </div>
-                        <button class="btn btn-danger other-cost-delete-btn delete-btn" data-index="${index}">×</button>
                     </div>
                     <div class="other-cost-row-2">
                         <div class="form-group quantity"><label>Menny.</label><input type="number" data-index="${index}" data-field="quantity" value="${item.quantity}"></div>
                         <div class="form-group unit"><label>Egység</label><input type="text" data-index="${index}" data-field="unit" value="${item.unit}"></div>
                         <div class="form-group amount"><label>${amountLabel}</label><input type="text" data-index="${index}" data-field="amount" value="${item.amount}" class="formatted-input" data-field-type="currency"></div>
                         <div class="cost-toggle-container">${costToggleHtml}</div>
+                         <div class="other-cost-actions">
+                            <button class="other-cost-action-btn save other-cost-save-btn" data-index="${index}" title="Mentés">
+                                <svg fill="#69BE28" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                            </button>
+                            <button class="other-cost-action-btn delete other-cost-delete-btn" data-index="${index}" title="Törlés">
+                                 <svg fill="#9B2C2C" viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+                            </button>
+                        </div>
                     </div>
                 </div>`;
                 return itemHtml;
             }).join('');
             
-            // Add formatting to newly created inputs
             container.querySelectorAll('.formatted-input').forEach(addInputFormatting);
         }
 
-
-        function handleOtherCostInput(e) {
-            const target = e.target;
+        function handleOtherCostInput(target) {
             const index = parseInt(target.dataset.index, 10);
             const field = target.dataset.field;
-            if (isNaN(index) || !field || !state.otherCosts[index]) return;
+            const item = state.otherCosts[index];
+            if (!item) return;
 
             if (target.classList.contains('formatted-input')) {
-                // Formatting is handled by the blur/change event, not input
-                return; 
+                // Formatting handles value on blur/change, we just mark as unsaved
+            } else {
+                item[field] = target.type === 'checkbox' ? target.checked : (target.type === 'number' ? parseFloat(target.value) || 0 : target.value);
             }
             
-            const value = target.type === 'checkbox' ? target.checked : (target.type === 'number' ? parseFloat(target.value) || 0 : target.value);
-            state.otherCosts[index][field] = value;
+            if (item.isSaved) {
+                item.isSaved = false;
+                calculateAndDisplay(); // Recalculate to remove from total
+            }
             
             if (field === 'isCostItem') {
-                setupOtherCostsList(); 
-                calculateAndDisplay();
-            } else if (target.type !== 'text' || field === 'unit') {
-                calculateAndDisplay();
+                setupOtherCostsList();
+            } else {
+                 const itemElement = target.closest('.other-cost-item');
+                 if(itemElement) itemElement.classList.add('unsaved');
             }
         }
         
@@ -1026,4 +1068,53 @@
         };
     </script>
 </body>
-</html>
+</html>--- END OF FILE prompts/prompt_3_logic_and_state.md ---
+
+# Logikai és Állapotkezelési Prompt (Prompt_3) - Részletes Működés
+
+Ez a dokumentum az alkalmazás belső működésének, állapotkezelésének és a felhasználói interakciókra adott logikai válaszainak részletes specifikációját tartalmazza. A `LOGIC.md` az üzleti szabályokat, ez a prompt pedig a technikai megvalósításukat írja le.
+
+## 1. Központi Állapotkezelés (`state` objektum)
+
+Az alkalmazás teljes állapota egyetlen, globálisan elérhető `state` objektumban van tárolva. Ez biztosítja az adatok konzisztenciáját és a könnyű hibakeresést.
+
+- **`state.rates`**: `Array` - A `rates.json`-ből és a `localStorage`-ból betöltött összes árlistát tartalmazza.
+- **`state.otherCosts`**: `Array` - A felhasználó által dinamikusan hozzáadott "Egyéb költségek" tételeit tárolja. Minden objektum tartalmazza a leírást, mennyiséget, árat, és egy `isCostItem` logikai értéket.
+- **`state.exchangeRates`**: `Object` - A `frankfurter.app` API-ról letöltött historikus árfolyam adatokat tartalmazza.
+- **`state.activeRatePackage`**: `Object` - Az aktuálisan kiválasztott árlista objektuma.
+- **`state.calculationResults`**: `Object` - A legutóbbi `calculateCosts()` futás eredményét tárolja (pl. `totalHuf`, `breakdown`). Ez megakadályozza a felesleges újraszámításokat a megjelenítés frissítésekor.
+- **`state.activeCurrency`**: `String` - Az aktuálisan kiválasztott pénznem ("HUF" vagy "EUR").
+- **`state.config`**: `Object` - A betöltött konfigurációs JSON fájlokat (`INPUT_CONFIG`, `RATE_KEY_LABELS`) tartalmazza.
+
+## 2. Inicializálási Folyamat (`initApp()`)
+
+Az alkalmazás a sikeres jelszó-ellenőrzés után az `initApp()` függvénnyel indul, amely a következő lépéseket hajtja végre aszinkron módon:
+
+1.  **Dátum Beállítása:** A "Kalkuláció dátuma" mezőt az aktuális dátumra állítja.
+2.  **Árfolyamok Lekérése:** Elindítja a `fetchExchangeRates()` függvényt, ami először a `localStorage`-ban keres érvényes (4 óránál nem régebbi) adatokat. Ha nincs, hálózati kérést indít.
+3.  **Konfiguráció Betöltése:** `Promise.all`-lal párhuzamosan betölti a `rates.json`, `rate_key_labels.json`, és `input_config.json` fájlokat, és az eredményt a `state.config`-ba menti.
+4.  **UI Renderelés:**
+    - `renderInputs()`: Az `input_config.json` alapján legenerálja a dinamikus űrlapokat.
+    - `updateRateSelectors()`: Feltölti az árlista-választó legördülő menüket.
+5.  **Kezdeti Kalkuláció:** Beállítja az alapértelmezett árlistát, és lefuttatja a `calculateAndDisplay()`-t, hogy a felület ne legyen üres.
+6.  **Eseményfigyelők Regisztrálása:** Hozzárendeli a szükséges eseményfigyelőket (pl. `input`, `click`) az interaktív elemekhez.
+
+## 3. A Reaktivitás Magja (`calculateAndDisplay()`)
+
+Ez a központi függvény, amely összeköti az adatokat a megjelenítéssel. Minden alkalommal lefut, amikor a kalkulációt befolyásoló adat változik.
+
+1.  **Adatok Gyűjtése:** Meghívja a `getInputs()` függvényt, hogy begyűjtse az összes beviteli mező aktuális értékét.
+2.  **Számítás:** Meghívja a `calculateCosts()` függvényt a begyűjtött adatokkal. Az eredményt a `state.calculationResults`-ban tárolja.
+3.  **Megjelenítés:**
+    - A `state.calculationResults.breakdown` tömb alapján felépíti a jobb oldali összesítő táblázat HTML tartalmát.
+    - Figyelembe veszi az aktív pénznemet (`state.activeCurrency`) és a kiválasztott részletességi szintet.
+    - Formázza a pénznemértékeket a `formatCustomCurrency()` segédfüggvénnyel.
+    - Kiszámolja és megjeleníti a kedvezményt és a kedvezményes végösszeget.
+    - Frissíti a felső információs panelt (`#calculation-summary-header`).
+
+## 4. Segédfüggvények
+
+- **`formatCustomCurrency(value, currencySymbol)`**: Egy numerikus értéket a magyar helyesírásnak és a választott pénznemnek megfelelően formázott stringgé alakít (pl. "1.234.567.- Ft" vagy "1.234,56.- €").
+- **`unformatCurrencyValue(string)`**: A formázott pénznem-stringet visszaalakítja tiszta, `parseFloat`-tal feldolgozható számmá.
+- **`convertPrice(hufValue, currency)`**: A belső HUF értéket átváltja EUR-ra, ha szükséges.
+- **`D(id)`**: Egy rövidítés a `document.getElementById(id)`-ra.
