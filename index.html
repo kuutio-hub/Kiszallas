@@ -315,7 +315,7 @@
     <div id="rate-modal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Díjtételek Módosítása (ideiglenes)</h2>
+                <h2>Díjtételek Módosítása</h2>
                 <button class="modal-close-btn">&times;</button>
             </div>
             <div class="modal-body">
@@ -389,20 +389,31 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.30";
+        const APP_VERSION = "v3.2.31";
 
         const RATE_EDITOR_GROUPS = [
             {
                 title: 'Személyi Óradíjak',
-                keys: ['mernok_hetkoznap_oradij', 'mernok_hetvege_oradij', 'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij', 'szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij']
+                keys: [
+                    'szerelo_hetkoznap_oradij', 'szerelo_hetvege_oradij', 
+                    'szerelesvezeto_hetkoznap_oradij', 'szerelesvezeto_hetvege_oradij',
+                    'mernok_hetkoznap_oradij', 'mernok_hetvege_oradij'
+                ]
             },
             {
-                title: 'Utazási Díjak',
-                keys: ['kiszallasi_dij_mernok', 'kiszallasi_dij_szerelo', 'kikuldeles_dij_mernok', 'kikuldeles_dij_szerelo', 'km_dij']
+                title: 'Kiszállási és Kiküldetési Díjak',
+                keys: [
+                    'kiszallasi_dij_szerelo', 'kiszallasi_dij_mernok', 
+                    'kikuldeles_dij_szerelo', 'kikuldeles_dij_mernok'
+                ]
             },
             {
-                title: 'Ellátás és Eszközök',
-                keys: ['szallas_dij', 'szallas_szorzo', 'emelogep_napidij', 'emelogep_szallitas_dij', 'emelogep_szorzo']
+                title: 'Utazás, Ellátás és Eszközök',
+                keys: [
+                    'km_dij', 
+                    'szallas_dij', 'szallas_szorzo', 
+                    'emelogep_napidij', 'emelogep_szallitas_dij', 'emelogep_szorzo'
+                ]
             }
         ];
         
@@ -1082,4 +1093,43 @@
         };
     </script>
 </body>
-</html>
+</html>--- END OF FILE prompts/prompt_3_features.md ---
+
+# Funkció Prompt (Prompt_3) - Specifikus Feladatok
+
+## 1. Fejlesztési Feladatok
+A következő feladatokat kell implementálni a meglévő keretrendszeren és dizájnon belül.
+
+### 1.1. Globális Költség Szorzó
+- **Feladat:** Hozz létre egy új beviteli mezőt a fejlécben, "Költség Szorzó" címmel.
+- **Működés:** Ez a mező egy százalékos értéket fogad el (alapértelmezett: 100%). A `calculateCosts()` funkcióban, a végső `breakdown` tömb minden elemének `unitPriceHuf` és `costPriceHuf` értékét meg kell szorozni ezzel a szorzóval (pl. 110%-os szorzó esetén `érték * 1.1`).
+- **UI:** A mező illeszkedjen a fejléc dizájnjába, a "Kedvezmény" mező mellé.
+
+### 1.2. Mentési és Betöltési Funkció
+- **Feladat:** Implementálj egy teljes mentési és betöltési funkcionalitást a `localStorage` használatával.
+- **Mentés Gomb:** Helyezz el egy "Mentés" gombot az alsó akciósávban (`.action-bar`).
+- **Mentési Folyamat:**
+    1.  Kattintásra egy `prompt()` ablak kérje be a mentés nevét.
+    2.  Az alkalmazás teljes `state` objektumából mentsd el a következő kulcsokat: az összes beviteli mező aktuális értéke (`getInputs()`), az `otherCosts` tömb, a `discount-input` értéke, a `currency-select` értéke és az aktív árlista ID-ja (`activeRatePackage.id`).
+    3.  Ezeket az adatokat egy objektumba csomagolva, a megadott névvel kulcsolva mentsd el a `localStorage`-ba egy `savedCalculations` nevű fő kulcs alá.
+- **Betöltés Gomb:** Helyezz el egy "Betöltés" gombot a fejlécben, a "Visszaállítás" gomb mellé.
+- **Betöltési Folyamat:**
+    1.  Kattintásra egy modális ablak (`#load-modal`) jelenjen meg.
+    2.  A modális ablak listázza ki a `localStorage`-ban található összes mentést, mindegyik mellett egy "Betöltés" és egy "Törlés" gombbal.
+    3.  **Betöltés:** A kiválasztott mentés adatait töltsd vissza a megfelelő beviteli mezőkbe és a `state` objektumba, majd hívd meg a `calculateAndDisplay()`-t a felület frissítéséhez.
+    4.  **Törlés:** A kiválasztott mentést távolítsd el a `localStorage`-ból és frissítsd a listát.
+
+### 1.3. Árlista Nyomtatása
+- **Feladat:** Adj egy "Nyomtat" gombot a díjtételek szerkesztőjének (`#rate-modal`) láblécébe.
+- **Működés:** A gombra kattintva a `handlePrint()` funkció hívódjon meg egy speciális paraméterrel (`isRateList = true`), ami egy egyszerű, letisztult HTML oldalt generál a kiválasztott árlista összes díjtételével és azok árával, majd megnyitja azt a nyomtatási előnézeti ablakban.
+
+## 2. Meglévő Funkciók Módosítása
+
+### 2.1. "Egyéb Költségek" UI Finomítása
+- **Feladat:** Az "Egyéb költségek" sorainak UI-ját tedd kompaktabbá és felhasználóbarátabbá.
+- **Elrendezés:** A jelenlegi két soros elrendezés helyett egyetlen sorban helyezd el az elemeket, reszponzívan. Használj `flexbox`-ot a tördeléshez.
+- **Mentési Logika Vizuális Kiemelése:** A nem mentett tételek kapjanak egy feltűnő, animált vizuális jelzést (pl. egy pulzáló, sárga oldalsó szegély), ami egyértelművé teszi a felhasználó számára, hogy a tétel még nincs benne a kalkulációban. A mentés gomb legyen egy zöld pipa ikon.
+
+## 3. Dokumentáció
+- **`LOGIC.md`:** Frissítsd a dokumentumot az új "Globális Költség Szorzó" működésének leírásával.
+- **`README.md` és `changelog.md`:** Dokumentáld az új funkciókat (Mentés/Betöltés, Árlista Nyomtatás, Költség Szorzó) és a UI fejlesztéseket.
