@@ -5,7 +5,8 @@
     "name": "2023",
     "isDefault": true,
     "rates": {
-      "fixed": {
+      "fixed": {},
+      "overridable": {
         "szerelo_hetkoznap_oradij": 8600,
         "szerelo_hetvege_oradij": 10000,
         "szerelesvezeto_hetkoznap_oradij": 14000,
@@ -15,9 +16,7 @@
         "kiszallasi_dij_szerelo": 7500,
         "kiszallasi_dij_mernok": 9200,
         "kikuldeles_dij_szerelo": 12000,
-        "kikuldeles_dij_mernok": 18000
-      },
-      "overridable": {
+        "kikuldeles_dij_mernok": 18000,
         "km_dij": 200,
         "szallas_dij": 22000,
         "szallas_szorzo": 30,
@@ -32,7 +31,8 @@
     "name": "2024",
     "isDefault": true,
     "rates": {
-      "fixed": {
+      "fixed": {},
+      "overridable": {
         "szerelo_hetkoznap_oradij": 9500,
         "szerelo_hetvege_oradij": 11000,
         "szerelesvezeto_hetkoznap_oradij": 15400,
@@ -42,9 +42,7 @@
         "kiszallasi_dij_szerelo": 8300,
         "kiszallasi_dij_mernok": 10200,
         "kikuldeles_dij_szerelo": 12000,
-        "kikuldeles_dij_mernok": 18000
-      },
-      "overridable": {
+        "kikuldeles_dij_mernok": 18000,
         "km_dij": 250,
         "szallas_dij": 22000,
         "szallas_szorzo": 30,

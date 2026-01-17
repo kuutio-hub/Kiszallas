@@ -127,6 +127,31 @@
         }
         #rate-editor-fields .rate-group-title:first-of-type { margin-top: 0; }
         
+        #rate-modal .form-group {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        #rate-modal .form-group label {
+            flex-basis: 50%;
+            margin-bottom: 0;
+            text-align: left;
+            white-space: nowrap;
+            color: var(--text-secondary);
+        }
+        #rate-modal .form-group input {
+            flex-grow: 1;
+            min-width: 120px;
+        }
+        .rate-item-separator {
+            margin-top: 1rem !important;
+            padding-top: 1rem !important;
+            border-top: 1px dashed var(--border-color);
+            grid-column: 1 / -1;
+        }
+
         .other-cost-item {
             display: flex; flex-direction: column; gap: 0.8rem; border-bottom: 1px solid var(--border-color);
             padding-bottom: 1rem; margin-bottom: 1rem; position: relative;
@@ -325,7 +350,7 @@
                         <select id="rate-package-selector-modal" class="seahawks-select"></select>
                     </div>
                 </div>
-                <div id="rate-editor-fields" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));"></div>
+                <div id="rate-editor-fields" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));"></div>
             </div>
             <div class="modal-footer" style="justify-content: space-between;">
                 <button id="rate-print-btn" class="btn">Nyomtat</button>
@@ -389,7 +414,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.32";
+        const APP_VERSION = "v3.2.33";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -889,6 +914,11 @@
                         
                         const formGroup = document.createElement('div');
                         formGroup.className = 'form-group';
+
+                        if (key === 'mernok_hetkoznap_oradij') {
+                            formGroup.classList.add('rate-item-separator');
+                        }
+                        
                         formGroup.innerHTML = `<label for="rate-edit-${key}">${label}</label>`;
                         
                         const input = document.createElement('input');

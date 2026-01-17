@@ -1,5 +1,13 @@
 # Változási Napló
 
+## v3.2.33 - Díjtételek Kezelőjének Finomhangolása
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **Minden Díjtétel Szerkeszthető:** A `rates.json`-ben minden díjtétel átkerült a felülírható kategóriába, ezzel biztosítva, hogy az összes tétel megjelenik és módosítható a díjtételek szerkesztőjében.
+- **Rendezettebb Elrendezés:** A díjtételek szerkesztőjében a címkék és beviteli mezők mostantól rendezetten, két oszlopban jelennek meg a jobb átláthatóságért.
+- **Vizuális Elválasztás:** A személyi díjakon belül a szerelői és mérnöki kategóriák egy finom elválasztóval különülnek el.
+
 ## v3.2.32 - Kritikus HTML Struktúra Javítás
 *Dátum: 2024-06-18*
 
