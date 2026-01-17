@@ -122,35 +122,32 @@
         .mobile-results-btn { display: none; }
         .close-mobile-results { display: none; }
 
+        #rate-editor-fields {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 0.8rem 1.2rem;
+            align-items: center;
+        }
+        #rate-editor-fields .rate-group-title, 
+        #rate-editor-fields .rate-item-separator {
+            grid-column: 1 / -1;
+        }
         #rate-editor-fields .rate-group-title {
-            grid-column: 1 / -1; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem;
+            margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem;
             color: var(--accent-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem;
         }
         #rate-editor-fields .rate-group-title:first-of-type { margin-top: 0; }
-        
-        #rate-modal .form-group {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        #rate-modal .form-group label {
-            flex-basis: 50%;
-            margin-bottom: 0;
-            text-align: left;
-            white-space: nowrap;
-            color: var(--text-secondary);
-        }
-        #rate-modal .form-group input {
-            flex-grow: 1;
-            min-width: 120px;
-        }
-        .rate-item-separator {
-            margin-top: 1rem !important;
-            padding-top: 1rem !important;
+        #rate-editor-fields .rate-item-separator {
+            border: 0;
             border-top: 1px dashed var(--border-color);
-            grid-column: 1 / -1;
+            margin: 1rem 0 0.2rem 0;
+            padding: 0;
+            height: 0;
+        }
+        #rate-editor-fields label {
+            text-align: right;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
         .other-cost-item {
@@ -351,7 +348,7 @@
                         <select id="rate-package-selector-modal" class="seahawks-select"></select>
                     </div>
                 </div>
-                <div id="rate-editor-fields" class="form-grid" style="grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));"></div>
+                <div id="rate-editor-fields"></div>
             </div>
             <div class="modal-footer" style="justify-content: space-between;">
                 <button id="rate-print-btn" class="btn">Nyomtat</button>
@@ -415,7 +412,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.34";
+        const APP_VERSION = "v3.2.35";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -905,22 +902,28 @@
             const allRates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
             
             RATE_EDITOR_GROUPS.forEach(group => {
-                fieldsContainer.innerHTML += `<h3 class="rate-group-title">${group.title}</h3>`;
+                const titleEl = document.createElement('h3');
+                titleEl.className = 'rate-group-title';
+                titleEl.textContent = group.title;
+                fieldsContainer.appendChild(titleEl);
+
                 group.keys.forEach(key => {
                     if (state.config.RATE_KEY_LABELS[key] && allRates.hasOwnProperty(key)) {
-                        const label = state.config.RATE_KEY_LABELS[key];
+                        const labelText = state.config.RATE_KEY_LABELS[key];
                         const value = allRates[key] || 0;
                         const isPercentage = key.includes('_szorzo');
                         const fieldType = isPercentage ? 'percentage' : 'currency';
                         
-                        const formGroup = document.createElement('div');
-                        formGroup.className = 'form-group';
-
                         if (key === 'mernok_hetkoznap_oradij') {
-                            formGroup.classList.add('rate-item-separator');
+                            const separator = document.createElement('div');
+                            separator.className = 'rate-item-separator';
+                            fieldsContainer.appendChild(separator);
                         }
                         
-                        formGroup.innerHTML = `<label for="rate-edit-${key}">${label}</label>`;
+                        const label = document.createElement('label');
+                        label.htmlFor = `rate-edit-${key}`;
+                        label.textContent = labelText;
+                        fieldsContainer.appendChild(label);
                         
                         const input = document.createElement('input');
                         input.type = 'text';
@@ -929,9 +932,8 @@
                         input.dataset.rateKey = key;
                         input.dataset.fieldType = fieldType;
                         input.value = value;
-
-                        formGroup.appendChild(input);
-                        fieldsContainer.appendChild(formGroup);
+                        fieldsContainer.appendChild(input);
+                        
                         addInputFormatting(input);
                     }
                 });
