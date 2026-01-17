@@ -1,11 +1,11 @@
-# Költségkalkulátor v3.2.35
+# Költségkalkulátor v3.2.36
 
 ## 1. Projekt Bemutatása
 Helyszíni szerelési projektek költségbecslésére szolgáló, modern, reszponzív webalkalmas.
 
-## 2. Legutóbbi Változások (v3.2.35)
-- **Stabilitás és Dizájn:** Az árlisták szerkesztő felülete egy teljesen új, robusztus grid elrendezést kapott, amely megoldja a korábbi vizuális hibákat, és biztosítja az összes díjtétel tökéletes, rendezett megjelenítését minden esetben.
-- **Bővített Nyomtatás:** A nyomtatható árlista mostantól minden díjtételt tartalmaz, logikusan csoportosítva a maximális átláthatóság érdekében.
-- **UI Finomhangolás:** Az eredményeket megjelenítő panel "Bezárás" gombja mostantól csak mobilnézetben jelenik meg, javítva az asztali felület letisztultságát.
+## 2. Legutóbbi Változások (v3.2.36)
+- **Felhasználói Felület Finomhangolása:** Az árlisták szerkesztőjének felülete tovább javult. A címkék és beviteli mezők igazítása, valamint a megnövelt térközök egy sokkal átláthatóbb és professzionálisabb elrendezést biztosítanak.
+- **Stabilitás és Dizájn:** A szerkesztőfelület egy robusztus grid elrendezést használ, amely megoldja a korábbi vizuális hibákat, és biztosítja az összes díjtétel tökéletes, rendezett megjelenítését.
+- **Bővített Nyomtatás:** A nyomtatható árlista minden díjtételt tartalmaz, logikusan csoportosítva.
 
 Részletesebb információkért lásd a `changelog.md` fájlt.

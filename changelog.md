@@ -1,5 +1,13 @@
 # Változási Napló
 
+## v3.2.36 - Finomhangolt Árlista Szerkesztő Elrendezés
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **Javított Olvashatóság:** Az árlista szerkesztőjében a címkék mostantól balra, a beviteli mezők pedig jobbra igazodnak, ami egy tisztább, táblázatszerűbb elrendezést eredményez.
+- **Jobb Vizuális Tagolás:** A logikailag összetartozó díjtételek (pl. Kiszállás/Kiküldetés) között megnövelt vertikális térköz javítja a felület átláthatóságát.
+- **Szellősebb Dizájn:** A sorok végére egy láthatatlan helytartó elem került, amely egyenletesebb, szellősebb elrendezést biztosít.
+
 ## v3.2.35 - Robusztusabb Árlista Szerkesztő Felület
 *Dátum: 2024-06-18*
 
@@ -27,13 +35,5 @@
 
 ### Javítások
 - **Oldal Elrendezésének Végleges Helyreállítása:** Kijavítva egy kritikus hiba, amely miatt a HTML fájl végére hibásan extra tartalom került, ami az oldal elrendezésének szétesését okozta. A hiba forrása azonosítva és a javítási folyamat megerősítve a jövőbeli előfordulás megelőzése érdekében.
-
-## v3.2.31 - Díjtételek Átláthatóságának Javítása
-*Dátum: 2024-06-18*
-
-### Fejlesztések
-- **Díjtételek Új Csoportosítása:** A díjtételek szerkesztő felülete a felhasználói visszajelzések alapján új, logikusabb csoportokba (Személyi díjak, Kiszállási díjak, Eszközök és ellátás) lett rendezve, javítva ezzel az áttekinthetőséget.
-- **Láthatósági Hiba Javítva:** Az átszervezés során véglegesen javításra került a hiba, ami miatt nem minden díjtétel jelent meg a listában.
-- **Felület Tisztítása:** A díjtételek szerkesztőjének címe letisztultabb lett a jobb felhasználói élmény érdekében.
 
 ... (korábbi verziók)

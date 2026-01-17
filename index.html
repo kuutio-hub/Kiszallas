@@ -124,12 +124,13 @@
 
         #rate-editor-fields {
             display: grid;
-            grid-template-columns: auto 1fr;
+            grid-template-columns: auto 1fr auto;
             gap: 0.8rem 1.2rem;
             align-items: center;
         }
         #rate-editor-fields .rate-group-title, 
-        #rate-editor-fields .rate-item-separator {
+        #rate-editor-fields .rate-item-separator,
+        #rate-editor-fields .rate-item-vertical-spacer {
             grid-column: 1 / -1;
         }
         #rate-editor-fields .rate-group-title {
@@ -144,8 +145,9 @@
             padding: 0;
             height: 0;
         }
+         #rate-editor-fields .rate-item-vertical-spacer { height: 0.5rem; }
         #rate-editor-fields label {
-            text-align: right;
+            text-align: left;
             color: var(--text-secondary);
             font-size: 0.9rem;
         }
@@ -412,7 +414,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.35";
+        const APP_VERSION = "v3.2.36";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -900,6 +902,7 @@
             const fieldsContainer = D('rate-editor-fields');
             fieldsContainer.innerHTML = '';
             const allRates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
+            const verticalSpacerKeys = ['kikuldeles_dij_szerelo', 'szallas_dij', 'emelogep_napidij'];
             
             RATE_EDITOR_GROUPS.forEach(group => {
                 const titleEl = document.createElement('h3');
@@ -919,6 +922,12 @@
                             separator.className = 'rate-item-separator';
                             fieldsContainer.appendChild(separator);
                         }
+
+                        if (verticalSpacerKeys.includes(key)) {
+                            const vSpacer = document.createElement('div');
+                            vSpacer.className = 'rate-item-vertical-spacer';
+                            fieldsContainer.appendChild(vSpacer);
+                        }
                         
                         const label = document.createElement('label');
                         label.htmlFor = `rate-edit-${key}`;
@@ -934,6 +943,9 @@
                         input.value = value;
                         fieldsContainer.appendChild(input);
                         
+                        const rightSpacer = document.createElement('span');
+                        fieldsContainer.appendChild(rightSpacer);
+
                         addInputFormatting(input);
                     }
                 });
