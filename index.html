@@ -377,7 +377,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.26";
+        const APP_VERSION = "v3.2.27";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1068,53 +1068,4 @@
         };
     </script>
 </body>
-</html>--- END OF FILE prompts/prompt_3_logic_and_state.md ---
-
-# Logikai és Állapotkezelési Prompt (Prompt_3) - Részletes Működés
-
-Ez a dokumentum az alkalmazás belső működésének, állapotkezelésének és a felhasználói interakciókra adott logikai válaszainak részletes specifikációját tartalmazza. A `LOGIC.md` az üzleti szabályokat, ez a prompt pedig a technikai megvalósításukat írja le.
-
-## 1. Központi Állapotkezelés (`state` objektum)
-
-Az alkalmazás teljes állapota egyetlen, globálisan elérhető `state` objektumban van tárolva. Ez biztosítja az adatok konzisztenciáját és a könnyű hibakeresést.
-
-- **`state.rates`**: `Array` - A `rates.json`-ből és a `localStorage`-ból betöltött összes árlistát tartalmazza.
-- **`state.otherCosts`**: `Array` - A felhasználó által dinamikusan hozzáadott "Egyéb költségek" tételeit tárolja. Minden objektum tartalmazza a leírást, mennyiséget, árat, és egy `isCostItem` logikai értéket.
-- **`state.exchangeRates`**: `Object` - A `frankfurter.app` API-ról letöltött historikus árfolyam adatokat tartalmazza.
-- **`state.activeRatePackage`**: `Object` - Az aktuálisan kiválasztott árlista objektuma.
-- **`state.calculationResults`**: `Object` - A legutóbbi `calculateCosts()` futás eredményét tárolja (pl. `totalHuf`, `breakdown`). Ez megakadályozza a felesleges újraszámításokat a megjelenítés frissítésekor.
-- **`state.activeCurrency`**: `String` - Az aktuálisan kiválasztott pénznem ("HUF" vagy "EUR").
-- **`state.config`**: `Object` - A betöltött konfigurációs JSON fájlokat (`INPUT_CONFIG`, `RATE_KEY_LABELS`) tartalmazza.
-
-## 2. Inicializálási Folyamat (`initApp()`)
-
-Az alkalmazás a sikeres jelszó-ellenőrzés után az `initApp()` függvénnyel indul, amely a következő lépéseket hajtja végre aszinkron módon:
-
-1.  **Dátum Beállítása:** A "Kalkuláció dátuma" mezőt az aktuális dátumra állítja.
-2.  **Árfolyamok Lekérése:** Elindítja a `fetchExchangeRates()` függvényt, ami először a `localStorage`-ban keres érvényes (4 óránál nem régebbi) adatokat. Ha nincs, hálózati kérést indít.
-3.  **Konfiguráció Betöltése:** `Promise.all`-lal párhuzamosan betölti a `rates.json`, `rate_key_labels.json`, és `input_config.json` fájlokat, és az eredményt a `state.config`-ba menti.
-4.  **UI Renderelés:**
-    - `renderInputs()`: Az `input_config.json` alapján legenerálja a dinamikus űrlapokat.
-    - `updateRateSelectors()`: Feltölti az árlista-választó legördülő menüket.
-5.  **Kezdeti Kalkuláció:** Beállítja az alapértelmezett árlistát, és lefuttatja a `calculateAndDisplay()`-t, hogy a felület ne legyen üres.
-6.  **Eseményfigyelők Regisztrálása:** Hozzárendeli a szükséges eseményfigyelőket (pl. `input`, `click`) az interaktív elemekhez.
-
-## 3. A Reaktivitás Magja (`calculateAndDisplay()`)
-
-Ez a központi függvény, amely összeköti az adatokat a megjelenítéssel. Minden alkalommal lefut, amikor a kalkulációt befolyásoló adat változik.
-
-1.  **Adatok Gyűjtése:** Meghívja a `getInputs()` függvényt, hogy begyűjtse az összes beviteli mező aktuális értékét.
-2.  **Számítás:** Meghívja a `calculateCosts()` függvényt a begyűjtött adatokkal. Az eredményt a `state.calculationResults`-ban tárolja.
-3.  **Megjelenítés:**
-    - A `state.calculationResults.breakdown` tömb alapján felépíti a jobb oldali összesítő táblázat HTML tartalmát.
-    - Figyelembe veszi az aktív pénznemet (`state.activeCurrency`) és a kiválasztott részletességi szintet.
-    - Formázza a pénznemértékeket a `formatCustomCurrency()` segédfüggvénnyel.
-    - Kiszámolja és megjeleníti a kedvezményt és a kedvezményes végösszeget.
-    - Frissíti a felső információs panelt (`#calculation-summary-header`).
-
-## 4. Segédfüggvények
-
-- **`formatCustomCurrency(value, currencySymbol)`**: Egy numerikus értéket a magyar helyesírásnak és a választott pénznemnek megfelelően formázott stringgé alakít (pl. "1.234.567.- Ft" vagy "1.234,56.- €").
-- **`unformatCurrencyValue(string)`**: A formázott pénznem-stringet visszaalakítja tiszta, `parseFloat`-tal feldolgozható számmá.
-- **`convertPrice(hufValue, currency)`**: A belső HUF értéket átváltja EUR-ra, ha szükséges.
-- **`D(id)`**: Egy rövidítés a `document.getElementById(id)`-ra.
+</html>
