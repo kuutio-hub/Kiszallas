@@ -124,7 +124,7 @@
 
         #rate-editor-fields {
             display: grid;
-            grid-template-columns: auto 1fr 20px;
+            grid-template-columns: auto 1fr 30px;
             gap: 0.8rem 1.2rem;
             align-items: center;
         }
@@ -418,7 +418,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.37";
+        const APP_VERSION = "v3.2.38";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1151,50 +1151,4 @@
         };
     </script>
 </body>
-</html>--- START OF FILE changelog.md ---
-
-# Változási Napló
-
-## v3.2.37 - Továbbfejlesztett Dizájn és Nyomtatási Kép
-*Dátum: 2024-06-18*
-
-### Fejlesztések
-- **PDF Fejléc Finomhangolása:** A nyomtatott dokumentum fejlécében az üresen hagyott mezők helyett a "-" jel helyett mostantól a "nincs megadva" szöveg jelenik meg.
-- **Árlista Szerkesztő Stílusa:** A díjtételek beviteli mezői szürke hátteret kaptak a jobb vizuális elkülönülés érdekében.
-- **Szellősebb Elrendezés:** Az árlista szerkesztő jobb szélén megnövelt térköz biztosít egy letisztultabb, szimmetrikusabb megjelenést.
-
-## v3.2.36 - Finomhangolt Árlista Szerkesztő Elrendezés
-*Dátum: 2024-06-18*
-
-### Fejlesztések
-- **Javított Olvashatóság:** Az árlista szerkesztőjében a címkék mostantól balra, a beviteli mezők pedig jobbra igazodnak, ami egy tisztább, táblázatszerűbb elrendezést eredményez.
-- **Jobb Vizuális Tagolás:** A logikailag összetartozó díjtételek (pl. Kiszállás/Kiküldetés) között megnövelt vertikális térköz javítja a felület átláthatóságát.
-- **Szellősebb Dizájn:** A sorok végére egy láthatatlan helytartó elem került, amely egyenletesebb, szellősebb elrendezést biztosít.
-
-## v3.2.35 - Robusztusabb Árlista Szerkesztő Felület
-*Dátum: 2024-06-18*
-
-### Fejlesztések
-- **Újraírt Szerkesztőfelület:** A díjtételek szerkesztőjének elrendezése teljesen újra lett írva egy stabil, kéthasábos grid rendszer használatával.
-- **Vizuális Hiba Javítva:** Ez a módosítás megoldja a korábbi vizuális hibákat, ahol a hosszabb megnevezések eltolták a beviteli mezőket, biztosítva, hogy minden díjtétel mindig helyesen és átláthatóan jelenjen meg.
-
-## v3.2.34 - UI Finomhangolás és Bővített Nyomtatás
-*Dátum: 2024-06-18*
-
-### Fejlesztések
-- **Teljeskörű Árlista Nyomtatás:** A nyomtatható árlista mostantól az összes díjtételt tartalmazza, beleértve a haszonkulcsokat is. A tételek a jobb áttekinthetőség érdekében logikai csoportokba vannak rendezve.
-- **Reszponzív "Bezárás" Gomb:** Az eredménytáblázat "Bezárás" gombja mostantól csak mobilnézetben jelenik meg, amikor a panel felugró ablakként viselkedik, javítva ezzel az asztali nézet letisztultságát.
-
-... (korábbi verziók)--- START OF FILE README.md ---
-
-# Költségkalkulátor v3.2.37
-
-## 1. Projekt Bemutatása
-Helyszíni szerelési projektek költségbecslésére szolgáló, modern, reszponzív webalkalmas.
-
-## 2. Legutóbbi Változások (v3.2.37)
-- **Professzionálisabb Nyomtatás:** A PDF fejlécben az üresen hagyott adatok helyett a "nincs megadva" szöveg jelenik meg.
-- **Felhasználói Felület Finomhangolása:** Az árlisták szerkesztő felülete tovább javult: a beviteli mezők új, szürke hátteret kaptak, a jobb oldali térköz pedig megnövelésre került a szellősebb dizájn érdekében.
-- **Stabilitás és Dizájn:** A szerkesztőfelület egy robusztus grid elrendezést használ, amely biztosítja az összes díjtétel tökéletes, rendezett megjelenítését.
-
-Részletesebb információkért lásd a `changelog.md` fájlt.
+</html>

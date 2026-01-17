@@ -1,5 +1,21 @@
 # Változási Napló
 
+## v3.2.38 - Felhasználói Felület Finomhangolása
+*Dátum: 2024-06-19*
+
+### Fejlesztések
+- **Ellenőrzött Implementáció:** A korábbi kérések (pl. PDF fejléc "nincs megadva" szövege, árlista beviteli mezőinek stílusa) sikeresen implementálva és ellenőrizve lettek.
+- **Szimmetrikusabb Elrendezés:** Az árlista szerkesztő felületén a jobb oldali térköz megnövelésre került a letisztultabb, szellősebb megjelenés érdekében.
+- **Általános Ellenőrzés:** A landing page és az alkalmazás általános működése ellenőrizve, hibát nem tartalmaz.
+
+## v3.2.37 - Továbbfejlesztett Dizájn és Nyomtatási Kép
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **PDF Fejléc Finomhangolása:** A nyomtatott dokumentum fejlécében az üresen hagyott mezők helyett a "-" jel helyett mostantól a "nincs megadva" szöveg jelenik meg.
+- **Árlista Szerkesztő Stílusa:** A díjtételek beviteli mezői szürke hátteret kaptak a jobb vizuális elkülönülés érdekében.
+- **Szellősebb Elrendezés:** Az árlista szerkesztő jobb szélén megnövelt térköz biztosít egy letisztultabb, szimmetrikusabb megjelenést.
+
 ## v3.2.36 - Finomhangolt Árlista Szerkesztő Elrendezés
 *Dátum: 2024-06-18*
 
@@ -21,19 +37,5 @@
 ### Fejlesztések
 - **Teljeskörű Árlista Nyomtatás:** A nyomtatható árlista mostantól az összes díjtételt tartalmazza, beleértve a haszonkulcsokat is. A tételek a jobb áttekinthetőség érdekében logikai csoportokba vannak rendezve.
 - **Reszponzív "Bezárás" Gomb:** Az eredménytáblázat "Bezárás" gombja mostantól csak mobilnézetben jelenik meg, amikor a panel felugró ablakként viselkedik, javítva ezzel az asztali nézet letisztultságát.
-
-## v3.2.33 - Díjtételek Kezelőjének Finomhangolása
-*Dátum: 2024-06-18*
-
-### Fejlesztések
-- **Minden Díjtétel Szerkeszthető:** A `rates.json`-ben minden díjtétel átkerült a felülírható kategóriába, ezzel biztosítva, hogy az összes tétel megjelenik és módosítható a díjtételek szerkesztőjében.
-- **Rendezettebb Elrendezés:** A díjtételek szerkesztőjében a címkék és beviteli mezők mostantól rendezetten, két oszlopban jelennek meg a jobb átláthatóságért.
-- **Vizuális Elválasztás:** A személyi díjakon belül a szerelői és mérnöki kategóriák egy finom elválasztóval különülnek el.
-
-## v3.2.32 - Kritikus HTML Struktúra Javítás
-*Dátum: 2024-06-18*
-
-### Javítások
-- **Oldal Elrendezésének Végleges Helyreállítása:** Kijavítva egy kritikus hiba, amely miatt a HTML fájl végére hibásan extra tartalom került, ami az oldal elrendezésének szétesését okozta. A hiba forrása azonosítva és a javítási folyamat megerősítve a jövőbeli előfordulás megelőzése érdekében.
 
 ... (korábbi verziók)
