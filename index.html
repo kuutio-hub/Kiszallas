@@ -316,7 +316,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.19";
+        const APP_VERSION = "v3.2.20";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -848,4 +848,43 @@
         };
     </script>
 </body>
-</html>
+</html>--- END OF FILE prompts/prompt_3_features.md ---
+
+# Funkció Prompt (Prompt_3) - Kiegészítő Funkciók és Finomítások
+
+Ez a prompt az alapvető funkciókon túli, a felhasználói élményt javító kiegészítő funkciókat és a meglévő működés finomítását írja le.
+
+## 1. Felhasználói Élményt Javító Funkciók (UX)
+
+- **Témaváltó:**
+    - Egy gomb a fejlécben, amely lehetővé teszi a váltást a sötét (`.dark-mode`) és világos (`.light-mode`) téma között.
+    - A kiválasztott téma `localStorage`-ban tárolódik, így a felhasználó preferenciája megmarad a következő látogatáskor is.
+- **Reszponzív Összesítő Nézet:**
+    - Mobilon (`@media (max-width: 1023px)`) a jobb oldali kalkulációs táblázat alapértelmezetten rejtve van.
+    - Egy lebegő akciógomb (Floating Action Button - FAB) jelenik meg a jobb alsó sarokban, amellyel a táblázat teljes képernyős modális ablakként előhívható.
+    - A modális ablaknak van egy "Bezárás" gombja, amellyel visszatérhet a felhasználó a beviteli felületre.
+- **Automatikus Kijelölés:** A numerikus és szöveges beviteli mezőkre kattintva a mező teljes tartalma automatikusan kijelölődik, megkönnyítve az értékek gyors felülírását.
+- **Utazási Idő Egységváltó:** Az "Utazási idő" beviteli mező címkéjében az "óra" szóra kattintva az egység átvált "percre", és a beviteli mező értéke automatikusan átszámolódik (és fordítva). Ez a funkció (`.travel-unit-toggle`) JavaScript segítségével valósul meg.
+
+## 2. Kalkulációs Logika Finomítása
+
+- **Nulla Értékek Kezelése:** A `calculateCosts` funkciónak robusztusnak kell lennie: a `null`, `undefined` vagy üres string bemeneti értékeket `0`-ként kell kezelnie, hogy elkerülje a `NaN` (Not a Number) hibákat a számításokban.
+- **Szerelésvezetői Díj Számításának Pontosítása:**
+    - A szerelésvezetői díj csak azokon a napokon merülhet fel, amikor a szerelők mérnöki felügyelet nélkül dolgoznak.
+    - A számításnak a **ténylegesen átfedés nélküli napokat** kell figyelembe vennie. Például, ha van 10 szerelői munkanap és 3 mérnöki munkanap, akkor a szerelésvezetői díj 7 napra számolandó el. Ezt a hétköznapi és hétvégi napokra külön-külön kell elvégezni.
+    - `Szerelésvezetői Napok (hétköznap) = max(0, Szerelői Hétköznapok - Mérnöki Hétköznapok)`
+    - `Szerelésvezetői Napok (hétvége) = max(0, Szerelői Hétvégi Napok - Mérnöki Hétvégi Napok)`
+
+## 3. Adatkezelés és Perzisztencia
+
+- **`localStorage` Használata:**
+    - **Árlisták:** A felhasználó által létrehozott árlisták (`rates`) egy `kalkulator_user_rates` nevű kulcs alatt, JSON stringként tárolódnak.
+    - **Téma:** A kiválasztott téma (`theme`, értéke lehet 'light' vagy 'dark') a `kalkulator_theme` kulcs alatt tárolódik.
+    - **Árfolyamok:** A lekért árfolyamadatok (`exchangeRates`) a `kalkulator_exchange_rates` kulcs alatt tárolódnak egy időbélyeggel együtt, hogy elkerülhetők legyenek a felesleges API hívások.
+- **Alapértelmezett Állapot:** Az alkalmazás első indításakor, ha a `localStorage`-ban nem találhatók a szükséges kulcsok, az alapértelmezett állapotot kell létrehoznia (sötét téma, nincsenek felhasználói árlisták).
+
+## 4. Adminisztrációs Funkciók
+
+- **Felhasználói Árlisták Védelme:** A felhasználó által létrehozott árlistáknál egy "Védett" jelölőnégyzet biztosítja, hogy a lista ne legyen véletlenül törölhető. A védett listák törléséhez az adminisztrátori jelszó ismételt megadása szükséges egy `prompt()` ablakban.
+- **Utolsó Árlista Védelme:** A rendszernek meg kell akadályoznia az utolsó meglévő (akár gyári, akár felhasználói) árlista törlését. A törlés gombnak inaktívvá kell válnia, ha csak egy árlista maradt.
+- **Visszaállítás Gomb:** Egy "Minden törlése" (`#reset-btn`) gomb a fejlécben, amely egy `confirm()` dialógus után törli az összes beviteli mező tartalmát és a `localStorage`-ban tárolt összes, az alkalmazáshoz tartozó adatot, majd újratölti az oldalt, visszaállítva a gyári állapotot.
