@@ -377,7 +377,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.27";
+        const APP_VERSION = "v3.2.28";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -489,7 +489,7 @@
                 if (latestDate && state.exchangeRates.rates[latestDate].HUF) {
                     state.latestExchangeRateDate = latestDate;
                     const rateInput = D('exchange-rate-manual');
-                    rateInput.value = state.exchangeRates.rates[latestDate].HUF.toFixed(2);
+                    rateInput.value = state.exchangeRates.rates[latestDate].HUF.toFixed(2).replace('.', ',');
                     formatInputField(rateInput);
                     D('exchange-rate-title').innerHTML = `Árfolyam (${new Date(latestDate).toLocaleDateString('hu-HU')})`;
                 }
@@ -876,7 +876,7 @@
 
                         formGroup.appendChild(input);
                         fieldsContainer.appendChild(formGroup);
-                        if (!isDisabled) addInputFormatting(input);
+                        addInputFormatting(input);
                     }
                 });
             });
