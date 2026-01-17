@@ -58,7 +58,9 @@
         .header input:focus, .header select:focus { outline: none; box-shadow: 0 0 0 3px var(--glow-color); }
         
         .input-with-button { display: flex; align-items: center; flex-grow: 1; }
-        .input-with-button button { padding: 0 0.6rem; border: none; background-color: var(--bg-tertiary); color: var(--text-primary); cursor: pointer; transition: background-color 0.2s; height: 100%; }
+        .input-with-button input { padding-right: 2.5rem !important; }
+        .input-with-button button { padding: 0 0.6rem; border: none; background-color: var(--bg-tertiary); color: var(--text-primary); cursor: pointer; transition: background-color 0.2s; height: 100%; position: absolute; right: 0; top: 0; border-top-right-radius: var(--border-radius); border-bottom-right-radius: var(--border-radius); }
+        .header-item .input-with-button { position: relative; }
         .input-with-button button:hover { background-color: var(--accent-primary); color: var(--text-on-accent); }
         
         .seahawks-select { -webkit-appearance: none; -moz-appearance: none; appearance: none; padding-right: 2rem !important; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2369BE28'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 0.5rem center; }
@@ -104,10 +106,13 @@
         .radio-pill input:checked + span { background-color: var(--accent-primary); color: var(--text-on-accent); font-weight: bold; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); }
-        #print-preview-modal { z-index: 2001; }
+        #print-preview-modal, #wiki-modal { z-index: 2001; }
         .modal-content { background-color: var(--bg-secondary); margin: 5vh auto; padding: 1.5rem; width: 90%; max-width: 900px; border-radius: var(--border-radius); border: 1px solid var(--border-color); display: flex; flex-direction: column; max-height: 90vh; }
         .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
         .modal-body { overflow-y: auto; flex-grow: 1; }
+        .modal-body h3 { margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--accent-primary); border-bottom: 1px solid var(--border-color); padding-bottom: 0.5rem; }
+        .modal-body p, .modal-body li { line-height: 1.6; color: var(--text-primary); }
+        .modal-body ul { padding-left: 20px; margin-bottom: 1rem;}
         .modal-footer { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border-color); }
         .modal-close-btn { background: none; border: none; color: var(--text-primary); font-size: 1.5rem; cursor: pointer; }
         
@@ -125,10 +130,12 @@
         .other-cost-row-1, .other-cost-row-2 { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; }
         .other-cost-row-1 .description { flex: 1 1 auto; }
         .other-cost-row-1 .delete-btn { flex-shrink: 0; }
-        .other-cost-row-2 .quantity, .other-cost-row-2 .unit, .other-cost-row-2 .amount, .other-cost-row-2 .multiplier { flex: 1 1 90px; }
-        .other-cost-row-2 .is-cost-item-group { display: flex; align-items: center; gap: 0.5rem; flex: 0 1 auto; white-space: nowrap; padding-bottom: 0.5rem; }
-        .other-cost-row-2 .multiplier { transition: visibility 0.2s, opacity 0.2s; }
-        .other-cost-row-2 .multiplier.hidden { visibility: hidden; opacity: 0; }
+        .other-cost-row-2 .quantity { flex: 1 1 60px; }
+        .other-cost-row-2 .unit { flex: 1 1 70px; }
+        .other-cost-row-2 .amount { flex: 1 1 90px; }
+        .other-cost-row-2 .cost-toggle-container { flex: 1 1 120px; }
+        .other-cost-row-2 .is-cost-item-group, .other-cost-row-2 .multiplier { padding-bottom: 0.5rem; }
+        .other-cost-row-2 .is-cost-item-group { display: flex; align-items: center; gap: 0.5rem; white-space: nowrap; }
 
         #calculation-summary-header-content { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; padding: 1rem; }
         #calculation-summary-header-content .summary-title { flex-basis: 100%; text-align: center; font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: var(--accent-primary); }
@@ -203,6 +210,9 @@
                     <div id="theme-switcher" class="header-action-btn" title="Téma váltás" style="border-radius: var(--border-radius); border: 1px solid var(--border-color); padding: 0.5rem;">
                         <svg viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0s.39-1.02 0-1.41L5.99 4.58zm12.37 12.37c-.39-.39-1.02-.39-1.41 0-.39.39-.39 1.02 0 1.41l1.06 1.06c.39.39 1.02.39 1.41 0 .39-.39.39-1.02 0-1.41l-1.06-1.06zm1.06-10.96c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06zM7.05 18.36c.39-.39.39-1.02 0-1.41-.39-.39-1.02-.39-1.41 0l-1.06 1.06c-.39.39-.39 1.02 0 1.41s1.02.39 1.41 0l1.06-1.06z"/></svg>
                     </div>
+                    <button id="wiki-btn" class="header-action-btn" title="Súgó" style="border-radius: var(--border-radius); border: 1px solid var(--border-color); padding: 0.5rem;">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:20px;height:20px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.89 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+                    </button>
                 </div>
             </header>
 
@@ -313,10 +323,49 @@
             </div>
         </div>
     </div>
+    
+    <div id="wiki-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Használati Útmutató</h2>
+                <button class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Alapvető Használat</h3>
+                <p>Az alkalmazás a helyszíni kiszállások költségeinek gyors és pontos becslésére szolgál. A bal oldali, lenyitható panelekben adhatja meg a projekt részleteit.</p>
+                <ul>
+                    <li><strong>Fejléc:</strong> Itt válthat árlistát, pénznemet (HUF/EUR), adhat meg egyedi árfolyamot és globális kedvezményt.</li>
+                    <li><strong>Adatpanelek:</strong> Töltse ki a releváns mezőket az utazásra, személyzetre és eszközökre vonatkozóan. A számítás valós időben frissül a jobb oldali táblázatban.</li>
+                    <li><strong>Egyéb költségek:</strong> Lehetősége van egyedi tételek hozzáadására.
+                        <ul>
+                            <li><strong>Normál tétel:</strong> Adja meg a tétel nevét, mennyiségét és a nettó eladási árat.</li>
+                            <li><strong>Önköltséges tétel:</strong> Pipálja be az "Önköltséges?" jelölőnégyzetet. Ekkor a jelölő helyén megjelenik a "Haszonkulcs" mező. Az "Ár" mezőbe a tétel beszerzési árát (önköltséget) írja, a rendszer erre számolja rá a megadott haszonkulcsot.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h3>Számítási Logika</h3>
+                <ul>
+                    <li><strong>Személyi díjak:</strong> A rendszer a Mérnök > Szerelésvezető > Szerelő prioritás alapján számol. Szerelésvezetői díj csak azokon a napokon merül fel, amikor szerelők mérnök felügyelete nélkül dolgoznak.</li>
+                    <li><strong>Önköltség és haszonkulcs:</strong> A szállás, emelőgép és az egyedileg "önköltségesnek" jelölt tételek eladási ára a megadott beszerzési árból és a hozzáadott haszonkulcsból tevődik össze.</li>
+                </ul>
+                 <h3>Nyomtatás és Nézetek</h3>
+                 <p>Az alsó sávban három nézet közül választhat, amelyek a jobb oldali táblázat és a nyomtatási kép részletességét is befolyásolják:</p>
+                 <ul>
+                    <li><strong>Egyszerű:</strong> Csak a főbb kategóriák és a végösszegek látszanak. Ideális ügyfélajánlatokhoz.</li>
+                    <li><strong>Részletes:</strong> Minden tételt megjelenít mennyiséggel, egységárral és összesített árral.</li>
+                    <li><strong>Teljes:</strong> A részletes nézet kiegészítve az önköltségi oszloppal. Ez a nézet belső használatra készült, a nyomtatási képen vízjellel ellátva.</li>
+                </ul>
+            </div>
+             <div class="modal-footer" style="justify-content: flex-end;">
+                <button class="btn modal-close-btn" style="font-size: 0.9rem;">Bezárás</button>
+            </div>
+        </div>
+    </div>
+
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.20";
+        const APP_VERSION = "v3.2.21";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -436,6 +485,7 @@
                 D('currency-select').onchange = (e) => { state.activeCurrency = e.target.value; calculateAndDisplay(); };
                 D('reset-btn').onclick = () => { if(confirm("Minden beviteli mezőt töröl? A módosított árak is alaphelyzetbe állnak.")) location.reload(); };
                 D('theme-switcher').onclick = () => document.body.classList.toggle('light-mode');
+                D('wiki-btn').onclick = () => D('wiki-modal').style.display = 'block';
                 
                 D('manage-rates-btn').onclick = openRateManager;
                 D('print-btn').onclick = () => handlePrint();
@@ -785,7 +835,16 @@
             const container = D('other-costs-list');
             container.innerHTML = state.otherCosts.map((item, index) => {
                 const amountLabel = item.isCostItem ? 'Önköltség (HUF)' : 'Ár (HUF)';
-                const multiplierVisibilityClass = item.isCostItem ? '' : 'hidden';
+                
+                const costToggleHtml = item.isCostItem 
+                    ? `<div class="form-group multiplier">
+                           <label>Haszonkulcs (%)</label>
+                           <input type="number" data-index="${index}" data-field="multiplier" value="${item.multiplier}">
+                       </div>`
+                    : `<div class="form-group is-cost-item-group">
+                           <input type="checkbox" id="is-cost-item-${index}" data-index="${index}" data-field="isCostItem">
+                           <label for="is-cost-item-${index}">Önköltséges?</label>
+                       </div>`;
 
                 return `
                 <div class="other-cost-item">
@@ -800,8 +859,7 @@
                         <div class="form-group quantity"><label>Menny.</label><input type="number" data-index="${index}" data-field="quantity" value="${item.quantity}"></div>
                         <div class="form-group unit"><label>Egység</label><input type="text" data-index="${index}" data-field="unit" value="${item.unit}"></div>
                         <div class="form-group amount"><label>${amountLabel}</label><input type="number" data-index="${index}" data-field="amount" value="${item.amount}"></div>
-                        <div class="form-group is-cost-item-group"><input type="checkbox" id="is-cost-item-${index}" data-index="${index}" data-field="isCostItem" ${item.isCostItem ? 'checked' : ''}><label for="is-cost-item-${index}">Önköltséges?</label></div>
-                        <div class="form-group multiplier ${multiplierVisibilityClass}"><label>Haszonkulcs (%)</label><input type="number" data-index="${index}" data-field="multiplier" value="${item.multiplier}"></div>
+                        <div class="cost-toggle-container">${costToggleHtml}</div>
                     </div>
                 </div>`;
             }).join('');
@@ -815,7 +873,7 @@
                 const value = target.type === 'checkbox' ? target.checked : (target.type === 'number' ? parseFloat(target.value) || 0 : target.value);
                 state.otherCosts[index][field] = value;
                 if (field === 'isCostItem') {
-                    setupOtherCostsList(); // Re-render to update labels and visibility
+                    setupOtherCostsList(); 
                 }
                 calculateAndDisplay();
             }
@@ -848,43 +906,4 @@
         };
     </script>
 </body>
-</html>--- END OF FILE prompts/prompt_3_features.md ---
-
-# Funkció Prompt (Prompt_3) - Kiegészítő Funkciók és Finomítások
-
-Ez a prompt az alapvető funkciókon túli, a felhasználói élményt javító kiegészítő funkciókat és a meglévő működés finomítását írja le.
-
-## 1. Felhasználói Élményt Javító Funkciók (UX)
-
-- **Témaváltó:**
-    - Egy gomb a fejlécben, amely lehetővé teszi a váltást a sötét (`.dark-mode`) és világos (`.light-mode`) téma között.
-    - A kiválasztott téma `localStorage`-ban tárolódik, így a felhasználó preferenciája megmarad a következő látogatáskor is.
-- **Reszponzív Összesítő Nézet:**
-    - Mobilon (`@media (max-width: 1023px)`) a jobb oldali kalkulációs táblázat alapértelmezetten rejtve van.
-    - Egy lebegő akciógomb (Floating Action Button - FAB) jelenik meg a jobb alsó sarokban, amellyel a táblázat teljes képernyős modális ablakként előhívható.
-    - A modális ablaknak van egy "Bezárás" gombja, amellyel visszatérhet a felhasználó a beviteli felületre.
-- **Automatikus Kijelölés:** A numerikus és szöveges beviteli mezőkre kattintva a mező teljes tartalma automatikusan kijelölődik, megkönnyítve az értékek gyors felülírását.
-- **Utazási Idő Egységváltó:** Az "Utazási idő" beviteli mező címkéjében az "óra" szóra kattintva az egység átvált "percre", és a beviteli mező értéke automatikusan átszámolódik (és fordítva). Ez a funkció (`.travel-unit-toggle`) JavaScript segítségével valósul meg.
-
-## 2. Kalkulációs Logika Finomítása
-
-- **Nulla Értékek Kezelése:** A `calculateCosts` funkciónak robusztusnak kell lennie: a `null`, `undefined` vagy üres string bemeneti értékeket `0`-ként kell kezelnie, hogy elkerülje a `NaN` (Not a Number) hibákat a számításokban.
-- **Szerelésvezetői Díj Számításának Pontosítása:**
-    - A szerelésvezetői díj csak azokon a napokon merülhet fel, amikor a szerelők mérnöki felügyelet nélkül dolgoznak.
-    - A számításnak a **ténylegesen átfedés nélküli napokat** kell figyelembe vennie. Például, ha van 10 szerelői munkanap és 3 mérnöki munkanap, akkor a szerelésvezetői díj 7 napra számolandó el. Ezt a hétköznapi és hétvégi napokra külön-külön kell elvégezni.
-    - `Szerelésvezetői Napok (hétköznap) = max(0, Szerelői Hétköznapok - Mérnöki Hétköznapok)`
-    - `Szerelésvezetői Napok (hétvége) = max(0, Szerelői Hétvégi Napok - Mérnöki Hétvégi Napok)`
-
-## 3. Adatkezelés és Perzisztencia
-
-- **`localStorage` Használata:**
-    - **Árlisták:** A felhasználó által létrehozott árlisták (`rates`) egy `kalkulator_user_rates` nevű kulcs alatt, JSON stringként tárolódnak.
-    - **Téma:** A kiválasztott téma (`theme`, értéke lehet 'light' vagy 'dark') a `kalkulator_theme` kulcs alatt tárolódik.
-    - **Árfolyamok:** A lekért árfolyamadatok (`exchangeRates`) a `kalkulator_exchange_rates` kulcs alatt tárolódnak egy időbélyeggel együtt, hogy elkerülhetők legyenek a felesleges API hívások.
-- **Alapértelmezett Állapot:** Az alkalmazás első indításakor, ha a `localStorage`-ban nem találhatók a szükséges kulcsok, az alapértelmezett állapotot kell létrehoznia (sötét téma, nincsenek felhasználói árlisták).
-
-## 4. Adminisztrációs Funkciók
-
-- **Felhasználói Árlisták Védelme:** A felhasználó által létrehozott árlistáknál egy "Védett" jelölőnégyzet biztosítja, hogy a lista ne legyen véletlenül törölhető. A védett listák törléséhez az adminisztrátori jelszó ismételt megadása szükséges egy `prompt()` ablakban.
-- **Utolsó Árlista Védelme:** A rendszernek meg kell akadályoznia az utolsó meglévő (akár gyári, akár felhasználói) árlista törlését. A törlés gombnak inaktívvá kell válnia, ha csak egy árlista maradt.
-- **Visszaállítás Gomb:** Egy "Minden törlése" (`#reset-btn`) gomb a fejlécben, amely egy `confirm()` dialógus után törli az összes beviteli mező tartalmát és a `localStorage`-ban tárolt összes, az alkalmazáshoz tartozó adatot, majd újratölti az oldalt, visszaállítva a gyári állapotot.
+</html>
