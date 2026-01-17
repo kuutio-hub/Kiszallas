@@ -1,5 +1,17 @@
 # Változási Napló
 
+## v3.2.23 - Kódkarbantartás és Tisztítás
+*Dátum: 2024-06-15*
+
+### Javítások
+- **Kódmaradvány Eltávolítása:** Eltávolításra került egy jelentős mennyiségű, hibásan a HTML fájl végére került szöveges tartalom (dokumentációs fájlok maradványai), amely látható volt a felhasználói felületen.
+
+## v3.2.22 - UI Igazítás
+*Dátum: 2024-06-14*
+
+### Javítások
+- **CSS Igazítás:** Az "Egyéb költségek" szekcióban a "Haszonkulcs" beviteli mező tökéletesen egy vonalba került a sor többi elemével a felhasználói élmény javítása érdekében.
+
 ## v3.2.21 - Felhasználói Felület Finomítások és Súgó
 *Dátum: 2024-06-14*
 
