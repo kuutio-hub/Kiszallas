@@ -1,5 +1,12 @@
 # Változási Napló
 
+## v3.2.34 - UI Finomhangolás és Bővített Nyomtatás
+*Dátum: 2024-06-18*
+
+### Fejlesztések
+- **Teljeskörű Árlista Nyomtatás:** A nyomtatható árlista mostantól az összes díjtételt tartalmazza, beleértve a haszonkulcsokat is. A tételek a jobb áttekinthetőség érdekében logikai csoportokba vannak rendezve.
+- **Reszponzív "Bezárás" Gomb:** Az eredménytáblázat "Bezárás" gombja mostantól csak mobilnézetben jelenik meg, amikor a panel felugró ablakként viselkedik, javítva ezzel az asztali nézet letisztultságát.
+
 ## v3.2.33 - Díjtételek Kezelőjének Finomhangolása
 *Dátum: 2024-06-18*
 

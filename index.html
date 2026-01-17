@@ -120,6 +120,7 @@
         #print-preview-iframe { width: 100%; height: 60vh; border: 1px solid var(--border-color); background-color: #fff; }
 
         .mobile-results-btn { display: none; }
+        .close-mobile-results { display: none; }
 
         #rate-editor-fields .rate-group-title {
             grid-column: 1 / -1; margin-top: 1.5rem; margin-bottom: 0.5rem; font-size: 1rem;
@@ -414,7 +415,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.33";
+        const APP_VERSION = "v3.2.34";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1016,13 +1017,22 @@
         function getRateListPrintableHtml(pkg) {
             const allRates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
             let tableRows = '';
-            Object.entries(allRates).forEach(([key, value]) => {
-                if (!key.endsWith('_szorzo')) {
-                     tableRows += `<tr><td>${state.config.RATE_KEY_LABELS[key] || key}</td><td style="text-align:right;">${formatCustomCurrency(value, 'Ft')}</td></tr>`;
-                }
+
+            RATE_EDITOR_GROUPS.forEach(group => {
+                tableRows += `<tr><td colspan="2" style="background-color: #f2f2f2; font-weight: bold; text-align: left; padding-left: 10px;">${group.title}</td></tr>`;
+                group.keys.forEach(key => {
+                     if (allRates.hasOwnProperty(key)) {
+                        const label = state.config.RATE_KEY_LABELS[key] || key;
+                        const value = allRates[key];
+                        const isPercentage = key.endsWith('_szorzo');
+                        const formattedValue = isPercentage ? `${value} %` : formatCustomCurrency(value, 'Ft');
+                        tableRows += `<tr><td style="padding-left: 20px;">${label}</td><td style="text-align:right;">${formattedValue}</td></tr>`;
+                     }
+                });
             });
+
             const title = `Árlista: ${pkg.name}`;
-            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${title}</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm 50mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style></head><body><h1>${title}</h1><p><strong>Dátum:</strong> ${new Date().toLocaleDateString('hu-HU')}</p><table><thead><tr><th>Megnevezés</th><th style="text-align:right;">Egységár (Ft)</th></tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${title}</title><style>@font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');} @page{size:A4;margin:25mm 50mm;} body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important;} table{width:100%;border-collapse:collapse;margin-top:20px;} th,td{border:1px solid #ccc;padding:8px;text-align:left;} th{background-color:#f2f2f2;}</style></head><body><h1>${title}</h1><p><strong>Dátum:</strong> ${new Date().toLocaleDateString('hu-HU')}</p><table><thead><tr><th>Megnevezés</th><th style="text-align:right;">Érték</th></tr></thead><tbody>${tableRows}</tbody></table></body></html>`;
         }
 
         function setupOtherCostsList() {
