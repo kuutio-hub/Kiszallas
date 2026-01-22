@@ -1,10 +1,8 @@
 
-Checkpoint: v3.2.42 - Stabilizált logika és professzionális PDF kimenet
+Checkpoint: v3.2.43 - Arculati finomhangolás
 
-Ez a verzió a korábbi funkcionális kérések pontosítására és a vizuális minőség javítására fókuszál.
+Ez a verzió a vizuális identitás erősítését célozta meg.
 
-Főbb fejlesztések:
-- **Üzleti Logika Pontosítása:** Jármű km díj kivezetése az önköltségi körből.
-- **Időváltó Fix:** Precíz óra/perc konverzió az utazási adatoknál.
-- **Prémium PDF Megjelenés:** Kiemelt kedvezmények, elválasztó vonalak és dinamikus fájlnévkezelés.
-- **Visszakövethetőség:** Az alkalmazás URL-je beépítésre került a nyomtatási láblécbe.
+Főbb változások:
+- **Identitás:** Az alkalmazás neve "Kiszállás", és egyedi, témához illő favicont kapott.
+- **Stabilitás:** Megőrizte a v3.2.42 logikai és nyomtatási fejlesztéseit.

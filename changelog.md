@@ -1,6 +1,12 @@
 
 # Változási Napló
 
+## v3.2.43 - Arculati Frissítés
+*Dátum: 2024-06-20*
+
+- **App Név:** Az alkalmazás böngésző címsorában megjelenő neve "Kiszállás"-ra módosult.
+- **Favicon:** Egyedi, a sötétkék-zöld "Industrial Seahawks" témához illeszkedő SVG favicon került beállításra (hexagonális K betű).
+
 ## v3.2.42 - Javítások és PDF Esztétika
 *Dátum: 2024-06-20*
 
