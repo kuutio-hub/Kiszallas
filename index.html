@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="hu">
 <head>
@@ -418,7 +419,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.41";
+        const APP_VERSION = "v3.2.42";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -614,6 +615,13 @@
 
                 D('app-container').addEventListener('click', (e) => {
                     const target = e.target.closest('button');
+                    const spanTarget = e.target.closest('.travel-unit-toggle');
+                    
+                    if (spanTarget) {
+                        handleTravelUnitToggle();
+                        return;
+                    }
+
                     if (!target) return;
                     
                     if (target.classList.contains('other-cost-delete-btn')) {
@@ -630,8 +638,6 @@
                         }
                     } else if (target.closest('.card-save-btn')) {
                         target.closest('details').open = false;
-                    } else if (target.closest('.travel-unit-toggle')) {
-                        handleTravelUnitToggle();
                     }
                 });
 
@@ -781,7 +787,7 @@
             
             addItem('Kiszállási díj - Szerelő', travelTime * 2 * (inputs.utazas_odautak_szama_szerelo || 0) * sF, 'óra', rates.kiszallasi_dij_szerelo, rates.kiszallasi_dij_szerelo, false);
             addItem('Kiszállási díj - Mérnök', travelTime * 2 * (inputs.utazas_odautak_szama_mernok || 0) * mF, 'óra', rates.kiszallasi_dij_mernok, rates.kiszallasi_dij_mernok, false);
-            addItem('Jármű km díj', (inputs.utazas_tavolsag_km || 0) * 2 * ((inputs.utazas_odautak_szama_szerelo || 0) * (inputs.utazas_jarmuvek_szama_szerelo || 0) + (inputs.utazas_odautak_szama_mernok || 0) * (inputs.utazas_jarmuvek_szama_mernok || 0)), 'km', rates.km_dij, rates.km_dij, true);
+            addItem('Jármű km díj', (inputs.utazas_tavolsag_km || 0) * 2 * ((inputs.utazas_odautak_szama_szerelo || 0) * (inputs.utazas_jarmuvek_szama_szerelo || 0) + (inputs.utazas_odautak_szama_mernok || 0) * (inputs.utazas_jarmuvek_szama_mernok || 0)), 'km', rates.km_dij, rates.km_dij, false);
             
             addItem('Szállás költség', (inputs.szerelo_szallas_ejszaka || 0) * sF + (inputs.mernok_szallas_ejszaka || 0) * mF, 'éj', rates.szallas_dij * (1 + rates.szallas_szorzo / 100), rates.szallas_dij, true);
 
@@ -958,13 +964,23 @@
 
         function handlePrint(isRateList = false, pkg) {
             const iframe = D('print-preview-iframe');
+            const inputs = getInputs();
             let printableHtml;
+            let docTitle = "Kalkuláció";
+
             if (isRateList && pkg) {
                 printableHtml = getRateListPrintableHtml(pkg);
+                docTitle = `Arlista-${pkg.name}`;
             } else {
                 const detailLevel = document.querySelector('input[name="print-detail"]:checked').value;
-                printableHtml = getPrintableHtml(detailLevel, getInputs(), state.calculationResults);
+                printableHtml = getPrintableHtml(detailLevel, inputs, state.calculationResults);
+                const offerNum = inputs.offer_number || "X";
+                const dateStr = inputs.calculation_date || new Date().toISOString().split('T')[0];
+                docTitle = `${offerNum}-Kalk-${dateStr}`;
             }
+            
+            // Beállítjuk a címet, hogy a böngésző fájlnévként javasolja
+            document.title = docTitle;
             iframe.srcdoc = printableHtml;
             iframe.onload = () => { iframe.contentWindow.scrollTo(0, 0); };
             D('print-preview-modal').style.display = 'block';
@@ -1004,7 +1020,7 @@
             let footerHtml = '';
             if (showCost) {
                 const totalCostFinal = convertPrice(totalCostHuf, currency);
-                footerHtml += `<tr><td colspan="${colspanForLabel}" style="text-align:right; font-weight:bold;">Önköltség összesen:</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal, symbol)}</td></tr>`;
+                footerHtml += `<tr class="summary-line"><td colspan="${colspanForLabel}" style="text-align:right; font-weight:bold;">Önköltség összesen:</td><td style="text-align:right; font-weight:bold;">${formatCustomCurrency(totalCostFinal, symbol)}</td></tr>`;
             }
 
             const printHeader = `<div style="display:flex; justify-content:space-between; width:100%; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 10px;">
@@ -1028,27 +1044,29 @@
             const isInternal = detailLevel === 'internal';
             const watermarkHtml = isInternal ? `<div class="watermark">BELSŐ HASZNÁLATRA</div>` : "";
             const thStyle = isInternal ? 'background-color: rgba(242, 242, 242, 0.7);' : 'background-color: #f2f2f2;';
-            const footerPrintHTML = `<div class="print-footer"><hr><p>${new Date().getFullYear()} &copy; Költségkalkulátor</p><p>Verzió: ${APP_VERSION}</p></div>`;
+            const footerPrintHTML = `<div class="print-footer"><hr><p>${new Date().getFullYear()} &copy; Költségkalkulátor | Verzió: ${APP_VERSION}</p><p>URL: https://kuutio-hub.github.io/Kiszallas/</p></div>`;
 
-            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>Kalkuláció</title><style>
+            return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${inputs.offer_number || 'Ajánlat'}</title><style>
                 @font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');}
-                @page{size:A4;margin:25mm;}
-                body{position:relative;font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color:#ffffff!important;}
+                @page{size:A4;margin:15mm 20mm;}
+                body{position:relative;font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color:#ffffff!important; padding: 10px;}
                 h1{text-align:center;} p{margin:2px 0;}
                 .print-wrapper{position:relative;z-index:1;}
                 table{width:100%;border-collapse:collapse;margin-top:20px;}
                 th,td{border:1px solid #ccc;padding:6px;text-align:left;}
                 th{${thStyle}}
                 .summary-table{margin-top:20px;width:60%;margin-left:auto;border:none;}
-                .summary-table td{border:none;}
+                .summary-table td{border:none; padding: 4px 6px;}
+                .summary-line { border-top: 1.5px solid #333 !important; }
+                .discount-highlight { color: #d32f2f; font-weight: bold; }
                 .watermark, .print-footer { display: none; }
                 @media print {
                     .watermark { display: block; position:absolute; top:40vh; left:0; right:0; text-align:center; width:100%; transform:rotate(-45deg); font-size:8vw; color:rgba(128,0,0,0.08); z-index:0; font-weight:bold; pointer-events:none; }
-                    .print-footer { display: block; position:fixed; bottom:10mm; left:25mm; right:25mm; text-align:center; font-size:9px; color:#666; }
+                    .print-footer { display: block; position:fixed; bottom:10mm; left:20mm; right:20mm; text-align:center; font-size:9px; color:#666; }
                     .print-footer hr { border: 0; border-top: 1px solid #ccc; margin-bottom: 5px; }
-                    .print-footer p { margin: 0; }
+                    .print-footer p { margin: 2px 0; }
                 }
-            </style></head><body>${watermarkHtml}<div class="print-wrapper">${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr><td colspan="${colspanForLabel}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr><td colspan="${colspanForLabel}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr><td colspan="${colspanForLabel}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></div>${footerPrintHTML}</body></html>`;
+            </style></head><body>${watermarkHtml}<div class="print-wrapper">${printHeader}${summaryHtml}<table><thead><tr><th>Leírás</th>${headerCols}</tr></thead><tbody>${tableRows}</tbody></table><table class="summary-table"><tbody>${footerHtml}<tr class="${!showCost ? 'summary-line' : ''}"><td colspan="${colspanForLabel}" style="text-align:right;">Nettó végösszeg:</td><td style="text-align:right;">${formatCustomCurrency(totalSellFinal,symbol)}</td></tr>${discount>0?`<tr class="discount-highlight"><td colspan="${colspanForLabel}" style="text-align:right;">Kedvezmény (${discount}%):</td><td style="text-align:right;">- ${formatCustomCurrency(totalSellFinal-discountedTotal,symbol)}</td></tr><tr class="summary-line"><td colspan="${colspanForLabel}" style="text-align:right;"><strong>Kedvezményes nettó végösszeg:</strong></td><td style="text-align:right;"><strong>${formatCustomCurrency(discountedTotal,symbol)}</strong></td></tr>`:''}</tbody></table></div>${footerPrintHTML}</body></html>`;
         }
 
         function getRateListPrintableHtml(pkg) {
@@ -1068,20 +1086,20 @@
             });
 
             const title = `Árlista: ${pkg.name}`;
-            const footerPrintHTML = `<div class="print-footer"><hr><p>${new Date().getFullYear()} &copy; Költségkalkulátor</p><p>Verzió: ${APP_VERSION}</p></div>`;
+            const footerPrintHTML = `<div class="print-footer"><hr><p>${new Date().getFullYear()} &copy; Költségkalkulátor | Verzió: ${APP_VERSION}</p><p>URL: https://kuutio-hub.github.io/Kiszallas/</p></div>`;
             
             return `<!DOCTYPE html><html lang="hu"><head><meta charset="UTF-8"><title>${title}</title><style>
                 @font-face{font-family:'DejaVuSans';src:url('https://cdn.jsdelivr.net/gh/dejavu-fonts/dejavu-fonts-ttf/ttf/DejaVuSans.ttf') format('truetype');}
-                @page{size:A4;margin:25mm;}
-                body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important;}
+                @page{size:A4;margin:20mm;}
+                body{font-family:'DejaVuSans',sans-serif;font-size:10px;color:#333; background-color: #ffffff !important; padding: 20px;}
                 table{width:100%;border-collapse:collapse;margin-top:20px;}
                 th,td{border:1px solid #ccc;padding:8px;text-align:left;}
                 th{background-color:#f2f2f2;}
                 .print-footer { display: none; }
                 @media print {
-                    .print-footer { display: block; position:fixed; bottom:10mm; left:25mm; right:25mm; text-align:center; font-size:9px; color:#666; }
+                    .print-footer { display: block; position:fixed; bottom:10mm; left:20mm; right:20mm; text-align:center; font-size:9px; color:#666; }
                     .print-footer hr { border: 0; border-top: 1px solid #ccc; margin-bottom: 5px; }
-                    .print-footer p { margin: 0; }
+                    .print-footer p { margin: 2px 0; }
                 }
             </style></head><body><h1>${title}</h1><p><strong>Dátum:</strong> ${new Date().toLocaleDateString('hu-HU')}</p><table><thead><tr><th>Megnevezés</th><th style="text-align:right;">Érték</th></tr></thead><tbody>${tableRows}</tbody></table>${footerPrintHTML}</body></html>`;
         }
@@ -1139,14 +1157,13 @@
             if (!item) return;
 
             if (target.classList.contains('formatted-input')) {
-                // Formatting handles value on blur/change, we just mark as unsaved
+                // Blur/change will update value
             } else {
                 item[field] = target.type === 'checkbox' ? target.checked : (target.type === 'number' ? parseFloat(target.value) || 0 : target.value);
             }
             
             if (item.isSaved) {
                 item.isSaved = false;
-                // No need to calculate here, main event listener will do it.
             }
             
             if (field === 'isCostItem') {
@@ -1161,15 +1178,19 @@
         function handleTravelUnitToggle() {
             const input = D('utazas_ido_ora');
             const label = document.querySelector('label[for="utazas_ido_ora"]');
+            if (!input || !label) return;
+            
             let currentValue = parseFloat(input.value) || 0;
 
             if (state.travelTimeUnit === 'óra') {
                 state.travelTimeUnit = 'perc';
-                input.value = (currentValue * 60).toFixed(0);
+                const newValue = Math.round(currentValue * 60);
+                input.value = newValue;
                 label.innerHTML = `Utazási idő (<span class="travel-unit-toggle">perc</span>, oda)`;
             } else {
                 state.travelTimeUnit = 'óra';
-                input.value = (currentValue / 60).toFixed(2);
+                const newValue = (currentValue / 60).toFixed(2);
+                input.value = newValue;
                 label.innerHTML = `Utazási idő (<span class="travel-unit-toggle">óra</span>, oda)`;
             }
             calculateAndDisplay();

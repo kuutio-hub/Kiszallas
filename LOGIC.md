@@ -1,3 +1,4 @@
+
 # Költségkalkulátor - Üzleti Logika
 
 Ez a dokumentum a Kiszállási és Szerelési Költségkalkulátor számítási motorjának üzleti logikáját írja le.
@@ -33,7 +34,7 @@ A rendszer dinamikusan dönti el, hogy a szerelői órákból mennyi számít sz
 - Az összes itt szereplő díj (kiszállás, kiküldetés, km, szállás) az aktív árlistából származik.
 - **Kiszállási díj:** Az utazással töltött idő alapján számolódik, oda-vissza úttal.
 - **Kiküldetési díj:** Csak "Külföld" esetén, napidíj alapon.
-- **Jármű km díj:** A távolság alapján, oda-vissza úttal, a megadott számú járműre.
+- **Jármű km díj:** A távolság alapján, oda-vissza úttal, a megadott számú járműre. **Fontos: A km díj nem számít önköltséges tételnek a kalkulációban.**
 - **Szállás:** Személyenként és éjszakánként, a haszonkulccsal növelt áron.
   - `Szállás Költség = Létszám * Éjszakák * (Szállás önköltség * (1 + Szállás haszonkulcs / 100))`
 
