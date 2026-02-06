@@ -1225,15 +1225,21 @@
                     rateYearTables[year][key] = ratePackage.rates.overridable[key] || 0;
                 });
             });
+            
+            const rateYearNames = Object.keys(rateYearTables);
+            const dataSheetHeader = ["Díjtétel", "Kiválasztott érték", null, ...rateYearNames];
+            const rateTableWidth = rateYearNames.length + 1;
+            const rateTableEndCol = XLSX.utils.encode_col(2 + rateTableWidth);
 
             const ws_data_aoa = [
                 ["Aktív árlista (évszám):", pkg.name, null, "Választható árlisták:"],
                 [],
-                ["Díjtétel", "Kiválasztott érték", null, ...Object.keys(rateYearTables)],
+                dataSheetHeader,
             ];
-            const rateYearNames = Object.keys(rateYearTables);
+            
             rateKeys.forEach(key => {
-                const row = [rateNames[key], {t:'n', f:`VLOOKUP(A${ws_data_aoa.length+1},D4:F${rateKeys.length+3},MATCH(B1,D3:F3,0),FALSE)`, z: HUF_FORMAT}, null];
+                const formula = `VLOOKUP(A${ws_data_aoa.length+1},D4:${rateTableEndCol}${rateKeys.length+3},MATCH($B$1,$D$3:${rateTableEndCol}$3,0),FALSE)`;
+                const row = [rateNames[key], {t:'n', f:formula, z: key.includes('_szorzo') ? '0" %"' : HUF_FORMAT}, null];
                 rateYearNames.forEach(year => {
                     row.push(rateYearTables[year][key]);
                 });
@@ -1247,22 +1253,21 @@
             const ws_data = XLSX.utils.aoa_to_sheet(ws_data_aoa);
             ws_data["!cols"] = [{ wch: 40 }, { wch: 20 }, {wch: 5}, { wch: 20 }, { wch: 20 }];
             
-            // Data validation for year selector
             const yearList = rateYearNames.join(',');
             ws_data['!dataValidation'] = [{ sqref: 'B1', type: 'list', formula1: `"${yearList}"` }];
-            ws_data[`B${exchangeRateRow + 1}`].z = HUF_FORMAT;
+            ws_data[`B${exchangeRateRow + 1}`].z = HUF_FORMAT.replace('"', ' Ft/"');
              // Add formatting to rate tables
             for (let r = 3; r < rateKeys.length + 3; r++) {
                 for (let c = 3; c < 3 + rateYearNames.length; c++) {
                     const cellAddress = XLSX.utils.encode_cell({r, c});
+                    const key = rateKeys[r-3];
                     if (ws_data[cellAddress] && typeof ws_data[cellAddress].v === 'number') {
-                         ws_data[cellAddress].z = HUF_FORMAT;
+                         ws_data[cellAddress].z = key.includes('_szorzo') ? '0" %"' : HUF_FORMAT;
                     }
                 }
             }
             XLSX.utils.book_append_sheet(wb, ws_data, "Adatok");
 
-            // Cell references map for the Adatok sheet
             const rateCellMap = {};
             rateKeys.forEach((key, i) => {
                  rateCellMap[key] = `Adatok!$B$${i + 4}`;
@@ -1286,7 +1291,7 @@
                 ws_inputs_aoa.push([]); inputRowIdx++;
             };
             ws_inputs_aoa.push(["Projekt Alapadatok"]); inputRowIdx++;
-            const projectData = [{ id: "offer_number", label: "Ajánlatszám"}, {id: "project_number", label: "Projektszám"}, { id: "customer", label: "Megrendelő"}, { id: "feladat", label: "Feladat leírása"}];
+            const projectData = [{ id: "offer_number", label: "Ajánlatszám"}, {id: "project_number", label: "Projektszám"}, { id: "customer", label: "Megrendelő"}, { id: "feladat", label: "Feladat leírása"}, { id: "creator_name", label: "Készítő"}];
             projectData.forEach(item => {
                 ws_inputs_aoa.push([item.label, inputs[item.id]]);
                 inputCellMap[item.id] = `'Beviteli Adatok'!$B$${inputRowIdx}`;
@@ -1316,8 +1321,8 @@
             r++;
              XLSX.utils.sheet_add_aoa(ws_calc, [[{t:'s', v:"Feladat:"}, {t:'s', f:`='Beviteli Adatok'!B5`}]], { origin: r });
             r+=2;
-            XLSX.utils.sheet_add_aoa(ws_calc, [["", "Mennyiség", "Egységár", "Önköltségi ár", "Ajánlati ár"]], { origin: r });
-            const firstDataRow = r + 1;
+            XLSX.utils.sheet_add_aoa(ws_calc, [["", "Egység", "Mennyiség", "Egységár", "Önköltségi ár", "Ajánlati ár"]], { origin: r });
+            const firstDataRow = r;
 
             const sF = inputCellMap.szerelo_fo, sH = inputCellMap.szerelo_munkaora, sN = inputCellMap.szerelo_munkanap, sW = inputCellMap.szerelo_hetvegi_nap;
             const sSz = inputCellMap.szerelo_szallas_ejszaka, sO = inputCellMap.utazas_odautak_szama_szerelo, sJ = inputCellMap.utazas_jarmuvek_szama_szerelo;
@@ -1329,64 +1334,63 @@
             const sWd = `(${sN}-${sW})`, mWd = `(${mN}-${mW})`, fWd = `MAX(0,${sWd}-${mWd})`, fWe = `MAX(0,${sW}-${mW})`;
             const travelTime = state.travelTimeUnit === 'perc' ? `(${ido}/60)` : ido;
 
-            const addFormulaRow = (label, qtyFormula, unit, unitPriceFormula, costPriceFormula = "0") => {
+            const addFormulaRow = (label, unit, qtyFormula, unitPriceFormula, costPriceFormula = "0") => {
                 r++;
-                const qtyCell = `B${r + 1}`, unitPriceCell = `C${r + 1}`;
-                XLSX.utils.sheet_add_aoa(ws_calc, [[label, { t: 'n', f: qtyFormula, z: `#,##0.00" ${unit}"` }, { t: 'n', f: unitPriceFormula, z: HUF_FORMAT }, { t: 'n', f: costPriceFormula, z: HUF_FORMAT }, { t: 'n', f: `=${qtyCell}*${unitPriceCell}`, z: HUF_FORMAT }]], { origin: r });
+                const qtyCell = `C${r + 1}`, unitPriceCell = `D${r + 1}`;
+                XLSX.utils.sheet_add_aoa(ws_calc, [[label, unit, { t: 'n', f: qtyFormula, z: `#,##0.00` }, { t: 'n', f: unitPriceFormula, z: HUF_FORMAT }, { t: 'n', f: costPriceFormula, z: HUF_FORMAT }, { t: 'n', f: `=${qtyCell}*${unitPriceCell}`, z: HUF_FORMAT }]], { origin: r });
             };
             
-            addFormulaRow("Szerelő emberóra hétköznap", `=(${sF}*${sWd}*${sH})-(${fWd}*${sH})`, "óra", `=${rateCellMap.szerelo_hetkoznap_oradij}`);
-            addFormulaRow("Szerelő emberóra hétvégén", `=(${sF}*${sW}*${sH})-(${fWe}*${sH})`, "óra", `=${rateCellMap.szerelo_hetvege_oradij}`);
-            addFormulaRow("Szerelésvezető óra hétköznap", `=${fWd}*${sH}`, "óra", `=${rateCellMap.szerelesvezeto_hetkoznap_oradij}`);
-            addFormulaRow("Szerelésvezető óra hétvégén", `=${fWe}*${sH}`, "óra", `=${rateCellMap.szerelesvezeto_hetvege_oradij}`);
-            addFormulaRow("Mérnök óradíj (hétköznap)", `=${mF}*${mWd}*${mH}`, "óra", `=${rateCellMap.mernok_hetkoznap_oradij}`);
-            addFormulaRow("Mérnök óradíj (hétvége)", `=${mF}*${mW}*${mH}`, "óra", `=${rateCellMap.mernok_hetvege_oradij}`);
-            addFormulaRow("Kiszállás mérnök", `=${travelTime}*2*${mO}*${mF}`, "óra", `=${rateCellMap.kiszallasi_dij_mernok}`);
-            addFormulaRow("Kiszállás szerelő", `=${travelTime}*2*${sO}*${sF}`, "óra", `=${rateCellMap.kiszallasi_dij_szerelo}`);
-            addFormulaRow("Km díj", `=${tav}*2*(${sO}*${sJ}+${mO}*${mJ})`, "km", `=${rateCellMap.km_dij}`, `=${rateCellMap.km_dij}`);
-            addFormulaRow("Kiküldetés - Mérnök", `=${mF}*${mN}*${isKulfold}`, "nap", `=${rateCellMap.kikuldeles_dij_mernok}`, `=${rateCellMap.kikuldeles_dij_mernok}`);
-            addFormulaRow("Kiküldetés - Szerelő", `=${sF}*${sN}*${isKulfold}`, "nap", `=${rateCellMap.kikuldeles_dij_szerelo}`, `=${rateCellMap.kikuldeles_dij_szerelo}`);
-            r+=2;
-            addFormulaRow("Szállás költség", `=${sSz}*${sF}+${mSz}*${mF}`, "éj", `=${rateCellMap.szallas_dij}*(1+${rateCellMap.szallas_szorzo}/100)`, `=${rateCellMap.szallas_dij}`);
-            r+=2;
-            addFormulaRow("Emelőgép bérlet", `=${eDb}*${eN}`, "nap", `=${rateCellMap.emelogep_napidij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_napidij}`);
-            addFormulaRow("Emelőgép szállítás", `=${eSz}*2`, "alk", `=${rateCellMap.emelogep_szallitas_dij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_szallitas_dij}`);
-            r+=2;
+            addFormulaRow("Szerelő emberóra hétköznap", "óra", `=(${sF}*${sWd}*${sH})-(${fWd}*${sH})`, `=${rateCellMap.szerelo_hetkoznap_oradij}`);
+            addFormulaRow("Szerelő emberóra hétvégén", "óra", `=(${sF}*${sW}*${sH})-(${fWe}*${sH})`, `=${rateCellMap.szerelo_hetvege_oradij}`);
+            addFormulaRow("Szerelésvezető óra hétköznap", "óra", `=${fWd}*${sH}`, `=${rateCellMap.szerelesvezeto_hetkoznap_oradij}`);
+            addFormulaRow("Szerelésvezető óra hétvégén", "óra", `=${fWe}*${sH}`, `=${rateCellMap.szerelesvezeto_hetvege_oradij}`);
+            addFormulaRow("Mérnök óradíj (hétköznap)", "óra", `=${mF}*${mWd}*${mH}`, `=${rateCellMap.mernok_hetkoznap_oradij}`);
+            addFormulaRow("Mérnök óradíj (hétvége)", "óra", `=${mF}*${mW}*${mH}`, `=${rateCellMap.mernok_hetvege_oradij}`);
+            addFormulaRow("Kiszállás mérnök", "óra", `=${travelTime}*2*${mO}*${mF}`, `=${rateCellMap.kiszallasi_dij_mernok}`);
+            addFormulaRow("Kiszállás szerelő", "óra", `=${travelTime}*2*${sO}*${sF}`, `=${rateCellMap.kiszallasi_dij_szerelo}`);
+            addFormulaRow("Km díj", "km", `=${tav}*2*(${sO}*${sJ}+${mO}*${mJ})`, `=${rateCellMap.km_dij}`, `=${rateCellMap.km_dij}`);
+            addFormulaRow("Kiküldetés - Mérnök", "nap", `=${mF}*${mN}*${isKulfold}`, `=${rateCellMap.kikuldeles_dij_mernok}`, `=${rateCellMap.kikuldeles_dij_mernok}`);
+            addFormulaRow("Kiküldetés - Szerelő", "nap", `=${sF}*${sN}*${isKulfold}`, `=${rateCellMap.kikuldeles_dij_szerelo}`, `=${rateCellMap.kikuldeles_dij_szerelo}`);
+            r++;
+            addFormulaRow("Szállás költség", "éj", `=${sSz}*${sF}+${mSz}*${mF}`, `=${rateCellMap.szallas_dij}*(1+${rateCellMap.szallas_szorzo}/100)`, `=${rateCellMap.szallas_dij}`);
+            r++;
+            addFormulaRow("Emelőgép bérlet", "nap", `=${eDb}*${eN}`, `=${rateCellMap.emelogep_napidij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_napidij}`);
+            addFormulaRow("Emelőgép szállítás", "alk", `=${eSz}*2`, `=${rateCellMap.emelogep_szallitas_dij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_szallitas_dij}`);
+            r++;
 
             XLSX.utils.sheet_add_aoa(ws_calc, [["Egyéb költségek:"]], { origin: r });
-            const otherCostsStartRow = r + 1;
             state.otherCosts.forEach(c => {
                 if (c.isSaved && c.description) {
                     r++;
                     const cost = c.amount;
                     const sell = c.isCostItem ? cost * (1 + (c.multiplier / 100)) : cost;
-                    XLSX.utils.sheet_add_aoa(ws_calc, [[c.description, {t:'n', v: c.quantity, z: `#,##0.00" ${c.unit || 'db'}"` }, { t: 'n', v: sell, z: HUF_FORMAT }, { t: 'n', v: c.isCostItem ? cost : 0, z: HUF_FORMAT }, { t: 'n', f: `=B${r + 1}*C${r + 1}`, z: HUF_FORMAT }]], { origin: r });
+                    XLSX.utils.sheet_add_aoa(ws_calc, [[c.description, c.unit || 'db', {t:'n', v: c.quantity}, { t: 'n', v: sell, z: HUF_FORMAT }, { t: 'n', v: c.isCostItem ? cost : 0, z: HUF_FORMAT }, { t: 'n', f: `=C${r + 1}*D${r + 1}`, z: HUF_FORMAT }]], { origin: r });
                 }
             });
             const lastDataRow = r;
             r += 2;
 
-            const totalFormula = `SUM(E${firstDataRow + 1}:E${lastDataRow + 1})`;
-            const costTotalFormula = `SUM(D${firstDataRow + 1}:D${lastDataRow + 1})`;
+            const totalFormula = `SUM(F${firstDataRow + 2}:F${lastDataRow + 1})`;
+            const costTotalFormula = `SUM(E${firstDataRow + 2}:E${lastDataRow + 1})`;
 
-            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, "Önköltség összesen", { t: 'n', f: costTotalFormula, z: HUF_FORMAT }]], { origin: r });
+            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, null, "Önköltség összesen", { t: 'n', f: costTotalFormula, z: HUF_FORMAT }]], { origin: r });
             r++;
-            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, "Ajánlati ár összesen", { t: 'n', f: totalFormula, z: HUF_FORMAT }]], { origin: r });
-            const totalCell = `E${r + 1}`;
+            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, null, "Ajánlati ár összesen", { t: 'n', f: totalFormula, z: HUF_FORMAT }]], { origin: r });
+            const totalCell = `F${r + 1}`;
             r++;
             
             const discountFormula = `-${totalCell}*${inputCellMap.discount}/100`;
-            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, "Kedvezmény", { t: 'n', f: discountFormula, z: HUF_FORMAT }]], { origin: r });
-            const discountCell = `E${r + 1}`;
+            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, null, "Kedvezmény", { t: 'n', f: discountFormula, z: HUF_FORMAT }]], { origin: r });
+            const discountCell = `F${r + 1}`;
             r++;
             
-            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, "Kedvezményes végösszeg (HUF)", { t: 'n', f: `=${totalCell}+${discountCell}`, z: HUF_FORMAT }]], { origin: r });
-            const finalHufCell = `E${r+1}`;
+            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, null, "Kedvezményes végösszeg (HUF)", { t: 'n', f: `=${totalCell}+${discountCell}`, z: HUF_FORMAT }]], { origin: r });
+            const finalHufCell = `F${r+1}`;
             r++;
 
-            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, "Kedvezményes végösszeg (EUR)", { t: 'n', f: `=${finalHufCell}/${rateCellMap.exchange_rate}`, z: EUR_FORMAT }]], { origin: r });
+            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, null, "Kedvezményes végösszeg (EUR)", { t: 'n', f: `=${finalHufCell}/${rateCellMap.exchange_rate}`, z: EUR_FORMAT }]], { origin: r });
 
-            ws_calc["!cols"] = [{ wch: 30 }, { wch: 18 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
+            ws_calc["!cols"] = [{ wch: 30 }, {wch: 10}, { wch: 15 }, { wch: 18 }, { wch: 18 }, { wch: 18 }];
             XLSX.utils.book_append_sheet(wb, ws_calc, "Kalkuláció");
             
             const offerNum = inputs.offer_number || "ajanlat";
@@ -1404,39 +1408,4 @@
         };
     </script>
 </body>
-</html>--- END OF FILE prompts/prompt_3_features.md ---
-
-
-# Funkcionális Prompt (Prompt_3) - Képességek és Működés
-
-## 1. Core Funkciók
-
-- **Valós Idejű Kalkuláció:** Az alkalmazás lelke a `calculateAndDisplay()` funkció. Ezt minden olyan eseménynek (pl. `input`, `change`) meg kell hívnia, amely a kalkuláció eredményét befolyásolhatja. A számításnak azonnalinak kell lennie, a felhasználói felületnek késleltetés nélkül kell frissülnie.
-- **Árlista Kezelés:** A felhasználónak lehetősége van váltani a betöltött árlisták (`rates.json`-ből) között. Az aktív árlista díjtételeit ideiglenesen felülírhatja az "Árlisták" gombbal elérhető modális ablakban. Ezek a változtatások nem perzisztensek, az oldal újratöltésével elvesznek.
-- **Pénznemváltás:** A HUF és EUR közötti váltás az "Árfolyam" mezőben megadott érték alapján történik. Az árfolyamot az alkalmazás induláskor megpróbálja automatikusan lekérni a `frankfurter.app` API-ról, de a felhasználó bármikor manuálisan felülírhatja.
-
-## 2. "Egyéb Költségek" Modul
-
-Ez egy kiemelt fontosságú, dinamikus modul.
-- **Hozzáadás/Törlés:** A felhasználó tetszőleges számú új költségtételt adhat hozzá, vagy törölhet meglévőket.
-- **Mentési Állapot:** Egy tétel csak akkor számít bele a végleges kalkulációba, ha "mentett" állapotban van. Egy új tétel létrehozásakor, vagy egy meglévő módosításakor a tétel "nem mentett" (`isSaved: false`) állapotba kerül. A mentést a sorvégi zöld pipa ikonnal lehet végrehajtani. A "nem mentett" állapotot egy sárga oldalsáv jelzi vizuálisan.
-- **Önköltség Logika:** Ha egy tétel "Önköltséges"-re van állítva, a megadott ár (`amount`) önköltségnek minősül, és a rendszer a `multiplier` mezőben megadott százalékos haszonkulcsot adja hozzá az eladási ár képzéséhez.
-
-## 3. Export és Nyomtatás
-
-- **Nyomtatási Nézetek:** A nyomtatási kép és a jobb oldali táblázat részletessége három szinten állítható:
-    - **Egyszerű:** Csak a fő kategóriák és végösszegek. Ügyfélnek szánt ajánlatokhoz ideális.
-    - **Részletes:** Minden tétel, mennyiséggel, egységárral.
-    - **Teljes:** A részletes nézet, kiegészítve az önköltségi oszloppal. Ez belső használatra készült, és a nyomtatási képen egy "BELSŐ HASZNÁLATRA" vízjel jelenik meg.
-- **XLS Export:** Az "Export XLS" gomb egy dinamikus, **három munkalapos** `.xlsx` fájlt generál:
-    1.  **"Beviteli Adatok":** Egy űrlapszerű lap az összes bemeneti paraméterrel.
-    2.  **"Kalkuláció":** A fő, nyomtatványszerű nézet, amely **Excel függvényekkel** hivatkozik a másik két lapra.
-    3.  **"Adatok":** Tartalmazza a díjtételeket, szorzókat, és egy cellát az árlista (évszám) kiválasztásához. A "Kalkuláció" lap `VLOOKUP` függvénnyel keresi ki innen a megfelelő díjakat.
-    - A cél, hogy a letöltött Excel fájl egy önálló, interaktív kalkulátorként működjön.
-
-## 4. Kiegészítő Funkciók
-
-- **Témaváltó:** Világos és sötét mód közötti váltás, ami a `<body>` elemen egy `light-mode` osztály kapcsolgatásával történik. Az állapotot a `localStorage`-ban kell tárolni.
-- **Súgó:** Egy modális ablakban megjelenő, a program használatát segítő rövid leírás.
-- **Visszaállítás:** Egy gomb, ami az összes beviteli mezőt törli, és újratölti az oldalt.
-- **Utazási Idő Egységváltó:** Az "Utazási idő" címkéjében az "óra" és "perc" szavakra kattintva a beviteli mező értéke és a mértékegység dinamikusan átváltódik. A `state` objektumban kell tárolni az aktuális mértékegységet.
+</html>

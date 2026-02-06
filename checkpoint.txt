@@ -1,9 +1,9 @@
 
-Checkpoint: v3.3.46 - Dinamikus, függvény-alapú Excel Export
+Checkpoint: v3.3.47 - Teljesen Dinamikus, Háromlapos Excel Export
 
-Ez a verzió a legfejlettebb exportálási funkciót vezeti be.
+Ez a verzió a webalkalmazás logikáját egy önálló, interaktív Excel fájlba ülteti át.
 
 Főbb változások:
-- **Formátum:** Az export egy kétszólamú, dinamikus `.xlsx` fájl.
-- **Működés:** A fő "Kalkuláció" lap Excel függvényekkel hivatkozik egy külön "Díjtételek" lapra, lehetővé téve a letöltött fájl utólagos, dinamikus módosítását.
+- **Formátum:** Az export egy három munkalapos (`Beviteli Adatok`, `Kalkuláció`, `Adatok`), dinamikus `.xlsx` fájl.
+- **Működés:** A generált Excel fájl egy teljes értékű, önálló kalkulátorként működik, ahol a díjtételek és a beviteli adatok módosítása azonnal frissíti a végeredményt a beépített Excel függvényeknek köszönhetően.
 - **UI:** A webalkalmazás felülete változatlan maradt.
