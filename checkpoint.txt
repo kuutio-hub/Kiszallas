@@ -1,9 +1,9 @@
 
-Checkpoint: v3.3.45 - Átalakított XLS Export
+Checkpoint: v3.3.46 - Dinamikus, függvény-alapú Excel Export
 
-Ez a verzió a felhasználói visszajelzések alapján finomítja az XLS export funkciót.
+Ez a verzió a legfejlettebb exportálási funkciót vezeti be.
 
 Főbb változások:
-- **Formátum:** A korábbi többlapos XLS exportot egyetlen, átfogó munkalap váltja fel.
-- **Tartalom:** Az új, egyoldalas export tartalmazza a projekt összes adatát egy logikus, dokumentum-szerű elrendezésben, beleértve az összes felhasznált díjtételt, szorzót és bemeneti paramétert is.
+- **Formátum:** Az export egy kétszólamú, dinamikus `.xlsx` fájl.
+- **Működés:** A fő "Kalkuláció" lap Excel függvényekkel hivatkozik egy külön "Díjtételek" lapra, lehetővé téve a letöltött fájl utólagos, dinamikus módosítását.
 - **UI:** A webalkalmazás felülete változatlan maradt.
