@@ -1,6 +1,15 @@
 
 # Változási Napló
 
+## v4.0.0 - Új Generációs Felület: "Document View"
+*Dátum: 2024-06-20*
+
+- **ARCHITEKTURÁLIS VÁLTOZÁS:** Az alkalmazás teljes felhasználói felülete és belső renderelési logikája újra lett írva. A korábbi, panelekre és különálló eredménytáblára épülő modellt egyetlen, nagy, dokumentum-szerű nézet váltotta fel.
+- **Új Funkció - Integrált Adatbevitel:** Minden beviteli mező (pl. létszám, napok száma, távolság) mostantól közvetlenül a központi kalkulációs táblázatban található, a számított eredmények mellett. Ez rendkívül gyors és intuitív adatkezelést tesz lehetővé.
+- **Új Funkció - Valós Idejű EUR Oszlop:** A kalkulációs táblázat egy új, "Összesen (EUR)" oszloppal bővült, amely a megadott árfolyam alapján azonnal mutatja az egyes tételek és a végösszeg értékét euróban.
+- **Megszűnt Elemek:** A lenyitható `<details>` panelek és a különálló jobb oldali eredménytáblázat megszüntetésre került az új, egységes nézet javára.
+- **UI Fejlesztés - Rögzített Vezérlősáv:** A globális beállítások (árlista, pénznem, kedvezmény) és a főbb műveletek (nyomtatás, export, stb.) egy képernyő tetején rögzített, mindig elérhető sávba kerültek a jobb használhatóság érdekében.
+
 ## v3.3.44 - XLS Export Funkció
 *Dátum: 2024-06-20*
 
@@ -12,27 +21,5 @@
     - `Bemeneti Adatok`: Az összes felhasznált bemeneti paraméter és díjtétel listája.
     - `Egyéb Költségek`: A manuálisan hozzáadott tételek részletes listája.
 - **Dokumentáció:** A Súgó (Használati Útmutató) frissült az új exportálási funkció leírásával.
-
-## v3.2.43 - Arculati Frissítés
-*Dátum: 2024-06-20*
-
-- **App Név:** Az alkalmazás böngésző címsorában megjelenő neve "Kiszállás"-ra módosult.
-- **Favicon:** Egyedi, a sötétkék-zöld "Industrial Seahawks" témához illeszkedő SVG favicon került beállításra (hexagonális K betű).
-
-## v3.2.42 - Javítások és PDF Esztétika
-*Dátum: 2024-06-20*
-
-### Logikai és Funkcionális Javítások
-- **Km díj módosítása:** A "Jármű km díj" mostantól nem önköltséges tétel, így nem szerepel az önköltségi összesítésben.
-- **Időváltó javítása:** Az utazási idő óra/perc átváltója stabilizálva lett, megbízhatóan végzi a konverziót.
-
-### Nyomtatási és PDF Fejlesztések
-- **Dinamikus Fájlnév:** Mentéskor a rendszer az ajánlatszámot és a dátumot javasolja fájlnévként.
-- **Vizuális Kiemelések:** A nyomtatványon hangsúlyos elválasztó vonal került az összesítés fölé, a kedvezmény sor pedig piros kiemeléssel látszik.
-- **Lábléc URL:** A professzionális lábléc mostantól tartalmazza az alkalmazás eléréséhez szükséges URL-t is.
-- **Margók:** Finomhangolt nyomtatási margók a jobb olvashatóság érdekében.
-
-## v3.2.41 - Azonnali Kalkuláció és Egységes Lábléc
-*Dátum: 2024-06-19*
 
 ... (korábbi verziók)
