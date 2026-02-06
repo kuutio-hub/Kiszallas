@@ -1,9 +1,8 @@
 
-Checkpoint: v3.3.47 - Teljesen Dinamikus, Háromlapos Excel Export
+Checkpoint: v3.3.48 - Excel Export Javítás
 
-Ez a verzió a webalkalmazás logikáját egy önálló, interaktív Excel fájlba ülteti át.
+Ez a verzió egy kritikus hibát javít az Excel export funkcióban.
 
 Főbb változások:
-- **Formátum:** Az export egy három munkalapos (`Beviteli Adatok`, `Kalkuláció`, `Adatok`), dinamikus `.xlsx` fájl.
-- **Működés:** A generált Excel fájl egy teljes értékű, önálló kalkulátorként működik, ahol a díjtételek és a beviteli adatok módosítása azonnal frissíti a végeredményt a beépített Excel függvényeknek köszönhetően.
-- **UI:** A webalkalmazás felülete változatlan maradt.
+- **Javítás:** A generált `.xlsx` fájl egy hibás számformátum miatt sérült volt, ami megnyitáskor javítási folyamatot indított az Excelben. Ez a hiba javításra került.
+- **Stabilitás:** Az export funkció ismét stabilan működik, a fájlok sérülésmentesen jönnek létre.

@@ -1,10 +1,10 @@
 
-# Költségkalkulátor v3.3.47
+# Költségkalkulátor v3.3.48
 
 ## 1. Projekt Bemutatása
 Helyszíni szerelési projektek költségbecslésére szolgáló, modern, reszponzív webalkalmazás.
 
-## 2. Legutóbbi Változások (v3.3.47)
-- **Forradalmi Excel Export:** Az export funkció mostantól egy teljesen interaktív, három munkalapos Excel kalkulátort generál (`.xlsx`). A fájl tartalmaz egy "Beviteli Adatok", egy "Kalkuláció" és egy "Adatok" munkalapot, amelyek Excel függvényekkel vannak összekötve, lehetővé téve a letöltött fájl önálló, dinamikus használatát.
+## 2. Legutóbbi Változások (v3.3.48)
+- **Hibajavítás:** Kijavítottunk egy hibát, ami a generált Excel (`.xlsx`) fájlok sérülését okozta. Az export funkció ismét megbízhatóan működik.
 
 Részletesebb információkért lásd a `changelog.md` fájlt.

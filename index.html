@@ -426,7 +426,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.3.47";
+        const APP_VERSION = "v3.3.48";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1209,8 +1209,13 @@
             if (!pkg) { alert("Nincs aktív árlista a mentéshez."); return; }
             
             const wb = XLSX.utils.book_new();
+            
+            // Define all formats as constants for clarity and to fix the corruption issue.
             const HUF_FORMAT = '#,##0" Ft"';
             const EUR_FORMAT = '#,##0.00" €"';
+            const PERCENT_FORMAT = '0" %"';
+            const RATE_FORMAT = '#,##0.00" Ft/Eur"';
+            const QTY_FORMAT = '#,##0.00';
 
             // --- SHEET 3: ADATOK ---
             const rateYearTables = {};
@@ -1239,7 +1244,7 @@
             
             rateKeys.forEach(key => {
                 const formula = `VLOOKUP(A${ws_data_aoa.length+1},D4:${rateTableEndCol}${rateKeys.length+3},MATCH($B$1,$D$3:${rateTableEndCol}$3,0),FALSE)`;
-                const row = [rateNames[key], {t:'n', f:formula, z: key.includes('_szorzo') ? '0" %"' : HUF_FORMAT}, null];
+                const row = [rateNames[key], {t:'n', f:formula, z: key.includes('_szorzo') ? PERCENT_FORMAT : HUF_FORMAT}, null];
                 rateYearNames.forEach(year => {
                     row.push(rateYearTables[year][key]);
                 });
@@ -1255,14 +1260,15 @@
             
             const yearList = rateYearNames.join(',');
             ws_data['!dataValidation'] = [{ sqref: 'B1', type: 'list', formula1: `"${yearList}"` }];
-            ws_data[`B${exchangeRateRow + 1}`].z = HUF_FORMAT.replace('"', ' Ft/"');
+            ws_data[`B${exchangeRateRow + 1}`].z = RATE_FORMAT;
+
              // Add formatting to rate tables
             for (let r = 3; r < rateKeys.length + 3; r++) {
                 for (let c = 3; c < 3 + rateYearNames.length; c++) {
                     const cellAddress = XLSX.utils.encode_cell({r, c});
                     const key = rateKeys[r-3];
                     if (ws_data[cellAddress] && typeof ws_data[cellAddress].v === 'number') {
-                         ws_data[cellAddress].z = key.includes('_szorzo') ? '0" %"' : HUF_FORMAT;
+                         ws_data[cellAddress].z = key.includes('_szorzo') ? PERCENT_FORMAT : HUF_FORMAT;
                     }
                 }
             }
@@ -1337,7 +1343,7 @@
             const addFormulaRow = (label, unit, qtyFormula, unitPriceFormula, costPriceFormula = "0") => {
                 r++;
                 const qtyCell = `C${r + 1}`, unitPriceCell = `D${r + 1}`;
-                XLSX.utils.sheet_add_aoa(ws_calc, [[label, unit, { t: 'n', f: qtyFormula, z: `#,##0.00` }, { t: 'n', f: unitPriceFormula, z: HUF_FORMAT }, { t: 'n', f: costPriceFormula, z: HUF_FORMAT }, { t: 'n', f: `=${qtyCell}*${unitPriceCell}`, z: HUF_FORMAT }]], { origin: r });
+                XLSX.utils.sheet_add_aoa(ws_calc, [[label, unit, { t: 'n', f: qtyFormula, z: QTY_FORMAT }, { t: 'n', f: unitPriceFormula, z: HUF_FORMAT }, { t: 'n', f: costPriceFormula, z: HUF_FORMAT }, { t: 'n', f: `=${qtyCell}*${unitPriceCell}`, z: HUF_FORMAT }]], { origin: r });
             };
             
             addFormulaRow("Szerelő emberóra hétköznap", "óra", `=(${sF}*${sWd}*${sH})-(${fWd}*${sH})`, `=${rateCellMap.szerelo_hetkoznap_oradij}`);

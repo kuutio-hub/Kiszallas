@@ -1,6 +1,12 @@
 
 # Változási Napló
 
+## v3.3.48 - Excel Export Javítás
+*Dátum: 2024-06-22*
+
+- **Hibajavítás:** Kijavítottunk egy kritikus hibát az XLS export funkcióban, amely a generált `.xlsx` fájl sérülését és az Excelben való megnyitáskor javítási figyelmeztetést okozott. A probléma egy hibásan generált számformátum-kódból adódott az árfolyam cellájánál.
+- **Stabilitás:** A javítással az export funkció ismét stabilan és megbízhatóan működik, a generált fájlok hibátlanul nyithatók meg.
+
 ## v3.3.47 - Teljesen Dinamikus, Háromlapos Excel Export
 *Dátum: 2024-06-21*
 
