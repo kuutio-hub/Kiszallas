@@ -1,9 +1,9 @@
 
-Checkpoint: v3.3.44 - XLS Export funkció
+Checkpoint: v3.3.45 - Átalakított XLS Export
 
-Ez a verzió egy kulcsfontosságú új funkcióval, a részletes XLS exportálással bővíti az alkalmazást.
+Ez a verzió a felhasználói visszajelzések alapján finomítja az XLS export funkciót.
 
 Főbb változások:
-- **Funkcionalitás:** Teljes körű, kliensoldali XLS generálás és letöltés a SheetJS könyvtár segítségével.
-- **Részletesség:** A generált fájl több munkalapra bontva tartalmazza a projekt összes adatát, a bemeneti paraméterektől a végeredményig.
-- **UI:** Új, egységes stílusú gomb az export funkció eléréséhez.
+- **Formátum:** A korábbi többlapos XLS exportot egyetlen, átfogó munkalap váltja fel.
+- **Tartalom:** Az új, egyoldalas export tartalmazza a projekt összes adatát egy logikus, dokumentum-szerű elrendezésben, beleértve az összes felhasznált díjtételt, szorzót és bemeneti paramétert is.
+- **UI:** A webalkalmazás felülete változatlan maradt.

@@ -15,45 +15,16 @@
 ### 2.2. Adatbevitel és Kalkuláció
 - **Dinamikus Űrlapok:** A beviteli mezők (pl. létszám, napok száma, távolság) egy külső `input_config.json` fájl alapján dinamikusan generálódnak.
 - **Valós Idejű Számítás:** Bármely beviteli mező (beleértve az "Egyéb költségek" tételeit is) értékének megváltozása azonnal, késleltetés és külön mentési művelet nélkül kiváltja az újraszámítási és megjelenítési folyamatot (`calculateAndDisplay()`).
-- **Összesítő Panel:** Egy információs panel (`#calculation-summary-header`) valós időben összefoglalja a legfontosabb bemeneti adatokat (pl. feladat leírása, résztvevők, helyszín).
-
-### 2.3. Üzleti Logika (`calculateCosts()` funkció)
-A számítási motor logikájának szigorúan meg kell felelnie a `LOGIC.md` dokumentációban leírtaknak. A főbb logikai elemek:
-- **Pénznemkezelés:** A belső számítások mindig HUF-ban történnek. Az EUR-ra való átváltás csak a megjelenítéskor, a felhasználó által megadott árfolyamon történik.
-- **Személyi Költségek Hierarchiája:** A díjak prioritási sorrendje: Mérnök > Szerelésvezető > Szerelő.
-- **Szerelésvezetői Díj Logikája:** Szerelésvezetői díj csak azokon a napokon számolható el, amikor szerelők mérnöki felügyelet nélkül dolgoznak. A rendszernek ezt dinamikusan kell kiszámolnia a szerelői és mérnöki munkanapok különbségéből.
-- **Önköltséges Tételek:** Bizonyos tételek (pl. szállás, emelőgép) és a dinamikusan hozzáadott "egyéb költségek" rendelkeznek önköltségi árral és egy továbbértékesítési szorzóval/haszonkulccsal. A kalkulációnak mindkét értéket kezelnie kell.
-- **Kedvezmény:** A végösszegből egy százalékos kedvezmény levonásának lehetőségét biztosítani kell.
-
-### 2.4. Árlista Kezelés (Munkamenet-alapú Módosítás)
-- **Adatforrás:** Az alkalmazás a rendelkezésre álló árlistákat kizárólag a `rates.json` fájlból tölti be az induláskor. Ez a fájl jelenti az "igazság egyetlen forrását".
-- **Kezelőfelület:** Egy dedikált modális ablakban (`#rate-modal`) történik.
-- **Funkció:**
-    - **Ideiglenes Felülírás:** A felhasználó a modális ablakban kiválaszthat egyet a betöltött árlisták közül, és annak bármely díjtételét **ideiglenesen felülírhatja**.
-- **Perzisztencia:** A módosítások azonnal érvénybe lépnek a kalkulációban, de **kizárólag az aktuális munkamenet (böngésző fül) élettartamára vonatkoznak**. Az oldal újratöltésekor vagy bezárásakor a módosítások elvesznek, és a rendszer újra a `rates.json` fájlban lévő eredeti értékeket tölti be. Az alkalmazás nem hoz létre, nem töröl és nem ment tartósan árlistákat a `localStorage`-ba.
-
-### 2.5. Pénzügyi Funkciók
-- **Több Pénznem:** A felhasználónak lehetősége van HUF and EUR között váltani.
-- **Árfolyamkezelés:**
-    - **Automatikus Lekérés:** Az alkalmazás induláskor lekéri a historikus EUR/HUF árfolyamokat a `frankfurter.app` API-ról, hogy a legfrissebb elérhető árfolyamot javasolja.
-    - **Gyorsítótárazás:** A lekért árfolyamok a `localStorage`-ban tárolódnak a felesleges hálózati kérések elkerülése érdekében.
-    - **Manuális Felülírás:** A felhasználó bármikor manuálisan felülírhatja az aktuális árfolyamot.
-
-### 2.6. Kimenet Generálása
-- **Részletességi Szintek:** A felhasználó három nézet közül választhat, amelyek a nyomtatási kép és az XLS export tartalmát egyaránt befolyásolják:
-    1.  **Egyszerűsített:** Csak a tételek nevei és a nettó végösszeg.
-    2.  **Részletes:** Teljes költségbontás (mennyiség, egység, egységár, összesen).
-    3.  **Belső használatú:** Mint a részletes, de tartalmazza az önköltségi oszlopot és egy "BELSŐ HASZNÁLATRA" vízjelet.
-- **PDF Generálás:**
-    - **Nyomtatási Előnézet:** A generált dokumentum egy `<iframe>`-ben, egy modális ablakban jelenik meg ellenőrzésre.
-    - **Létrehozás:** A tényleges PDF generálás a böngésző beépített "Nyomtatás" funkciójával és a "Mentés PDF-ként" opcióval történik.
+- **Összesítő Panel:** Egy információs panel (`#calculation-summary-header`) valós időben összefoglalja a legfontosabb bemeneti adatokat (pl. feladat leírása, résztveöt.
 - **XLS Exportálás:**
     - **Könyvtár:** A funkció a `SheetJS (xlsx.js)` könyvtárat használja, CDN-ről betöltve.
-    - **Struktúra:** Az exportált fájl egy több munkalapos (`.xls`) dokumentum:
-        - **Összesítés:** Egy vezetői összefoglaló a főbb projektadatokkal és a végeredményekkel.
-        - **Részletes Kalkuláció:** A képernyőn látható kalkulációs táblázat pontos mása.
-        - **Bemeneti Adatok:** Az összes felhasznált bemeneti paraméter és díjtétel listája.
-        - **Egyéb Költségek:** A manuálisan hozzáadott tételek részletes listája.
+    - **Struktúra:** Az exportált fájl egy **egyetlen, részletes munkalapot** tartalmazó (`.xls`) dokumentum, amely egy logikus, fentről lefelé haladó sorrendben épül fel:
+        1.  Projekt fejléc adatok.
+        2.  Globális beállítások (árlista, árfolyam, kedvezmény).
+        3.  Az összes alkalmazott díjtétel, beleértve a szorzókat/haszonkulcsokat is.
+        4.  Az összes beviteli paraméter.
+        5.  A teljes, részletes kalkulációs táblázat.
+        6.  A végső összesítések.
     - **Dinamikus Fájlnév:** A letöltött fájl neve az ajánlatszámból és a dátumból generálódik.
 
 ### 2.7. Felhasználói Interakciók
