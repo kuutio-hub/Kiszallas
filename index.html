@@ -426,7 +426,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.3.46";
+        const APP_VERSION = "v3.3.47";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1205,134 +1205,129 @@
 
         function handleExportXLS() {
             const inputs = getInputs();
-            const { breakdown, totalHuf, totalCostHuf, hasCostItems } = state.calculationResults;
             const pkg = state.activeRatePackage;
-            if (!pkg) return;
+            if (!pkg) { alert("Nincs aktív árlista a mentéshez."); return; }
             const allRates = { ...pkg.rates.fixed, ...pkg.rates.overridable };
-            const detailLevel = document.querySelector('input[name="print-detail"]:checked').value;
-            const showCost = hasCostItems && detailLevel === 'internal';
-
             const wb = XLSX.utils.book_new();
             const HUF_FORMAT = '#,##0" Ft"';
 
-            // --- 1. DÍJTÉTELEK MUNKALAP ---
+            // --- SHEET 3: ADATOK ---
             const rateCellMap = {};
-            const rates_ws_data = [["Azonosító", "Megnevezés", "Érték"]];
-            let rateRowIdx = 1;
+            const ws_data_aoa = [["Megnevezés", "Érték"]];
+            let dataRowIdx = 1;
             Object.entries(allRates).forEach(([key, value]) => {
                 const label = state.config.RATE_KEY_LABELS[key] || key;
-                rates_ws_data.push([key, label, value]);
-                rateCellMap[key] = `Díjtételek!$C$${rateRowIdx + 1}`;
-                rateRowIdx++;
+                ws_data_aoa.push([label, value]);
+                rateCellMap[key] = `Adatok!$B$${dataRowIdx + 1}`;
+                dataRowIdx++;
             });
-            const ws_rates = XLSX.utils.aoa_to_sheet(rates_ws_data);
-            ws_rates["!cols"] = [{ wch: 30 }, { wch: 40 }, { wch: 20 }];
-            XLSX.utils.book_append_sheet(wb, ws_rates, "Díjtételek");
-
-
-            // --- 2. KALKULÁCIÓ MUNKALAP ---
-            const ws_calc = XLSX.utils.aoa_to_sheet([]); // Kezdés üres lappal
-            const inputCellMap = {};
-            let calcRowIdx = 0;
-
-            const addCalcRow = (data, isHeader = false) => {
-                XLSX.utils.sheet_add_aoa(ws_calc, [data], { origin: calcRowIdx });
-                if (isHeader) {
-                    // Itt lehetne formázást hozzáadni, ha a SheetJS Community verzió támogatná jobban
+            ws_data_aoa.push([]); dataRowIdx++;
+            ws_data_aoa.push(["EUR/HUF Árfolyam", parseFloat(unformatCurrencyValue(inputs['exchange-rate-manual'])) || 0]);
+            rateCellMap['exchange_rate'] = `Adatok!$B$${dataRowIdx + 1}`;
+            dataRowIdx++;
+            const ws_data = XLSX.utils.aoa_to_sheet(ws_data_aoa);
+            ws_data["!cols"] = [{ wch: 40 }, { wch: 20 }];
+            for (let i = 1; i < dataRowIdx; i++) {
+                const cellAddress = `B${i + 1}`;
+                if (ws_data[cellAddress] && typeof ws_data[cellAddress].v === 'number') {
+                    const labelCell = ws_data[`A${i + 1}`];
+                    if (labelCell && typeof labelCell.v === 'string' && labelCell.v.includes('%')) {
+                        ws_data[cellAddress].z = '0" %"';
+                    } else {
+                         ws_data[cellAddress].z = HUF_FORMAT;
+                    }
                 }
-                calcRowIdx++;
+            }
+            XLSX.utils.book_append_sheet(wb, ws_data, "Adatok");
+
+            // --- SHEET 1: BEVITELI ADATOK ---
+            const inputCellMap = {};
+            const ws_inputs_aoa = [];
+            let inputRowIdx = 1;
+            const addInputGroup = (title, configItems) => {
+                ws_inputs_aoa.push([title]); inputRowIdx++;
+                configItems.forEach(config => {
+                    const label = config.label.replace(/<[^>]*>?/gm, '');
+                    const value = (config.type === 'select') ? inputs[config.id] : (parseFloat(unformatCurrencyValue(inputs[config.id])) || 0);
+                    ws_inputs_aoa.push([label, value]);
+                    inputCellMap[config.id] = `'Beviteli Adatok'!$B$${inputRowIdx}`;
+                    inputRowIdx++;
+                });
+                ws_inputs_aoa.push([]); inputRowIdx++;
             };
-
-            // Fejléc
-            addCalcRow(["Ajánlatszám:", inputs.offer_number || '-']);
-            addCalcRow(["Projektszám:", inputs.project_number || '-']);
-            addCalcRow(["Megrendelő:", inputs.customer || '-']);
-            calcRowIdx++;
-
-            // Beviteli adatok
-            addCalcRow(["Beviteli Adatok"], true);
-            Object.values(state.config.INPUT_CONFIG).flat().forEach(config => {
-                const label = config.label.replace(/<[^>]*>?/gm, '');
-                const value = parseFloat(unformatCurrencyValue(inputs[config.id])) || 0;
-                addCalcRow([label, value]);
-                inputCellMap[config.id] = `$B$${calcRowIdx}`;
+            ws_inputs_aoa.push(["Projekt Alapadatok"]); inputRowIdx++;
+            const projectData = [{ id: "offer_number", label: "Ajánlatszám"}, { id: "customer", label: "Megrendelő"}, { id: "feladat", label: "Feladat leírása"}];
+            projectData.forEach(item => {
+                ws_inputs_aoa.push([item.label, inputs[item.id]]);
+                inputCellMap[item.id] = `'Beviteli Adatok'!$B$${inputRowIdx}`;
+                inputRowIdx++;
             });
-            calcRowIdx++;
+            ws_inputs_aoa.push([]); inputRowIdx++;
+            addInputGroup("Utazás", state.config.INPUT_CONFIG.utazas);
+            addInputGroup("Szerelők", state.config.INPUT_CONFIG.szerelo);
+            addInputGroup("Mérnökök", state.config.INPUT_CONFIG.mernok);
+            addInputGroup("Eszközök", state.config.INPUT_CONFIG.emelogep);
+            const ws_inputs = XLSX.utils.aoa_to_sheet(ws_inputs_aoa);
+            ws_inputs["!cols"] = [{ wch: 40 }, { wch: 25 }];
+            XLSX.utils.book_append_sheet(wb, ws_inputs, "Beviteli Adatok");
 
-            // Kalkulációs táblázat
-            addCalcRow(["Tételek", "Mennyiség", "Egység", "Egységár", "Önköltségi Ár", "Ajánlati Ár"], true);
-            const firstCalcRow = calcRowIdx;
+            // --- SHEET 2: KALKULÁCIÓ ---
+            const ws_calc = XLSX.utils.aoa_to_sheet([]);
+            let r = 0;
+            XLSX.utils.sheet_add_aoa(ws_calc, [[inputCellMap.offer_number, null, null, inputCellMap.customer]], { origin: { r, c: 0 } });
+            XLSX.utils.sheet_add_aoa(ws_calc, [[`=HYPERLINK("https://kuutio-hub.github.io/Kiszallas/","Kalkulátor v${APP_VERSION}")`]], { origin: { r, c: 3 } });
 
-            const addFormulaRow = (label, qtyFormula, unit, unitPriceFormula, costPriceFormula) => {
-                const r = calcRowIdx;
-                const qtyCellRef = XLSX.utils.encode_cell({r, c: 1});
-                const unitPriceCellRef = XLSX.utils.encode_cell({r, c: 3});
-
-                XLSX.utils.sheet_add_aoa(ws_calc, [[label]], { origin: {r, c:0} });
-                ws_calc[qtyCellRef] = { t: 'n', f: qtyFormula, z: '#,##0.00' };
-                XLSX.utils.sheet_add_aoa(ws_calc, [[unit]], { origin: {r, c:2} });
-                ws_calc[XLSX.utils.encode_cell({r,c:3})] = { t: 'n', f: unitPriceFormula, z: HUF_FORMAT };
-                ws_calc[XLSX.utils.encode_cell({r,c:4})] = { t: 'n', f: costPriceFormula, z: HUF_FORMAT };
-                ws_calc[XLSX.utils.encode_cell({r,c:5})] = { t: 'n', f: `=${qtyCellRef}*${unitPriceCellRef}`, z: HUF_FORMAT };
-                calcRowIdx++;
-            };
-
-            // Formulák definiálása
+            r += 2;
+            XLSX.utils.sheet_add_aoa(ws_calc, [[`="fő/nap/óra (" & IF('Beviteli Adatok'!B9="kulfold", "Külföld", "Belföld") & ")"`]], { origin: { r, c: 0 } });
+            r += 2;
+            XLSX.utils.sheet_add_aoa(ws_calc, [["", "Egység", "Egységár", "Önköltségi ár", "Ajánlati ár"]], { origin: { r, c: 0 } });
+            const firstDataRow = r + 1;
             const sF = inputCellMap.szerelo_fo, sH = inputCellMap.szerelo_munkaora, sN = inputCellMap.szerelo_munkanap, sW = inputCellMap.szerelo_hetvegi_nap;
             const sSz = inputCellMap.szerelo_szallas_ejszaka, sO = inputCellMap.utazas_odautak_szama_szerelo, sJ = inputCellMap.utazas_jarmuvek_szama_szerelo;
             const mF = inputCellMap.mernok_fo, mH = inputCellMap.mernok_munkaora, mN = inputCellMap.mernok_munkanap, mW = inputCellMap.mernok_hetvegi_nap;
             const mSz = inputCellMap.mernok_szallas_ejszaka, mO = inputCellMap.utazas_odautak_szama_mernok, mJ = inputCellMap.utazas_jarmuvek_szama_mernok;
             const tav = inputCellMap.utazas_tavolsag_km, ido = inputCellMap.utazas_ido_ora;
             const eDb = inputCellMap.emelogep_db, eN = inputCellMap.emelogep_napok, eSz = inputCellMap.emelogep_szallitasok;
+            const isKulfold = `IF(${inputCellMap.location_type}="kulfold", 1, 0)`;
             const sWd = `(${sN}-${sW})`, mWd = `(${mN}-${mW})`, fWd = `MAX(0,${sWd}-${mWd})`, fWe = `MAX(0,${sW}-${mW})`;
             const travelTime = state.travelTimeUnit === 'perc' ? `(${ido}/60)` : ido;
 
-            // Tételek hozzáadása formulákkal
-            addFormulaRow("Mérnök óradíj (hétköznap)", `=${mF}*${mWd}*${mH}`, "óra", `=${rateCellMap.mernok_hetkoznap_oradij}`, "0");
-            addFormulaRow("Mérnök óradíj (hétvége)", `=${mF}*${mW}*${mH}`, "óra", `=${rateCellMap.mernok_hetvege_oradij}`, "0");
-            addFormulaRow("Szerelésvezető óradíj (hétköznap)", `=${fWd}*${sH}`, "óra", `=${rateCellMap.szerelesvezeto_hetkoznap_oradij}`, "0");
-            addFormulaRow("Szerelésvezető óradíj (hétvége)", `=${fWe}*${sH}`, "óra", `=${rateCellMap.szerelesvezeto_hetvege_oradij}`, "0");
-            addFormulaRow("Szerelő óradíj (hétköznap)", `=(${sF}*${sWd}*${sH})-(${fWd}*${sH})`, "óra", `=${rateCellMap.szerelo_hetkoznap_oradij}`, "0");
-            addFormulaRow("Szerelő óradíj (hétvége)", `=(${sF}*${sW}*${sH})-(${fWe}*${sH})`, "óra", `=${rateCellMap.szerelo_hetvege_oradij}`, "0");
-            addFormulaRow("Kiküldetés - Szerelő", `=${sF}*${sN}`, "nap", `=${rateCellMap.kikuldeles_dij_szerelo}`, `=${rateCellMap.kikuldeles_dij_szerelo}`);
-            addFormulaRow("Kiküldetés - Mérnök", `=${mF}*${mN}`, "nap", `=${rateCellMap.kikuldeles_dij_mernok}`, `=${rateCellMap.kikuldeles_dij_mernok}`);
-            addFormulaRow("Kiszállási díj - Szerelő", `=${travelTime}*2*${sO}*${sF}`, "óra", `=${rateCellMap.kiszallasi_dij_szerelo}`, "0");
-            addFormulaRow("Kiszállási díj - Mérnök", `=${travelTime}*2*${mO}*${mF}`, "óra", `=${rateCellMap.kiszallasi_dij_mernok}`, "0");
-            addFormulaRow("Jármű km díj", `=${tav}*2*(${sO}*${sJ}+${mO}*${mJ})`, "km", `=${rateCellMap.km_dij}`, `=${rateCellMap.km_dij}`);
+            const addFormulaRow = (label, qtyFormula, unit, unitPriceFormula, costPriceFormula = "0") => {
+                r++;
+                const qtyCell = `B${r + 1}`, unitPriceCell = `C${r + 1}`;
+                XLSX.utils.sheet_add_aoa(ws_calc, [[label, { t: 'n', f: qtyFormula, z: `#,##0.00" ${unit}"` }, { t: 'n', f: unitPriceFormula, z: HUF_FORMAT }, { t: 'n', f: costPriceFormula, z: HUF_FORMAT }, { t: 'n', f: `=${qtyCell}*${unitPriceCell}`, z: HUF_FORMAT }]], { origin: r });
+            };
+            
+            addFormulaRow("Szerelő emberóra hétköznap", `=(${sF}*${sWd}*${sH})-(${fWd}*${sH})`, "óra", `=${rateCellMap.szerelo_hetkoznap_oradij}`);
+            addFormulaRow("Szerelő emberóra hétvégén", `=(${sF}*${sW}*${sH})-(${fWe}*${sH})`, "óra", `=${rateCellMap.szerelo_hetvege_oradij}`);
+            addFormulaRow("Szerelésvezető óra hétköznap", `=${fWd}*${sH}`, "óra", `=${rateCellMap.szerelesvezeto_hetkoznap_oradij}`);
+            addFormulaRow("Szerelésvezető óra hétvégén", `=${fWe}*${sH}`, "óra", `=${rateCellMap.szerelesvezeto_hetvege_oradij}`);
+            addFormulaRow("Mérnök óradíj (hétköznap)", `=${mF}*${mWd}*${mH}`, "óra", `=${rateCellMap.mernok_hetkoznap_oradij}`);
+            addFormulaRow("Mérnök óradíj (hétvége)", `=${mF}*${mW}*${mH}`, "óra", `=${rateCellMap.mernok_hetvege_oradij}`);
+            addFormulaRow("Kiszállás mérnök", `=${travelTime}*2*${mO}*${mF}`, "óra", `=${rateCellMap.kiszallasi_dij_mernok}`);
+            addFormulaRow("Kiszállás szerelő", `=${travelTime}*2*${sO}*${sF}`, "óra", `=${rateCellMap.kiszallasi_dij_szerelo}`);
+            addFormulaRow("Km díj", `=${tav}*2*(${sO}*${sJ}+${mO}*${mJ})`, "km", `=${rateCellMap.km_dij}`, `=${rateCellMap.km_dij}`);
+            addFormulaRow("Kiküldetés - Mérnök", `=${mF}*${mN}*${isKulfold}`, "nap", `=${rateCellMap.kikuldeles_dij_mernok}`, `=${rateCellMap.kikuldeles_dij_mernok}`);
+            addFormulaRow("Kiküldetés - Szerelő", `=${sF}*${sN}*${isKulfold}`, "nap", `=${rateCellMap.kikuldeles_dij_szerelo}`, `=${rateCellMap.kikuldeles_dij_szerelo}`);
+            r++;
             addFormulaRow("Szállás költség", `=${sSz}*${sF}+${mSz}*${mF}`, "éj", `=${rateCellMap.szallas_dij}*(1+${rateCellMap.szallas_szorzo}/100)`, `=${rateCellMap.szallas_dij}`);
-            addFormulaRow("Emelőgép napidíj", `=${eDb}*${eN}`, "nap", `=${rateCellMap.emelogep_napidij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_napidij}`);
+            r++;
+            addFormulaRow("Emelőgép bérlet", `=${eDb}*${eN}`, "nap", `=${rateCellMap.emelogep_napidij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_napidij}`);
             addFormulaRow("Emelőgép szállítás", `=${eSz}*2`, "alk", `=${rateCellMap.emelogep_szallitas_dij}*(1+${rateCellMap.emelogep_szorzo}/100)`, `=${rateCellMap.emelogep_szallitas_dij}`);
-
-            // Egyéb költségek (statikus értékekkel)
+            r++;
+            XLSX.utils.sheet_add_aoa(ws_calc, [["Egyéb költségek:"]], { origin: r });
             state.otherCosts.forEach(c => {
                 if (c.isSaved && c.description) {
+                    r++;
                     const cost = c.amount;
                     const sell = c.isCostItem ? cost * (1 + (c.multiplier / 100)) : cost;
-                    XLSX.utils.sheet_add_aoa(ws_calc, [[c.description, c.quantity, c.unit, sell, c.isCostItem ? cost : 0, c.quantity * sell]], { origin: calcRowIdx });
-                    calcRowIdx++;
+                    XLSX.utils.sheet_add_aoa(ws_calc, [[c.description, {t:'n', v: c.quantity, z: `#,##0.00" ${c.unit || 'db'}"` }, { t: 'n', v: sell, z: HUF_FORMAT }, { t: 'n', v: c.isCostItem ? cost : 0, z: HUF_FORMAT }, { t: 'n', f: `=B${r + 1}*C${r + 1}`, z: HUF_FORMAT }]], { origin: r });
                 }
             });
-            const lastCalcRow = calcRowIdx - 1;
-
-            // Összesítés
-            calcRowIdx++;
-            const offerCol = "F", costCol = "E";
-            const totalFormula = `SUM(${offerCol}${firstCalcRow + 1}:${offerCol}${lastCalcRow + 1})`;
-            addCalcRow(['', '', '', '', 'Összesen:', {t:'n', f: totalFormula, z: HUF_FORMAT}]);
-            const totalCell = `F${calcRowIdx}`;
-            
-            const discountPercent = parseFloat(unformatCurrencyValue(inputs['discount-input'])) || 0;
-            if (discountPercent > 0) {
-                addCalcRow(['', '', '', '', `Kedvezmény (${discountPercent}%):`, {t:'n', f: `-${totalCell}*${discountPercent/100}`, z: HUF_FORMAT}]);
-                const discountCell = `F${calcRowIdx}`;
-                addCalcRow(['', '', '', '', 'Kedvezményes Végösszeg:', {t:'n', f: `=${totalCell}+${discountCell}`, z: HUF_FORMAT}]);
-            }
-            if (showCost) {
-                const costTotalFormula = `SUM(${costCol}${firstCalcRow + 1}:${costCol}${lastCalcRow + 1})`;
-                addCalcRow(['', '', '', '', 'Önköltség Összesen:', {t:'n', f: costTotalFormula, z: HUF_FORMAT}]);
-            }
-            
-            ws_calc["!cols"] = [{ wch: 40 }, { wch: 15 }, { wch: 10 }, { wch: 20 }, { wch: 20 }, { wch: 20 }];
+            const lastDataRow = r;
+            r += 2;
+            XLSX.utils.sheet_add_aoa(ws_calc, [[null, null, null, "Összesen", { t: 'n', f: `SUM(E${firstDataRow + 1}:E${lastDataRow + 1})`, z: HUF_FORMAT }]], { origin: r });
+            ws_calc["!cols"] = [{ wch: 30 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
             XLSX.utils.book_append_sheet(wb, ws_calc, "Kalkuláció");
             
             const offerNum = inputs.offer_number || "ajanlat";
