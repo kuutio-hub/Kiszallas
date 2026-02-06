@@ -1,9 +1,10 @@
+
 # Projekt Prompt (Prompt_1) - Költségkalkulátor Alkalmazás
 
 ## 1. Projekt Célja és Áttekintése
 
 **Alkalmazás Neve:** Költségkalkulátor
-**Cél:** Egy teljes körű, egyoldalas webalkalmazás (SPA) létrehozása, amely képes precízen kiszámítani egy helyszíni szerelési projekt összes költségét. Az alkalmazásnak kezelnie kell a munkaerő, utazás, szállás, eszközök és egyéb tételek költségeit, majd ezek alapján professzionális, nyomtatható ajánlatokat kell generálnia.
+**Cél:** Egy teljes körű, egyoldalas webalkalmazás (SPA) létrehozása, amely képes precízen kiszámítani egy helyszíni szerelési projekt összes költségét. Az alkalmazásnak kezelnie kell a munkaerő, utazás, szállás, eszközök és egyéb tételek költségeit, majd ezek alapján professzionális, nyomtatható ajánlatokat és részletes XLS exportokat kell generálnia.
 
 ## 2. Funkcionális Követelmények
 
@@ -38,14 +39,22 @@ A számítási motor logikájának szigorúan meg kell felelnie a `LOGIC.md` dok
     - **Gyorsítótárazás:** A lekért árfolyamok a `localStorage`-ban tárolódnak a felesleges hálózati kérések elkerülése érdekében.
     - **Manuális Felülírás:** A felhasználó bármikor manuálisan felülírhatja az aktuális árfolyamot.
 
-### 2.6. Nyomtatás és PDF Generálás
-- **Részletességi Szintek:** A felhasználó három nyomtatási nézet közül választhat:
+### 2.6. Kimenet Generálása
+- **Részletességi Szintek:** A felhasználó három nézet közül választhat, amelyek a nyomtatási kép és az XLS export tartalmát egyaránt befolyásolják:
     1.  **Egyszerűsített:** Csak a tételek nevei és a nettó végösszeg.
     2.  **Részletes:** Teljes költségbontás (mennyiség, egység, egységár, összesen).
     3.  **Belső használatú:** Mint a részletes, de tartalmazza az önköltségi oszlopot és egy "BELSŐ HASZNÁLATRA" vízjelet.
-- **Nyomtatási Előnézet:** A generált dokumentum egy `<iframe>`-ben, egy modális ablakban jelenik meg ellenőrzésre.
-- **PDF Létrehozás:** A tényleges PDF generálás a böngésző beépített "Nyomtatás" funkciójával és a "Mentés PDF-ként" opcióval történik, a professzionális minőség érdekében.
-- **Egységes Lábléc:** Minden nyomtatott dokumentumnak (kalkuláció és árlista) azonos stílusú, verziószámot és dátumot tartalmazó lábléccel kell rendelkeznie.
+- **PDF Generálás:**
+    - **Nyomtatási Előnézet:** A generált dokumentum egy `<iframe>`-ben, egy modális ablakban jelenik meg ellenőrzésre.
+    - **Létrehozás:** A tényleges PDF generálás a böngésző beépített "Nyomtatás" funkciójával és a "Mentés PDF-ként" opcióval történik.
+- **XLS Exportálás:**
+    - **Könyvtár:** A funkció a `SheetJS (xlsx.js)` könyvtárat használja, CDN-ről betöltve.
+    - **Struktúra:** Az exportált fájl egy több munkalapos (`.xls`) dokumentum:
+        - **Összesítés:** Egy vezetői összefoglaló a főbb projektadatokkal és a végeredményekkel.
+        - **Részletes Kalkuláció:** A képernyőn látható kalkulációs táblázat pontos mása.
+        - **Bemeneti Adatok:** Az összes felhasznált bemeneti paraméter és díjtétel listája.
+        - **Egyéb Költségek:** A manuálisan hozzáadott tételek részletes listája.
+    - **Dinamikus Fájlnév:** A letöltött fájl neve az ajánlatszámból és a dátumból generálódik.
 
 ### 2.7. Felhasználói Interakciók
 - **Dinamikus "Egyéb Költségek":** A felhasználó tetszőleges számú egyedi költségtételt adhat hozzá a kalkulációhoz. Minden tételhez megadható leírás, mennyiség, egység, egységár (önköltség), és beállítható, hogy önköltséges tételként (egyedi haszonkulccsal) vagy normál tételként szerepeljen. **A bevitt adatok azonnal, gombnyomás nélkül frissítik a kalkulációt.**

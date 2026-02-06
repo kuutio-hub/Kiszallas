@@ -1,8 +1,9 @@
 
-Checkpoint: v3.2.43 - Arculati finomhangolás
+Checkpoint: v3.3.44 - XLS Export funkció
 
-Ez a verzió a vizuális identitás erősítését célozta meg.
+Ez a verzió egy kulcsfontosságú új funkcióval, a részletes XLS exportálással bővíti az alkalmazást.
 
 Főbb változások:
-- **Identitás:** Az alkalmazás neve "Kiszállás", és egyedi, témához illő favicont kapott.
-- **Stabilitás:** Megőrizte a v3.2.42 logikai és nyomtatási fejlesztéseit.
+- **Funkcionalitás:** Teljes körű, kliensoldali XLS generálás és letöltés a SheetJS könyvtár segítségével.
+- **Részletesség:** A generált fájl több munkalapra bontva tartalmazza a projekt összes adatát, a bemeneti paraméterektől a végeredményig.
+- **UI:** Új, egységes stílusú gomb az export funkció eléréséhez.

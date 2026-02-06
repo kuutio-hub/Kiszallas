@@ -1,6 +1,18 @@
 
 # Változási Napló
 
+## v3.3.44 - XLS Export Funkció
+*Dátum: 2024-06-20*
+
+- **Új Funkció:** Az alkalmazás mostantól képes a teljes kalkulációt egy részletes, többlapos XLS fájlba exportálni.
+- **UI Bővítés:** Egy új "Export XLS" gomb került az akciósávba a nyomtatási vezérlők mellé.
+- **Részletes Export:** A generált XLS fájl több munkalapot tartalmaz:
+    - `Összesítés`: Vezetői összefoglaló a projekt főbb adataival és a végeredménnyel.
+    - `Részletes Kalkuláció`: A képernyőn látható kalkulációs táblázat pontos mása.
+    - `Bemeneti Adatok`: Az összes felhasznált bemeneti paraméter és díjtétel listája.
+    - `Egyéb Költségek`: A manuálisan hozzáadott tételek részletes listája.
+- **Dokumentáció:** A Súgó (Használati Útmutató) frissült az új exportálási funkció leírásával.
+
 ## v3.2.43 - Arculati Frissítés
 *Dátum: 2024-06-20*
 

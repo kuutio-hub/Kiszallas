@@ -8,6 +8,7 @@
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpolygon points='50 5, 95 27.5, 95 72.5, 50 95, 5 72.5, 5 27.5' fill='%23002244' stroke='%2369BE28' stroke-width='8'/%3E%3Ctext x='50' y='75' font-family='sans-serif' font-size='60' font-weight='bold' fill='%2369BE28' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
     <style>
         @font-face {
             font-family: 'DejaVuSans';
@@ -295,6 +296,10 @@
                         <button id="manage-rates-btn" class="btn">
                             <span role="img" aria-hidden="true" class="btn-icon">⚙️</span><span class="btn-text">Árlisták</span>
                         </button>
+                        <button id="export-xls-btn" class="btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+                            <span class="btn-text">Export XLS</span>
+                        </button>
                         <div class="print-controls-group">
                             <div class="print-group">
                                 <label class="radio-pill"><input type="radio" name="print-detail" value="simple" checked><span>Egyszerű</span></label>
@@ -400,13 +405,14 @@
                 <h3>Díjtételek Módosítása</h3>
                 <p>Az "Árlisták" gombra kattintva felugró ablakban a kiválasztott árlista **bármely díjtételét ideiglenesen felülírhatja** az aktuális kalkulációhoz. Ezek a változtatások nem mentődnek el, az oldal újratöltésével visszaállnak az eredeti értékekre.</p>
                 
-                <h3>Nyomtatás és Nézetek</h3>
-                 <p>Az alsó sávban három nézet közül választhat, amelyek a jobb oldali táblázat és a nyomtatási kép részletességét is befolyásolják:</p>
+                <h3>Nyomtatás, Export és Nézetek</h3>
+                 <p>Az alsó sávban három nézet közül választhat, amelyek a jobb oldali táblázat, a nyomtatási kép és az XLS export részletességét is befolyásolják:</p>
                  <ul>
                     <li><strong>Egyszerű:</strong> Csak a főbb kategóriák és a végösszegek látszanak. Ideális ügyfélajánlatokhoz.</li>
                     <li><strong>Részletes:</strong> Minden tételt megjelenít mennyiséggel, egységárral és összesített árral.</li>
                     <li><strong>Teljes:</strong> A részletes nézet kiegészítve az önköltségi oszloppal. Ez a nézet belső használatra készült, a nyomtatási képen vízjellel ellátva.</li>
                 </ul>
+                <p>Az **Export XLS** gomb egy többlapos Excel fájlt generál, amely tartalmazza a projekt összes adatát: egy vezetői összefoglalót, a részletes kalkulációt, a bemeneti paramétereket és az összes díjtételt.</p>
 
                 <h3>Mobilnézet</h3>
                 <p>Kisebb képernyőkön (pl. tableten vagy telefonon) az eredménytáblázat el van rejtve. A jobb alsó sarokban megjelenő <strong>lebegő grafikon (📊) gombbal</strong> tudja megjeleníteni vagy elrejteni.</p>
@@ -420,7 +426,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.2.43";
+        const APP_VERSION = "v3.3.44";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -654,6 +660,7 @@
                 
                 D('manage-rates-btn').onclick = openRateManager;
                 D('print-btn').onclick = () => handlePrint();
+                D('export-xls-btn').onclick = handleExportXLS;
 
                 const mobileResultsBtn = D('mobile-results-btn');
                 const resultsPanel = D('results-panel');
@@ -980,7 +987,6 @@
                 docTitle = `${offerNum}-Kalk-${dateStr}`;
             }
             
-            // Beállítjuk a címet, hogy a böngésző fájlnévként javasolja
             document.title = docTitle;
             iframe.srcdoc = printableHtml;
             iframe.onload = () => { iframe.contentWindow.scrollTo(0, 0); };
@@ -1195,6 +1201,101 @@
                 label.innerHTML = `Utazási idő (<span class="travel-unit-toggle">óra</span>, oda)`;
             }
             calculateAndDisplay();
+        }
+
+        function handleExportXLS() {
+            const inputs = getInputs();
+            const { breakdown, totalHuf, totalCostHuf, hasCostItems } = state.calculationResults;
+            const currency = state.activeCurrency;
+            const discount = inputs['discount-input'] || 0;
+            const detailLevel = document.querySelector('input[name="print-detail"]:checked').value;
+            const showCost = hasCostItems && detailLevel === 'internal';
+
+            const wb = XLSX.utils.book_new();
+
+            // 1. Összesítés Munkalap
+            const summaryData = [
+                ["Projekt Összesítő"],
+                [],
+                ["Ajánlatszám:", inputs.offer_number || '-'],
+                ["Projektszám:", inputs.project_number || '-'],
+                ["Projekt neve:", inputs.project_name || '-'],
+                ["Megrendelő:", inputs.customer || '-'],
+                ["Dátum:", new Date(inputs.calculation_date).toLocaleDateString('hu-HU')],
+                ["Készítő:", inputs.creator_name || '-'],
+                [],
+                ["Pénzügyi Összesítés"],
+                [],
+                [`Végösszeg (${currency}):`, convertPrice(totalHuf, currency)]
+            ];
+            if (discount > 0) {
+                const totalSellFinal = convertPrice(totalHuf, currency);
+                const discountedTotal = totalSellFinal * (1 - discount / 100);
+                summaryData.push([`Kedvezmény (${discount}%):`, -(totalSellFinal - discountedTotal)]);
+                summaryData.push([`Kedvezményes Végösszeg (${currency}):`, discountedTotal]);
+            }
+            if (showCost) {
+                summaryData.push([`Önköltség Összesen (${currency}):`, convertPrice(totalCostHuf, currency)]);
+            }
+            const ws_summary = XLSX.utils.aoa_to_sheet(summaryData);
+            ws_summary['!cols'] = [{ wch: 30 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, ws_summary, "Összesítés");
+
+            // 2. Részletes Kalkuláció Munkalap
+            let breakdownHeader;
+            if (detailLevel === 'simple') {
+                breakdownHeader = ["Költségnem", "Összesen"];
+            } else {
+                breakdownHeader = ["Költségnem", "Menny.", "Egys.", "Egységár", ...(showCost ? ["Önköltség"] : []), "Összesen"];
+            }
+            const breakdownData = breakdown.map(item => {
+                if (detailLevel === 'simple') {
+                    return [item.label, convertPrice(item.totalHuf, currency)];
+                }
+                const row = [item.label, item.quantity, item.unit, convertPrice(item.unitPriceHuf, currency)];
+                if (showCost) row.push(item.isCostItem ? convertPrice(item.totalCostHuf, currency) : '');
+                row.push(convertPrice(item.totalHuf, currency));
+                return row;
+            });
+            const ws_breakdown = XLSX.utils.aoa_to_sheet([breakdownHeader, ...breakdownData]);
+            ws_breakdown['!cols'] = [{ wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+            XLSX.utils.book_append_sheet(wb, ws_breakdown, "Részletes Kalkuláció");
+
+            // 3. Bemeneti Adatok és Díjak
+            const inputsData = [["Bemeneti Paraméterek"], [], ["Paraméter", "Érték"]];
+            Object.values(state.config.INPUT_CONFIG).flat().forEach(config => {
+                 const label = config.label.replace(/<[^>]*>?/gm, ''); // HTML tagek eltávolítása
+                 inputsData.push([label, inputs[config.id]]);
+            });
+            inputsData.push([]);
+            inputsData.push(["Alkalmazott Díjtételek"], [], ["Díjtétel", "Érték (HUF)"]);
+            const allRates = { ...state.activeRatePackage.rates.fixed, ...state.activeRatePackage.rates.overridable };
+            Object.entries(allRates).forEach(([key, value]) => {
+                inputsData.push([state.config.RATE_KEY_LABELS[key] || key, value]);
+            });
+            const ws_inputs = XLSX.utils.aoa_to_sheet(inputsData);
+            ws_inputs['!cols'] = [{ wch: 40 }, { wch: 20 }];
+            XLSX.utils.book_append_sheet(wb, ws_inputs, "Bemeneti Adatok");
+
+            // 4. Egyéb Költségek
+            if (state.otherCosts.length > 0) {
+                const otherCostsHeader = ["Leírás", "Mennyiség", "Egység", "Ár/Önköltség", "Önköltséges?", "Haszonkulcs (%)"];
+                const otherCostsData = state.otherCosts.map(item => [
+                    item.description,
+                    item.quantity,
+                    item.unit,
+                    item.amount,
+                    item.isCostItem ? 'Igen' : 'Nem',
+                    item.isCostItem ? item.multiplier : '-'
+                ]);
+                const ws_other = XLSX.utils.aoa_to_sheet([otherCostsHeader, ...otherCostsData]);
+                ws_other['!cols'] = [{ wch: 40 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+                XLSX.utils.book_append_sheet(wb, ws_other, "Egyéb Költségek");
+            }
+            
+            const offerNum = inputs.offer_number || "ajanlat";
+            const dateStr = inputs.calculation_date || new Date().toISOString().split('T')[0];
+            XLSX.writeFile(wb, `${offerNum}-Kalkulacio-${dateStr}.xls`);
         }
 
         D('password-form').onsubmit = (e) => {
