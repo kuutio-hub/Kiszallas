@@ -1,8 +1,8 @@
 
-Checkpoint: v3.3.48 - Excel Export Javítás
+Checkpoint: v3.3.49 - Robosztus Excel Képlet Javítás
 
-Ez a verzió egy kritikus hibát javít az Excel export funkcióban.
+Ez a verzió egy kritikus hibát javít a generált Excel fájl dinamikus képleteiben.
 
 Főbb változások:
-- **Javítás:** A generált `.xlsx` fájl egy hibás számformátum miatt sérült volt, ami megnyitáskor javítási folyamatot indított az Excelben. Ez a hiba javításra került.
-- **Stabilitás:** Az export funkció ismét stabilan működik, a fájlok sérülésmentesen jönnek létre.
+- **Javítás:** A korábbi, instabil VLOOKUP (FKERES) alapú képletet egy megbízhatóbb INDEX/MATCH (INDEX/HOL.VAN) kombinációra cseréltük.
+- **Stabilitás:** A javítás biztosítja, hogy a letöltött Excel fájlban az árlisták közötti váltás minden esetben hibátlanul működjön.

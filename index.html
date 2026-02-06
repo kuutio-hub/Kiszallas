@@ -426,7 +426,7 @@
 
     <script type="module">
         const ADMIN_PASSWORD = 'Kalkulator_2026';
-        const APP_VERSION = "v3.3.48";
+        const APP_VERSION = "v3.3.49";
 
         const RATE_EDITOR_GROUPS = [
             {
@@ -1233,8 +1233,11 @@
             
             const rateYearNames = Object.keys(rateYearTables);
             const dataSheetHeader = ["Díjtétel", "Kiválasztott érték", null, ...rateYearNames];
-            const rateTableWidth = rateYearNames.length + 1;
-            const rateTableEndCol = XLSX.utils.encode_col(2 + rateTableWidth);
+            
+            // Correctly calculate the end column of the rate data.
+            // Column D is index 3. The data spans for rateYearNames.length columns.
+            const lastRateDataColumnIndex = 3 + rateYearNames.length - 1;
+            const rateTableEndCol = XLSX.utils.encode_col(lastRateDataColumnIndex);
 
             const ws_data_aoa = [
                 ["Aktív árlista (évszám):", pkg.name, null, "Választható árlisták:"],
@@ -1243,7 +1246,8 @@
             ];
             
             rateKeys.forEach(key => {
-                const formula = `VLOOKUP(A${ws_data_aoa.length+1},D4:${rateTableEndCol}${rateKeys.length+3},MATCH($B$1,$D$3:${rateTableEndCol}$3,0),FALSE)`;
+                // Switched from VLOOKUP to a more robust INDEX/MATCH/MATCH combination.
+                const formula = `INDEX(D4:${rateTableEndCol}${rateKeys.length+3}, MATCH(A${ws_data_aoa.length+1}, $A$4:$A$${rateKeys.length+3}, 0), MATCH($B$1, $D$3:${rateTableEndCol}$3, 0))`;
                 const row = [rateNames[key], {t:'n', f:formula, z: key.includes('_szorzo') ? PERCENT_FORMAT : HUF_FORMAT}, null];
                 rateYearNames.forEach(year => {
                     row.push(rateYearTables[year][key]);
